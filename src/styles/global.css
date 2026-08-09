@@ -1,0 +1,272 @@
+@import "../../assets/styles.css";
+
+/* Smooth local hover “wind” (used in hang-sway keyframes) */
+@property --hover-boost {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* Route-level layout (nav is fixed) */
+.page-root {
+  min-height: 100vh;
+  padding-top: 96px; /* keep first content below the fixed nav */
+}
+
+.page {
+  padding-bottom: 6rem;
+}
+
+/* Keep button nav link visually identical to anchor links */
+.nav-link-btn {
+  font-family: var(--sans);
+  font-size: var(--text-nav-link, 18px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  text-transform: lowercase;
+  position: relative;
+  transition: color .2s;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: none;
+}
+
+.nav-link-btn:hover { color: var(--ink); }
+
+/* Homepage landing hero + flow */
+.home-hero {
+  min-height: calc(100vh - 96px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.6rem 1.5rem 2rem;
+  border-top: none; /* avoid double rule with global `section` border */
+}
+
+.home-hanging {
+  position: relative;
+  /* Wide on large screens so %‑based letters use horizontal space; caps avoid ultra‑wide stretch */
+  width: min(97vw, 1640px);
+  margin-left: auto;
+  margin-right: auto;
+  height: 82vh;
+  min-height: 560px;
+}
+
+@media (min-width: 1600px) {
+  .home-hanging {
+    width: min(94vw, 1760px);
+  }
+}
+
+/*
+ * Outer: fixed anchor in layout space (top of line = suspension point).
+ * Inner: pendulum — transform-origin top center so line + letter swing as one rigid body.
+ */
+.hang-letter {
+  --hover-boost: 0;
+  position: absolute;
+  transform: translateX(-50%);
+  transition: --hover-boost 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hang-letter:hover {
+  --hover-boost: 1;
+}
+
+.hang-letter__swing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  transform-origin: top center;
+  will-change: transform;
+  animation: hang-sway 6.8s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.hang-line {
+  width: 0.5px;
+  height: var(--hangH, min(40vh, 300px));
+  transform-origin: top center;
+  background: linear-gradient(
+    to bottom,
+    rgba(25, 23, 19, 0.04) 0%,
+    rgba(25, 23, 19, 0.14) 45%,
+    rgba(25, 23, 19, 0.2) 100%
+  );
+  border-radius: 0;
+  flex-shrink: 0;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hang-letter:hover .hang-line {
+  /* Subtle “tension” — line tightens/loosens slightly while anchor stays fixed */
+  transform: scaleY(1.014);
+}
+
+.hang-text {
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  font-size: var(--letter-size, 2.65rem);
+  user-select: none;
+}
+
+.hang-text--serif {
+  font-family: var(--serif);
+  font-weight: 400;
+}
+.hang-text--mono {
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  font-weight: 400;
+}
+
+/*
+ * Pendulum sway: rotation + small horizontal drift (arc), amplitude from global scroll wind
+ * and local --hover-boost (0→1) for the hovered letter only.
+ */
+@keyframes hang-sway {
+  0%, 100% {
+    transform:
+      rotate(
+        calc(
+          -1deg
+          - (var(--wind-boost, 0) * 1.35deg)
+          - (var(--hover-boost, 0) * 2.25deg)
+        )
+      )
+      translateX(
+        calc(
+          -2px
+          - (var(--wind-boost, 0) * 3px)
+          - (var(--hover-boost, 0) * 5px)
+        )
+      );
+  }
+  50% {
+    transform:
+      rotate(
+        calc(
+          1.05deg
+          + (var(--wind-boost, 0) * 3.6deg)
+          + (var(--hover-boost, 0) * 4.1deg)
+        )
+      )
+      translateX(
+        calc(
+          2px
+          + (var(--wind-boost, 0) * 4px)
+          + (var(--hover-boost, 0) * 6px)
+        )
+      );
+  }
+}
+
+/* Home middle navigation — full-width rows, serif + tracking, row-level hover */
+.home-entry {
+  padding: 0.35rem 0 0.85rem;
+  border-top: none;
+  background: var(--paper2);
+}
+.home-entry-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-top: none;
+}
+.home-entry-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  text-decoration: none;
+  color: var(--ink-soft);
+  font-family: var(--serif);
+  font-size: clamp(1.32rem, 3.1vw, 2.05rem);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  padding: 0.88rem 1.5rem;
+  min-height: 0;
+  border-bottom: none;
+  background: transparent;
+  transition:
+    background 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.home-entry-item:hover,
+.home-entry-item:focus-visible {
+  color: var(--ink);
+  background: rgba(201, 169, 110, 0.14);
+}
+.home-entry-item:focus-visible {
+  outline: 2px solid rgba(201, 169, 110, 0.45);
+  outline-offset: -2px;
+}
+.home-entry-item:active {
+  background: rgba(201, 169, 110, 0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hang-letter {
+    --hover-boost: 0 !important;
+    transition: none;
+  }
+  .hang-letter__swing {
+    animation: none;
+  }
+  .hang-letter:hover .hang-line {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-root {
+    padding-top: 88px;
+  }
+  .home-hero {
+    min-height: calc(100vh - 88px);
+  }
+  .home-hanging {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    min-height: 520px;
+    padding: 0 0.5rem;
+  }
+  .hang-letter {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    transform: none;
+    margin: 0.45rem auto;
+  }
+  .hang-letter__swing {
+    animation: none;
+  }
+  .hang-letter:hover .hang-line {
+    transform: none;
+  }
+  .hang-line {
+    height: min(20vh, 120px) !important;
+  }
+  .home-entry {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .home-entry-item {
+    font-size: clamp(1.22rem, 5.2vw, 1.82rem);
+    letter-spacing: 0.1em;
+    padding: 0.75rem 1.25rem;
+  }
+}
+
