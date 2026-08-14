@@ -9,6 +9,8 @@ const HOVER_GROUPS = [
   { selector: "section#contact", className: "cursor-dark-surface" },
 ];
 
+const ANY_GROUP_SELECTOR = HOVER_GROUPS.map(({ selector }) => selector).join(", ");
+
 export default function CustomCursor() {
   useEffect(() => {
     const dot = document.getElementById("cursor-dot");
@@ -46,6 +48,7 @@ export default function CustomCursor() {
     // later client-side route changes are matched too — CustomCursor never
     // remounts across routes, since it lives outside <Routes> in App.jsx.
     const onPointerOver = (e) => {
+      if (!e.target.closest(ANY_GROUP_SELECTOR)) return;
       HOVER_GROUPS.forEach(({ selector, className }) => {
         const match = e.target.closest(selector);
         if (match && !match.contains(e.relatedTarget)) {
@@ -54,11 +57,14 @@ export default function CustomCursor() {
       });
     };
     const onPointerOut = (e) => {
+      if (!e.target.closest(ANY_GROUP_SELECTOR)) return;
       HOVER_GROUPS.forEach(({ selector, className }) => {
         const match = e.target.closest(selector);
-        if (match && !match.contains(e.relatedTarget)) {
-          document.body.classList.remove(className);
-        }
+        if (!match || match.contains(e.relatedTarget)) return;
+        // Moving to a sibling in the same group shouldn't flicker the class
+        // off and back on within the same tick.
+        if (e.relatedTarget && e.relatedTarget.closest(selector)) return;
+        document.body.classList.remove(className);
       });
     };
 
