@@ -2,10 +2,10 @@ import { useEffect } from "react";
 
 const HOVER_GROUPS = [
   {
-    selector: "img, .hero-photo-wrap, .project-corner-link, .resume-download-here",
+    selector: "img, .project-corner-link, .resume-download-here",
     className: "cursor-hover",
   },
-  { selector: "a, button, .ct-item, .social-btn", className: "cursor-link" },
+  { selector: "a, button, .ct-item", className: "cursor-link" },
   { selector: "section#contact", className: "cursor-dark-surface" },
 ];
 
