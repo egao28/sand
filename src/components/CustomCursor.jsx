@@ -1,4 +1,15 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
+
+const HOVER_GROUPS = [
+  {
+    selector: "img, .hero-photo-wrap, .project-corner-link, .resume-download-here",
+    className: "cursor-hover",
+  },
+  { selector: "a, button, .ct-item, .social-btn", className: "cursor-link" },
+  { selector: "section#contact", className: "cursor-dark-surface" },
+];
+
+const ANY_GROUP_SELECTOR = HOVER_GROUPS.map(({ selector }) => selector).join(", ");
 
 export default function CustomCursor() {
   useEffect(() => {
@@ -33,48 +44,38 @@ export default function CustomCursor() {
 
     raf = window.requestAnimationFrame(animate);
 
-    const hoverTargets = ["img", ".hero-photo-wrap", ".project-art", ".project-info", ".resume-btn"];
-    const hoverEls = Array.from(document.querySelectorAll(hoverTargets.join(",")));
+    // Delegated on document (not queried once at mount) so elements from
+    // later client-side route changes are matched too — CustomCursor never
+    // remounts across routes, since it lives outside <Routes> in App.jsx.
+    const onPointerOver = (e) => {
+      if (!e.target.closest(ANY_GROUP_SELECTOR)) return;
+      HOVER_GROUPS.forEach(({ selector, className }) => {
+        const match = e.target.closest(selector);
+        if (match && !match.contains(e.relatedTarget)) {
+          document.body.classList.add(className);
+        }
+      });
+    };
+    const onPointerOut = (e) => {
+      if (!e.target.closest(ANY_GROUP_SELECTOR)) return;
+      HOVER_GROUPS.forEach(({ selector, className }) => {
+        const match = e.target.closest(selector);
+        if (!match || match.contains(e.relatedTarget)) return;
+        // Moving to a sibling in the same group shouldn't flicker the class
+        // off and back on within the same tick.
+        if (e.relatedTarget && e.relatedTarget.closest(selector)) return;
+        document.body.classList.remove(className);
+      });
+    };
 
-    const linkEls = Array.from(document.querySelectorAll("a, button, .ct-item, .social-btn, .resume-btn"));
-
-    const onHoverEnter = () => document.body.classList.add("cursor-hover");
-    const onHoverLeave = () => document.body.classList.remove("cursor-hover");
-    const onLinkEnter = () => document.body.classList.add("cursor-link");
-    const onLinkLeave = () => document.body.classList.remove("cursor-link");
-
-    hoverEls.forEach((el) => {
-      el.addEventListener("mouseenter", onHoverEnter);
-      el.addEventListener("mouseleave", onHoverLeave);
-    });
-    linkEls.forEach((el) => {
-      el.addEventListener("mouseenter", onLinkEnter);
-      el.addEventListener("mouseleave", onLinkLeave);
-    });
-
-    const darkContactSections = Array.from(document.querySelectorAll("section#contact"));
-    const onDarkContactEnter = () => document.body.classList.add("cursor-dark-surface");
-    const onDarkContactLeave = () => document.body.classList.remove("cursor-dark-surface");
-    darkContactSections.forEach((el) => {
-      el.addEventListener("mouseenter", onDarkContactEnter);
-      el.addEventListener("mouseleave", onDarkContactLeave);
-    });
+    document.addEventListener("mouseover", onPointerOver);
+    document.addEventListener("mouseout", onPointerOut);
 
     return () => {
       document.removeEventListener("mousemove", onMove);
       window.cancelAnimationFrame(raf);
-      hoverEls.forEach((el) => {
-        el.removeEventListener("mouseenter", onHoverEnter);
-        el.removeEventListener("mouseleave", onHoverLeave);
-      });
-      linkEls.forEach((el) => {
-        el.removeEventListener("mouseenter", onLinkEnter);
-        el.removeEventListener("mouseleave", onLinkLeave);
-      });
-      darkContactSections.forEach((el) => {
-        el.removeEventListener("mouseenter", onDarkContactEnter);
-        el.removeEventListener("mouseleave", onDarkContactLeave);
-      });
+      document.removeEventListener("mouseover", onPointerOver);
+      document.removeEventListener("mouseout", onPointerOut);
     };
   }, []);
 
@@ -85,4 +86,3 @@ export default function CustomCursor() {
     </>
   );
 }
-
