@@ -42,6 +42,7 @@ export default function HeroSection({ content }) {
             className="hero-photo"
             id="hero-img"
             onError={(e) => {
+               
               e.currentTarget.outerHTML =
                 '<div class="hero-photo placeholder-photo">[ your photo here ]</div>'
             }}
@@ -64,7 +65,7 @@ export default function HeroSection({ content }) {
 
           <div className="hero-social">
             <a
-              href="https://www.linkedin.com/in/xinyi-evelyn-gao/"
+              href="https://linkedin.com/"
               className="social-btn"
               title="LinkedIn"
               aria-label="LinkedIn"
