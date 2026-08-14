@@ -73,6 +73,20 @@
   transition: --hover-boost 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* .hang-letter shrink-wraps to its content, so narrow glyphs (i, t, n…) leave
+   a hover target only a few pixels wide — you'd have to land right on the
+   hairline. Widen the actual hit area with an invisible, centered strip
+   spanning the full swing height, independent of the glyph's rendered width. */
+.hang-letter::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2.5rem;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
 .hang-letter:hover {
   --hover-boost: 1;
 }
@@ -142,14 +156,14 @@
         calc(
           -1deg
           - (var(--wind-boost, 0) * 1.35deg)
-          - (var(--hover-boost, 0) * 2.25deg)
+          - (var(--hover-boost, 0) * 4deg)
         )
       )
       translateX(
         calc(
           -2px
           - (var(--wind-boost, 0) * 3px)
-          - (var(--hover-boost, 0) * 5px)
+          - (var(--hover-boost, 0) * 9px)
         )
       );
   }
@@ -159,14 +173,14 @@
         calc(
           1.05deg
           + (var(--wind-boost, 0) * 3.6deg)
-          + (var(--hover-boost, 0) * 4.1deg)
+          + (var(--hover-boost, 0) * 7deg)
         )
       )
       translateX(
         calc(
           2px
           + (var(--wind-boost, 0) * 4px)
-          + (var(--hover-boost, 0) * 6px)
+          + (var(--hover-boost, 0) * 11px)
         )
       );
   }
