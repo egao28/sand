@@ -1,5 +1,4 @@
-import React from "react";
-import EducationTimeline from "./EducationTimeline.jsx";
+import EducationTimeline from './EducationTimeline.jsx'
 
 export default function ExperienceTimeline({ content, education }) {
   return (
@@ -14,11 +13,13 @@ export default function ExperienceTimeline({ content, education }) {
             <article key={item.title} className={`ct-item ${item.side}`} tabIndex="0">
               <header className="ct-head">
                 <div className="ct-time">{item.time}</div>
-                <div className={`ct-title${item.editorialTitle ? " ct-title--editorial" : ""}`}>{item.title}</div>
+                <div className={`ct-title${item.editorialTitle ? ' ct-title--editorial' : ''}`}>
+                  {item.title}
+                </div>
                 <div className="ct-sub">{item.sub}</div>
               </header>
 
-              {item.layout === "layered" && item.motivation && item.technologyTags ? (
+              {item.layout === 'layered' && item.motivation && item.technologyTags ? (
                 <div className="ct-detail ct-detail--layered">
                   <div className="ct-layer-section">
                     <p className="ct-layer-kicker">Motivation</p>
@@ -57,5 +58,5 @@ export default function ExperienceTimeline({ content, education }) {
         <EducationTimeline content={education} />
       </div>
     </section>
-  );
+  )
 }

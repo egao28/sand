@@ -1,20 +1,20 @@
-import React, { useEffect } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
-import CustomCursor from "./components/CustomCursor.jsx";
-import NavBar from "./components/NavBar.jsx";
-import HomePage from "./pages/HomePage.jsx";
-import AboutPage from "./pages/AboutPage.jsx";
-import ProjectsPage from "./pages/ProjectsPage.jsx";
-import ProjectDetailPage from "./pages/ProjectDetailPage.jsx";
-import ResumePage from "./pages/ResumePage.jsx";
-import { siteContent } from "./data/siteContent.js";
+import { useEffect } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import CustomCursor from './components/CustomCursor.jsx'
+import NavBar from './components/NavBar.jsx'
+import HomePage from './pages/HomePage.jsx'
+import AboutPage from './pages/AboutPage.jsx'
+import ProjectsPage from './pages/ProjectsPage.jsx'
+import ProjectDetailPage from './pages/ProjectDetailPage.jsx'
+import ResumePage from './pages/ResumePage.jsx'
+import { siteContent } from './data/siteContent.js'
 
 function ScrollToTop() {
-  const location = useLocation();
+  const location = useLocation()
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-  return null;
+    window.scrollTo(0, 0)
+  }, [location.pathname])
+  return null
 }
 
 export default function App() {
@@ -36,6 +36,5 @@ export default function App() {
         </Routes>
       </div>
     </BrowserRouter>
-  );
+  )
 }
-
