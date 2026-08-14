@@ -42,7 +42,6 @@ export default function HeroSection({ content }) {
             className="hero-photo"
             id="hero-img"
             onError={(e) => {
-               
               e.currentTarget.outerHTML =
                 '<div class="hero-photo placeholder-photo">[ your photo here ]</div>'
             }}
