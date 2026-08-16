@@ -45,7 +45,7 @@ export default function ExperienceTimeline({ content, education }) {
               ) : (
                 <div className="ct-detail">
                   <ul>
-                    {item.details.map((d) => (
+                    {(item.details ?? []).map((d) => (
                       <li key={d}>{d}</li>
                     ))}
                   </ul>
