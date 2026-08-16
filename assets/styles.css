@@ -749,164 +749,105 @@ section {
   line-height: 1.65;
 }
 
-/* Projects — full-width image, highlight labels only (no cards) */
+/* Projects — scattered polaroid gallery, one photo per project */
 #projects {
   background: transparent;
 }
-.projects-background-breakout {
-  width: 100vw;
-  max-width: 100%;
-  position: relative;
-  left: 50%;
-  margin-left: -50vw;
-  margin-right: -50vw;
-  padding: clamp(4.25rem, 11vh, 6rem) 0 clamp(2.5rem, 6vh, 4rem);
+.projects-gallery-wrap {
+  padding: clamp(4.25rem, 11vh, 6rem) 3.5rem clamp(2.5rem, 6vh, 4rem);
 }
-.projects-image-wrapper {
+.projects-gallery {
   position: relative;
   width: 100%;
-  height: clamp(70vh, 75vh, 80vh);
-  overflow: hidden;
-  background: var(--paper2);
+  height: clamp(520px, 64vh, 680px);
 }
-.projects-bg-image {
-  width: 100%;
-  height: 100%;
+.project-photo-card {
+  --tilt: 0deg;
+  --hover-boost: 0;
+  position: absolute;
   display: block;
-  object-fit: cover;
-  object-position: center;
-  opacity: 0.8;
-  transition: filter 0.3s ease;
-}
-.projects-image-wrapper:has(.project-corner-link:hover) .projects-bg-image {
-  filter: blur(3px);
-}
-.projects-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-.project-corner-link {
-  position: absolute;
-  pointer-events: auto;
+  width: clamp(150px, 18vw, 220px);
   text-decoration: none;
   color: inherit;
 }
-.project-corner-link:focus-visible {
-  outline: 2px solid rgba(25, 23, 19, 0.35);
-  outline-offset: 3px;
-}
-.project-label {
-  display: inline-block;
-  max-width: 100%;
-  padding: 8px 14px 6px 14px;
-  border-radius: 0;
-  box-shadow: none;
-  background: rgba(255, 255, 255, 0.9);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
-  font-family: var(--serif);
-  font-size: clamp(1.05rem, 2.15vw, 1.45rem);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  line-height: 1.12;
+/* Single merged rule: .reveal (opacity/transform fade-in-on-scroll) and this
+   card's own --hover-boost smoothing both need `transition` on this exact
+   element, and the shorthand doesn't merge across separate rules — whichever
+   selector wins takes the whole property list, silently dropping the other.
+   A compound selector here has higher specificity than either lone class,
+   so it deterministically wins and carries the full merged list. */
+.project-photo-card.reveal {
   transition:
-    background 0.25s ease,
-    transform 0.25s ease,
-    -webkit-backdrop-filter 0.25s ease,
-    backdrop-filter 0.25s ease;
+    opacity 0.7s ease,
+    transform 0.7s ease,
+    --hover-boost 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.project-corner-link:hover .project-label {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 1);
+.project-photo-card:hover,
+.project-photo-card:focus-visible {
+  --hover-boost: 1;
+  z-index: 10 !important;
 }
-.project-label-text {
+.project-photo-card:focus-visible {
+  outline: 2px solid rgba(25, 23, 19, 0.35);
+  outline-offset: 4px;
+}
+.project-photo-swing {
+  display: block;
+  transform-origin: center;
+  animation: photo-sway 7.4s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+.project-photo-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 18px rgba(25, 23, 19, 0.18));
+  user-select: none;
+}
+.project-photo-label {
+  display: block;
+  margin-top: 0.65rem;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
   color: var(--ink);
 }
+@keyframes photo-sway {
+  0%,
+  100% {
+    transform: rotate(calc(var(--tilt) - (var(--hover-boost) * 2.5deg)))
+      translateY(calc(var(--hover-boost) * -4px));
+  }
+  50% {
+    transform: rotate(calc(var(--tilt) + (var(--hover-boost) * 2.5deg)))
+      translateY(calc(var(--hover-boost) * -8px));
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .projects-bg-image {
-    transition: none;
+  .project-photo-swing {
+    animation: none;
+    transform: rotate(var(--tilt));
   }
-  .projects-image-wrapper:has(.project-corner-link:hover) .projects-bg-image {
-    filter: none;
+  .project-photo-card.reveal {
+    transition: opacity 0.7s ease;
   }
-  .project-label {
-    transition: none;
-  }
-  .project-corner-link:hover .project-label {
-    transform: none;
-  }
-}
-/* Four corners of central white tiled area — top narrow, bottom wider */
-.project-corner-link--tl {
-  top: 38%;
-  left: 30%;
-  max-width: min(10rem, 26%);
-}
-.project-corner-link--tr {
-  top: 38%;
-  right: 28%;
-  left: auto;
-  max-width: min(10rem, 26%);
-}
-.project-corner-link--bl {
-  bottom: 24%;
-  left: 28%;
-  top: auto;
-  max-width: min(20rem, 42%);
-}
-.project-corner-link--br {
-  bottom: 22%;
-  right: 24%;
-  left: auto;
-  top: auto;
-  max-width: min(26rem, 48%);
 }
 @media (max-width: 720px) {
-  .projects-background-breakout {
-    padding-left: 0;
-    padding-right: 0;
+  .projects-gallery-wrap {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
-  .projects-image-wrapper {
-    height: auto;
-    min-height: min(75vh, 520px);
-    overflow: visible;
-  }
-  .projects-bg-image {
-    height: min(75vh, 520px);
-    min-height: 280px;
-  }
-  .projects-overlay {
-    position: relative;
+  .projects-gallery {
+    position: static;
     height: auto;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 0.85rem;
-    padding: 1.25rem 1.25rem 0;
-    pointer-events: auto;
+    align-items: center;
+    gap: 2.25rem;
   }
-  .project-corner-link {
-    position: relative;
-    top: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    left: auto !important;
-    max-width: 100%;
-  }
-  .project-corner-link--tr {
-    align-self: flex-end;
-  }
-  .project-corner-link--bl {
-    align-self: flex-start;
-    max-width: 100%;
-  }
-  .project-corner-link--br {
-    align-self: flex-end;
-    max-width: 100%;
+  .project-photo-card {
+    position: static;
+    width: min(70vw, 320px);
   }
 }
 

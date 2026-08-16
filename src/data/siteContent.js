@@ -257,6 +257,19 @@ export const siteContent = {
         technical:
           'PCA · z-score normalization · K-means · clustering · feature correlation · ecological data analysis · data matrix construction · scree plot · dimensionality reduction · GIS visualization',
       },
+      {
+        slug: 'bloom-mcp',
+        artClass: 'art-e',
+        tags: ['MCP', 'TBD'],
+        title: 'bloom-mcp',
+        href: '/projects/bloom-mcp',
+        detailTone: 'a',
+        demoLabel: 'Open project',
+        motivation: [
+          'TODO — replace with real bloom-mcp project copy (motivation) before merging.',
+        ],
+        technical: 'TBD',
+      },
     ],
   },
   resume: {
