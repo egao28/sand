@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
 
+// Not derived from any shared source — renaming/removing a class referenced
+// here (e.g. .resume-photo-link) silently drops that element from cursor
+// hover detection. Keep in sync by hand when touching matched components.
 const HOVER_GROUPS = [
   {
-    selector: 'img, .hero-photo-wrap, .project-corner-link, .resume-download-here',
+    selector: 'img, .hero-photo-wrap, .project-corner-link, .resume-photo-link',
     className: 'cursor-hover',
   },
   { selector: 'a, button, .ct-item, .social-btn', className: 'cursor-link' },
