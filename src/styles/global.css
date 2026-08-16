@@ -1,8 +1,8 @@
-@import "../../assets/styles.css";
+@import '../../assets/styles.css';
 
 /* Smooth local hover “wind” (used in hang-sway keyframes) */
 @property --hover-boost {
-  syntax: "<number>";
+  syntax: '<number>';
   inherits: true;
   initial-value: 0;
 }
@@ -27,14 +27,16 @@
   text-decoration: none;
   text-transform: lowercase;
   position: relative;
-  transition: color .2s;
+  transition: color 0.2s;
   background: none;
   border: none;
   padding: 0;
   cursor: none;
 }
 
-.nav-link-btn:hover { color: var(--ink); }
+.nav-link-btn:hover {
+  color: var(--ink);
+}
 
 /* Homepage landing hero + flow */
 .home-hero {
@@ -136,39 +138,18 @@
  * and local --hover-boost (0→1) for the hovered letter only.
  */
 @keyframes hang-sway {
-  0%, 100% {
-    transform:
-      rotate(
-        calc(
-          -1deg
-          - (var(--wind-boost, 0) * 1.35deg)
-          - (var(--hover-boost, 0) * 2.25deg)
-        )
+  0%,
+  100% {
+    transform: rotate(
+        calc(-1deg - (var(--wind-boost, 0) * 1.35deg) - (var(--hover-boost, 0) * 2.25deg))
       )
-      translateX(
-        calc(
-          -2px
-          - (var(--wind-boost, 0) * 3px)
-          - (var(--hover-boost, 0) * 5px)
-        )
-      );
+      translateX(calc(-2px - (var(--wind-boost, 0) * 3px) - (var(--hover-boost, 0) * 5px)));
   }
   50% {
-    transform:
-      rotate(
-        calc(
-          1.05deg
-          + (var(--wind-boost, 0) * 3.6deg)
-          + (var(--hover-boost, 0) * 4.1deg)
-        )
+    transform: rotate(
+        calc(1.05deg + (var(--wind-boost, 0) * 3.6deg) + (var(--hover-boost, 0) * 4.1deg))
       )
-      translateX(
-        calc(
-          2px
-          + (var(--wind-boost, 0) * 4px)
-          + (var(--hover-boost, 0) * 6px)
-        )
-      );
+      translateX(calc(2px + (var(--wind-boost, 0) * 4px) + (var(--hover-boost, 0) * 6px)));
   }
 }
 
@@ -273,4 +254,3 @@
     padding: 0.75rem 1.25rem;
   }
 }
-

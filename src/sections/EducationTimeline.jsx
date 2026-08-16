@@ -1,24 +1,22 @@
-import React from "react";
-
 export default function EducationTimeline({ content }) {
   return (
-    <div className="education-block" style={{ marginTop: "5rem" }}>
+    <div className="education-block" style={{ marginTop: '5rem' }}>
       <div className="sec-label">
         <span>{content.label}</span>
       </div>
 
       <div className="center-timeline reveal" aria-label="Education timeline">
         {content.items.map((item) => {
-          const lines = item.coursework ?? item.details ?? [];
-          const detailLabel = item.detailLabel ?? "Coursework";
-          const baseSub = (item.subLine ?? item.sub ?? "").trim();
-          const hasGpa = item.gpa != null && String(item.gpa).trim() !== "";
+          const lines = item.coursework ?? item.details ?? []
+          const detailLabel = item.detailLabel ?? 'Coursework'
+          const baseSub = (item.subLine ?? item.sub ?? '').trim()
+          const hasGpa = item.gpa != null && String(item.gpa).trim() !== ''
           const subDisplay = hasGpa
             ? baseSub
               ? `${baseSub} · GPA: ${item.gpa}`
               : `GPA: ${item.gpa}`
-            : baseSub;
-          const eduLines = Array.isArray(item.eduLines) ? item.eduLines : null;
+            : baseSub
+          const eduLines = Array.isArray(item.eduLines) ? item.eduLines : null
 
           return (
             <article
@@ -53,9 +51,9 @@ export default function EducationTimeline({ content }) {
                 </div>
               ) : null}
             </article>
-          );
+          )
         })}
       </div>
     </div>
-  );
+  )
 }
