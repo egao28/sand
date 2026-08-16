@@ -36,12 +36,12 @@ function animateCursor() {
 }
 animateCursor();
 
-const hoverTargets = ["img", ".hero-photo-wrap", ".project-art", ".project-info", ".resume-btn"];
+const hoverTargets = ["img", ".project-art", ".project-info", ".resume-btn"];
 document.querySelectorAll(hoverTargets.join(",")).forEach((el) => {
   el.addEventListener("mouseenter", () => document.body.classList.add("cursor-hover"));
   el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-hover"));
 });
-document.querySelectorAll("a, button, .ct-item, .social-btn, .resume-btn").forEach((el) => {
+document.querySelectorAll("a, button, .ct-item, .resume-btn").forEach((el) => {
   el.addEventListener("mouseenter", () => document.body.classList.add("cursor-link"));
   el.addEventListener("mouseleave", () => document.body.classList.remove("cursor-link"));
 });
