@@ -1312,7 +1312,7 @@ section {
   }
 }
 
-/* Resume — minimal single link (see .resume-page-minimal) */
+/* Resume — centered polaroid-photo download link (see .resume-page-minimal) */
 .resume-page-minimal {
   display: flex;
   align-items: center;
@@ -1320,18 +1320,40 @@ section {
   min-height: calc(100vh - 96px);
   padding-bottom: 0;
 }
-.resume-download-here {
-  font-family: var(--mono);
-  font-size: var(--text-nav-link);
-  font-weight: 400;
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  color: var(--ink-soft);
+.resume-photo-link {
+  display: inline-block;
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.resume-download-here:hover {
-  color: var(--ink);
+.resume-photo-link:hover,
+.resume-photo-link:focus-visible {
+  transform: translateY(-6px) scale(1.02) rotate(-2deg);
+}
+.resume-photo-link:focus-visible {
+  outline: 2px solid rgba(201, 169, 110, 0.45);
+  outline-offset: 6px;
+}
+.resume-photo {
+  display: block;
+  width: min(90vw, 420px);
+  height: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .resume-photo-link {
+    transition: none;
+  }
+  .resume-photo-link:hover,
+  .resume-photo-link:focus-visible {
+    transform: none;
+  }
+}
+@media (max-width: 760px) {
+  .resume-page-minimal {
+    min-height: calc(100vh - 88px);
+  }
+  .resume-photo {
+    width: min(84vw, 340px);
+  }
 }
 
 /* Contact */

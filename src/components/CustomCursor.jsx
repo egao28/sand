@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 const HOVER_GROUPS = [
   {
-    selector: 'img, .hero-photo-wrap, .project-corner-link, .resume-download-here',
+    selector: 'img, .hero-photo-wrap, .project-corner-link, .resume-photo-link',
     className: 'cursor-hover',
   },
   { selector: 'a, button, .ct-item, .social-btn', className: 'cursor-link' },
