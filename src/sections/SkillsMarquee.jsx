@@ -1,13 +1,12 @@
-import React from "react";
-import SectionLabel from "../components/SectionLabel.jsx";
+import SectionLabel from '../components/SectionLabel.jsx'
 
 function SkillsTrack({ chips }) {
   // Render twice to create the seamless marquee loop (CSS translates by 50%).
-  const doubled = [...chips, ...chips];
+  const doubled = [...chips, ...chips]
   return (
     <div className="skills-track" aria-hidden="false">
       {doubled.map((chip, idx) => (
-        <div key={`${chip.text}-${idx}`} className={`skill-chip ${chip.subtle ? "subtle" : ""}`}>
+        <div key={`${chip.text}-${idx}`} className={`skill-chip ${chip.subtle ? 'subtle' : ''}`}>
           <span className="skill-icon" aria-hidden="true">
             {chip.icon}
           </span>
@@ -15,12 +14,12 @@ function SkillsTrack({ chips }) {
         </div>
       ))}
     </div>
-  );
+  )
 }
 
 export default function SkillsMarquee({ content }) {
-  const primary = content.primary;
-  const secondary = content.secondary.map((c) => ({ ...c, subtle: true }));
+  const primary = content.primary
+  const secondary = content.secondary.map((c) => ({ ...c, subtle: true }))
 
   return (
     <section id="skills">
@@ -43,6 +42,5 @@ export default function SkillsMarquee({ content }) {
         </div>
       </div>
     </section>
-  );
+  )
 }
-

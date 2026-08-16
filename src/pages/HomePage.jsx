@@ -1,24 +1,24 @@
-import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import ThinkInWindHero from "../sections/ThinkInWindHero.jsx";
-import ContactSection from "../sections/ContactSection.jsx";
-import { siteContent } from "../data/siteContent.js";
-import { useRevealOnScroll } from "../hooks/useRevealOnScroll.js";
+import { useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import ThinkInWindHero from '../sections/ThinkInWindHero.jsx'
+import ContactSection from '../sections/ContactSection.jsx'
+import { siteContent } from '../data/siteContent.js'
+import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
 
 export default function HomePage() {
-  const location = useLocation();
-  useRevealOnScroll();
+  const location = useLocation()
+  useRevealOnScroll()
 
   useEffect(() => {
-    if (location.hash === "#contact") {
-      const target = document.getElementById("home-contact");
+    if (location.hash === '#contact') {
+      const target = document.getElementById('home-contact')
       if (target) {
         window.setTimeout(() => {
-          target.scrollIntoView({ behavior: "smooth", block: "start" });
-        }, 40);
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 40)
       }
     }
-  }, [location.hash]);
+  }, [location.hash])
 
   return (
     <main className="home-page" aria-label="Home">
@@ -42,6 +42,5 @@ export default function HomePage() {
         <ContactSection content={siteContent.contact} variant="home" />
       </div>
     </main>
-  );
+  )
 }
-
