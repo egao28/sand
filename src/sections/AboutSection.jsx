@@ -1,35 +1,35 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import SectionLabel from "../components/SectionLabel.jsx";
-import { useTypewriter } from "../hooks/useTypewriter.js";
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import SectionLabel from '../components/SectionLabel.jsx'
+import { useTypewriter } from '../hooks/useTypewriter.js'
 
 export default function AboutSection({ content }) {
-  const dividerRef = useRef(null);
-  const [enabled, setEnabled] = useState(false);
+  const dividerRef = useRef(null)
+  const [enabled, setEnabled] = useState(false)
 
-  const typedName = useTypewriter(content.divider.typed, { enabled });
+  const typedName = useTypewriter(content.divider.typed, { enabled })
 
   useEffect(() => {
-    const el = dividerRef.current;
-    if (!el) return;
+    const el = dividerRef.current
+    if (!el) return
 
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting) {
-            setEnabled(true);
-            io.disconnect();
-            break;
+            setEnabled(true)
+            io.disconnect()
+            break
           }
         }
       },
-      { threshold: 0.35 },
-    );
+      { threshold: 0.35 }
+    )
 
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
-  const headlineLines = useMemo(() => content.headline.split("\n"), [content.headline]);
+  const headlineLines = useMemo(() => content.headline.split('\n'), [content.headline])
 
   return (
     <section id="about">
@@ -67,6 +67,5 @@ export default function AboutSection({ content }) {
         </div>
       </div>
     </section>
-  );
+  )
 }
-

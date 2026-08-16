@@ -1,5 +1,4 @@
-import React from "react";
-import { siteContent } from "../data/siteContent.js";
+import { siteContent } from '../data/siteContent.js'
 
 export default function ResumePage() {
   return (
@@ -8,5 +7,5 @@ export default function ResumePage() {
         download here
       </a>
     </main>
-  );
+  )
 }
