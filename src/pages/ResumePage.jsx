@@ -1,5 +1,7 @@
 import { siteContent } from '../data/siteContent.js'
-import polaroidUrl from '../../polaroid.png'
+import polaroidAvif from '../../polaroid-840.avif'
+import polaroidWebp from '../../polaroid-840.webp'
+import polaroidPng from '../../polaroid-840.png'
 
 export default function ResumePage() {
   return (
@@ -10,7 +12,18 @@ export default function ResumePage() {
         className="resume-photo-link"
         aria-label={siteContent.resume.buttonLabel}
       >
-        <img src={polaroidUrl} alt="" className="resume-photo" decoding="async" />
+        <picture>
+          <source srcSet={polaroidAvif} type="image/avif" />
+          <source srcSet={polaroidWebp} type="image/webp" />
+          <img
+            src={polaroidPng}
+            alt=""
+            className="resume-photo"
+            decoding="async"
+            width="840"
+            height="754"
+          />
+        </picture>
       </a>
     </main>
   )
