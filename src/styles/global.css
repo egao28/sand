@@ -75,11 +75,31 @@
   transition: --hover-boost 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* .hang-letter shrink-wraps to its content, so narrow glyphs (i, t, n…) leave
+   a hover target only a few pixels wide — you'd have to land right on the
+   hairline. Widen the actual hit area with an invisible, centered strip
+   spanning the full swing height, independent of the glyph's rendered width.
+   Sized off --letter-size (rather than a flat rem value) so adjacent letters
+   at tight leftPct spacing don't grow wide enough to overlap. Attached to
+   .hang-letter__swing, not the non-rotating .hang-letter, so the strip swings
+   in lockstep with the glyph instead of staying centered on the resting
+   position while the glyph arcs out from under it. */
+.hang-letter__swing::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: clamp(2rem, calc(var(--letter-size, 2.65rem) * 0.7), 3.25rem);
+  height: 100%;
+  transform: translateX(-50%);
+}
+
 .hang-letter:hover {
   --hover-boost: 1;
 }
 
 .hang-letter__swing {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
