@@ -51,7 +51,7 @@ export default function ContactSection({ content }) {
       <div className="contact-photo-bg" style={{ backgroundImage: `url(${contactPhoto})` }} />
 
       <div className="sec-inner">
-        <SectionLabel text="contact" />
+        <SectionLabel text="contact" noRule />
 
         <div className="contact-panels">
           <div className="contact-panel contact-panel--info reveal">
