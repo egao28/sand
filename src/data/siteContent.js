@@ -270,9 +270,9 @@ export const siteContent = {
     buttonLabel: 'Download PDF',
   },
   contact: {
-    label: 'contact',
-    headline: "Let's make\nsomething real.",
-    homeIntro: 'Want to work together?',
+    panelHeadline: 'Say hello.',
+    formHeadline: 'How can I help?',
+    formTopics: ['Say hello', 'Job or internship', 'Collaboration', 'Something else'],
     items: [
       {
         key: 'Email',
