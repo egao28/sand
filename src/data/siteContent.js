@@ -270,15 +270,15 @@ export const siteContent = {
     buttonLabel: 'Download PDF',
   },
   contact: {
-    panelHeadline: 'Say hello.',
-    formHeadline: 'How can I help?',
+    panelHeadline: 'Helloo ^ ^',
+    formHeadline: "Let's get in touch!",
     formTopics: ['Say hello', 'Job or internship', 'Collaboration', 'Something else'],
     items: [
       {
         key: 'Email',
         label: 'Email',
-        value: 'egao3@uchicago.edu',
-        href: 'mailto:egao3@uchicago.edu',
+        value: 'evelyneyi@outlook.com',
+        href: 'mailto:evelyneyi@outlook.com',
       },
       {
         key: 'LinkedIn',
@@ -286,7 +286,7 @@ export const siteContent = {
         value: 'linkedin.com/in/xinyi-evelyn-gao',
         href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/',
       },
-      { key: 'Location', label: 'Location', value: 'Chicago, IL · Beijing, CN', href: null },
+      { key: 'Location', label: 'Location', value: 'Chicago, IL / Beijing, CN', href: null },
     ],
     footerLeft: '© 2026 Evelyn Gao',
     footerRight: '',
