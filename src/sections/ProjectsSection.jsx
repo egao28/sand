@@ -8,18 +8,24 @@ import photo5 from '../assets/projects/photo-5.png'
 
 const PHOTOS = [photo1, photo2, photo3, photo4, photo5]
 
-// Designed cascade slots (percent anchors inside the gallery canvas), sized
-// against the real .sec-inner content width (~988px at desktop, ~673px at
-// the 721px mobile-breakpoint edge) and the card width ceiling (220px, see
-// CSS) so the rightmost slot can't push a card past the container edge even
-// with max jitter applied.
-const SLOTS = [
-  { top: '3%', left: '3%' },
-  { top: '9%', left: '19%' },
-  { top: '1%', left: '36%' },
-  { top: '10%', left: '53%' },
-  { top: '5%', left: '70%' },
-]
+// One handcrafted cascade row (percent anchors inside the gallery canvas),
+// sized against the real .sec-inner content width (~988px at desktop,
+// ~673px at the 721px mobile-breakpoint edge) and the card width ceiling
+// (220px, see CSS) so the rightmost slot can't push a card past the
+// container edge even with max jitter applied.
+const ROW_LEFT = [3, 19, 36, 53, 70]
+const ROW_TOP = [3, 9, 1, 10, 5]
+const ROW_LENGTH = ROW_LEFT.length
+const ROW_GAP = 9 // percent of vertical space between wrapped rows
+
+// One slot per item, independent of PHOTOS.length/ROW_LENGTH: a 6th project
+// (or more) wraps to a new row with a shifted top instead of silently
+// reusing an earlier item's exact position.
+function slotFor(index) {
+  const col = index % ROW_LENGTH
+  const row = Math.floor(index / ROW_LENGTH)
+  return { top: `${ROW_TOP[col] + row * ROW_GAP}%`, left: `${ROW_LEFT[col]}%` }
+}
 
 function shuffledIndices(n) {
   const arr = Array.from({ length: n }, (_, i) => i)
@@ -36,15 +42,19 @@ export default function ProjectsSection({ content }) {
   // allow at this specific spot (useMemo is expected to be a pure function
   // of its deps and may be re-invoked by the framework at any time).
   const [arrangement] = useState(() => {
-    const order = shuffledIndices(PHOTOS.length)
+    // Photo choice and z-index are shuffled independently of each other and
+    // of slot position, each sized to its own count, so neither collides
+    // with (or is limited by) how many photo assets happen to exist.
+    const photoOrder = shuffledIndices(PHOTOS.length)
+    const zOrder = shuffledIndices(content.items.length)
     return content.items.map((item, i) => ({
       item,
-      photo: PHOTOS[order[i % PHOTOS.length]],
-      slot: SLOTS[i % SLOTS.length],
+      photo: PHOTOS[photoOrder[i % PHOTOS.length]],
+      slot: slotFor(i),
       tilt: (Math.random() * 12 - 6).toFixed(2), // -6deg .. 6deg
       jitterX: (Math.random() * 3 - 1.5).toFixed(2), // -1.5% .. 1.5%
       jitterY: (Math.random() * 3 - 1.5).toFixed(2),
-      zIndex: order[i % PHOTOS.length] + 1, // rides the same shuffle, not pinned to slot i
+      zIndex: zOrder[i] + 1,
       delay: (i * 0.9 + Math.random() * 0.6).toFixed(2), // staggers the sway, mirrors hero
     }))
   })
