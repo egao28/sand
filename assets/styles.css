@@ -766,7 +766,7 @@ section {
   --hover-boost: 0;
   position: absolute;
   display: block;
-  width: clamp(150px, 18vw, 220px);
+  width: clamp(190px, 24vw, 300px);
   text-decoration: none;
   color: inherit;
 }
