@@ -42,7 +42,6 @@ export default function ContactSection({ content }) {
   return (
     <section id="contact" className="contact-photo">
       <div className="contact-photo-bg" style={{ backgroundImage: `url(${contactPhoto})` }} />
-      <div className="contact-photo-scrim" />
 
       <div className="sec-inner contact-photo-inner">
         <SectionLabel text="contact" />
