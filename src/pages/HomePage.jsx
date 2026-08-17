@@ -39,7 +39,7 @@ export default function HomePage() {
       </section>
 
       <div id="home-contact">
-        <ContactSection content={siteContent.contact} variant="home" />
+        <ContactSection content={siteContent.contact} />
       </div>
     </main>
   )
