@@ -13,7 +13,12 @@ const PHOTOS = [photo1, photo2, photo3, photo4, photo5]
 // the 721px mobile-breakpoint edge) and the card width ceiling (300px, see
 // CSS) so the rightmost slot can't push a card past the container edge even
 // with max jitter applied.
-const STEP = 17 // percent gap between adjacent slot left-anchors
+// Gap is intentionally narrower than CARD_WIDTH_PCT so adjacent cards overlap
+// like a scattered photo pile — but it must track the card width below (both
+// are % of the same canvas) or the overlap balloons. At the old 220px card
+// width this gap gave ~25% overlap; at the current 300px width, 21 preserves
+// that same ~25% ratio while still leaving room for jitter at the row edges.
+const STEP = 21 // percent gap between adjacent slot left-anchors
 const TOP_WAVE = [3, 9, 1, 10] // per-column vertical stagger for the scattered look
 const ROW_LENGTH = TOP_WAVE.length
 const ROW_GAP = 9 // percent of vertical space between wrapped rows
@@ -21,7 +26,8 @@ const ROW_GAP = 9 // percent of vertical space between wrapped rows
 // 300px against the ~974px .sec-inner canvas on any normal desktop screen —
 // ~31% of canvas width. ROW_LENGTH is capped at 4 (not 5) so a full row at
 // that real width still leaves comfortable margin for jitter/tilt on both
-// edges; used only to center each row.
+// edges; used only to center each row. Keep this in sync with the CSS card
+// width, and re-tune STEP above whenever this changes.
 const CARD_WIDTH_PCT = 31
 
 // One slot per item, independent of PHOTOS.length/ROW_LENGTH: a 5th project
