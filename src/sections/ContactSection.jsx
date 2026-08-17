@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import SectionLabel from '../components/SectionLabel.jsx'
 import contactPhoto from '../assets/contact.jpg'
 
 // Public client-side submit key for Web3Forms — safe to expose in source,
@@ -51,8 +50,6 @@ export default function ContactSection({ content }) {
       <div className="contact-photo-bg" style={{ backgroundImage: `url(${contactPhoto})` }} />
 
       <div className="sec-inner">
-        <SectionLabel text="contact" noRule />
-
         <div className="contact-panels">
           <div className="contact-panel contact-panel--info reveal">
             <h2 className="contact-panel-headline">{content.panelHeadline}</h2>

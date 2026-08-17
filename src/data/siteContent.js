@@ -268,9 +268,10 @@ export const siteContent = {
     href: resumePdf,
     fileName: 'Xinyi Gao Resume.pdf',
     buttonLabel: 'Download PDF',
+    lastUpdated: '8.17.2026',
   },
   contact: {
-    panelHeadline: 'Helloo ^ ^',
+    panelHeadline: 'Contact',
     formHeadline: "Let's get in touch!",
     formTopics: ['Say hello', 'Job or internship', 'Collaboration', 'Something else'],
     items: [
