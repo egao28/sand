@@ -14,16 +14,21 @@ const PHOTOS = [photo1, photo2, photo3, photo4, photo5]
 // CSS) so the rightmost slot can't push a card past the container edge even
 // with max jitter applied.
 const STEP = 17 // percent gap between adjacent slot left-anchors
-const TOP_WAVE = [3, 9, 1, 10, 5] // per-column vertical stagger for the scattered look
+const TOP_WAVE = [3, 9, 1, 10] // per-column vertical stagger for the scattered look
 const ROW_LENGTH = TOP_WAVE.length
 const ROW_GAP = 9 // percent of vertical space between wrapped rows
-const CARD_WIDTH_PCT = 26 // approx card width as a % of canvas width, used only to center each row
+// Real card width is clamp(190px, 24vw, 300px) (see CSS), which maxes out at
+// 300px against the ~974px .sec-inner canvas on any normal desktop screen —
+// ~31% of canvas width. ROW_LENGTH is capped at 4 (not 5) so a full row at
+// that real width still leaves comfortable margin for jitter/tilt on both
+// edges; used only to center each row.
+const CARD_WIDTH_PCT = 31
 
-// One slot per item, independent of PHOTOS.length/ROW_LENGTH: a 6th project
+// One slot per item, independent of PHOTOS.length/ROW_LENGTH: a 5th project
 // (or more) wraps to a new row with a shifted top instead of silently
 // reusing an earlier item's exact position. Each row is centered on its own
-// item count, so a partial row (e.g. today's 4 items) doesn't sit lopsided
-// in the leftover space of a wider, never-filled 5-across layout.
+// item count, so a partial row (e.g. a lone 5th item) doesn't sit lopsided
+// in the leftover space of a wider, never-filled 4-across layout.
 function slotFor(index, count) {
   const col = index % ROW_LENGTH
   const row = Math.floor(index / ROW_LENGTH)
