@@ -8,7 +8,7 @@ export default function ResumePage() {
     <main className="page page--secondary resume-page-minimal">
       <a
         href={siteContent.resume.href}
-        download
+        download={siteContent.resume.fileName}
         className="resume-photo-link"
         aria-label={siteContent.resume.buttonLabel}
       >

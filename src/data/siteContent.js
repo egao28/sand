@@ -1,3 +1,5 @@
+import resumePdf from '../../resume.pdf'
+
 export const siteContent = {
   nav: {
     items: [
@@ -262,8 +264,9 @@ export const siteContent = {
   resume: {
     label: 'resume',
     title: 'Resume',
-    sub: 'Add your PDF and update the link when ready.',
-    href: '#',
+    sub: 'Download my current resume.',
+    href: resumePdf,
+    fileName: 'Xinyi Gao Resume.pdf',
     buttonLabel: 'Download PDF',
   },
   contact: {
