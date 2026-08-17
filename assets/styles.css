@@ -1377,12 +1377,13 @@ section {
   gap: 1.25rem;
 }
 .contact-info-link {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   text-decoration: none;
   color: inherit;
-  padding: 0.15rem 0;
+  padding: 0.15rem 1.25rem 0.15rem 0;
   transition: transform 0.25s ease;
 }
 a.contact-info-link:hover,
@@ -1392,6 +1393,22 @@ a.contact-info-link:focus-visible {
 a.contact-info-link:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
+}
+.contact-info-arrow {
+  position: absolute;
+  top: 0.15rem;
+  right: 0;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+a.contact-info-link:hover .contact-info-arrow,
+a.contact-info-link:focus-visible .contact-info-arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 .contact-info-label {
   font-family: var(--sans);
@@ -1467,6 +1484,12 @@ a.contact-info-link:focus-visible .contact-info-value {
   border-color: var(--accent);
   background: var(--paper);
   box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.35);
+}
+.contact-field input:disabled,
+.contact-field select:disabled,
+.contact-field textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 .contact-field select {
   appearance: none;

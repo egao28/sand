@@ -9,8 +9,10 @@ const WEB3FORMS_ACCESS_KEY = '582a6f18-f79d-4578-bf3e-a29378790498'
 const EMPTY_FORM = { name: '', email: '', message: '' }
 
 export default function ContactSection({ content }) {
-  const [form, setForm] = useState({ ...EMPTY_FORM, topic: content.formTopics[0] })
-  const [status, setStatus] = useState('idle') // idle | sending | success | error
+  const [form, setForm] = useState({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
+  const [isSending, setIsSending] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [hasError, setHasError] = useState(false)
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -19,7 +21,9 @@ export default function ContactSection({ content }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
-    setStatus('sending')
+    setIsSending(true)
+    setIsSubmitted(false)
+    setHasError(false)
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -32,18 +36,21 @@ export default function ContactSection({ content }) {
       })
       const data = await res.json()
       if (!res.ok || !data.success) throw new Error(data.message || 'Submission failed')
-      setStatus('success')
-      setForm({ ...EMPTY_FORM, topic: content.formTopics[0] })
-    } catch {
-      setStatus('error')
+      setIsSubmitted(true)
+      setForm({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
+    } catch (err) {
+      console.error('Contact form submission failed:', err)
+      setHasError(true)
+    } finally {
+      setIsSending(false)
     }
   }
 
   return (
-    <section id="contact" className="contact-photo">
+    <section id="contact">
       <div className="contact-photo-bg" style={{ backgroundImage: `url(${contactPhoto})` }} />
 
-      <div className="sec-inner contact-photo-inner">
+      <div className="sec-inner">
         <SectionLabel text="contact" />
 
         <div className="contact-panels">
@@ -58,6 +65,11 @@ export default function ContactSection({ content }) {
                     <>
                       <span className="contact-info-label">{item.label}</span>
                       <span className="contact-info-value">{item.value}</span>
+                      {item.href && (
+                        <span className="contact-info-arrow" aria-hidden="true">
+                          ↗
+                        </span>
+                      )}
                     </>
                   )
                   return (
@@ -79,16 +91,12 @@ export default function ContactSection({ content }) {
             </ul>
           </div>
 
-          <form
-            className="contact-panel contact-panel--form reveal"
-            onSubmit={handleSubmit}
-            noValidate
-          >
+          <form className="contact-panel contact-panel--form reveal" onSubmit={handleSubmit}>
             <h3 className="contact-panel-headline">{content.formHeadline}</h3>
 
             <label className="contact-field">
               <span>Topic</span>
-              <select name="topic" value={form.topic} onChange={handleChange}>
+              <select name="topic" value={form.topic} onChange={handleChange} disabled={isSending}>
                 {content.formTopics.map((topic) => (
                   <option key={topic} value={topic}>
                     {topic}
@@ -100,7 +108,14 @@ export default function ContactSection({ content }) {
             <div className="contact-field-row">
               <label className="contact-field">
                 <span>Name</span>
-                <input type="text" name="name" required value={form.name} onChange={handleChange} />
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={form.name}
+                  onChange={handleChange}
+                  disabled={isSending}
+                />
               </label>
               <label className="contact-field">
                 <span>Email</span>
@@ -110,6 +125,7 @@ export default function ContactSection({ content }) {
                   required
                   value={form.email}
                   onChange={handleChange}
+                  disabled={isSending}
                 />
               </label>
             </div>
@@ -122,19 +138,20 @@ export default function ContactSection({ content }) {
                 required
                 value={form.message}
                 onChange={handleChange}
+                disabled={isSending}
               />
             </label>
 
             <div className="contact-form-footer">
-              <button type="submit" className="contact-submit" disabled={status === 'sending'}>
-                {status === 'sending' ? 'Sending…' : 'Send message'}
+              <button type="submit" className="contact-submit" disabled={isSending}>
+                {isSending ? 'Sending…' : 'Send message'}
               </button>
-              {status === 'success' && (
+              {isSubmitted && (
                 <p className="contact-form-status contact-form-status--ok">
                   Sent — thank you, I&apos;ll get back to you soon.
                 </p>
               )}
-              {status === 'error' && (
+              {hasError && (
                 <p className="contact-form-status contact-form-status--error">
                   Something went wrong — try emailing directly instead.
                 </p>
