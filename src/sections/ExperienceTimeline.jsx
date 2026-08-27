@@ -11,7 +11,7 @@ export default function ExperienceTimeline({ content, education }) {
 
         <div className="center-timeline reveal" aria-label="Experience timeline">
           {content.items.map((item) => (
-            <article key={item.title} className={`ct-item ${item.side}`} tabIndex="0">
+            <article key={item.title} className={`ct-item ${item.side}`}>
               <header className="ct-head">
                 <div className="ct-time">{item.time}</div>
                 <div className={`ct-title${item.editorialTitle ? ' ct-title--editorial' : ''}`}>

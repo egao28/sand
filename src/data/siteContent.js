@@ -40,7 +40,7 @@ export const siteContent = {
       'I build infrastructure for machine learning systems, with a focus on reliability, reproducibility, and developer experience.',
     body: [
       "I'm a Computer Science and Statistics student at the University of Chicago. I'm especially interested in the parts of ML that make a system usable beyond the model itself: data pipelines, validation, testing, tooling, and the infrastructure that keeps things working after the first demo.",
-      'Most recently, I worked on bloom-mcp at the Salk Institute, an MCP platform that lets AI agents run scientific analyses from plain-English requests. I built and worked across a set of 23 analysis tools with validated input and output contracts, reproducible execution, and provenance tracking for things like random seeds, library versions, and output hashes.',
+      'Most recently, I worked on bloom-mcp at the Salk Institute, an MCP platform that lets AI agents run scientific analyses from plain-English requests. I built and worked across a set of 22 analysis tools with validated input and output contracts, reproducible execution, and provenance tracking for things like random seeds, library versions, and output hashes.',
       "What I like about this kind of work is that the infrastructure is mostly invisible when it's doing its job. A researcher shouldn't have to think about whether an analysis used the right input format, whether a result can be reproduced, or whether something silently broke upstream. I like building systems that take care of those details.",
     ],
   },
@@ -58,7 +58,7 @@ export const siteContent = {
       { icon: '◌', text: 'HTML/CSS' },
       { icon: '✳', text: 'MCP' },
       { icon: '⧈', text: 'FastMCP' },
-      { icon: '✶', text: 'LangChain' },
+      { icon: '⬠', text: 'LangChain' },
       { icon: '✷', text: 'OpenAI Embeddings' },
     ],
     secondary: [
@@ -70,12 +70,12 @@ export const siteContent = {
       { icon: '⟑', text: 'Matplotlib' },
       { icon: '⟡', text: 'Git' },
       { icon: '⟢', text: 'GitHub Actions' },
-      { icon: '⬢', text: 'pytest' },
+      { icon: '⬥', text: 'pytest' },
       { icon: '⌬', text: 'Docker' },
       { icon: '◈', text: 'Pydantic' },
       { icon: '⟟', text: 'Supabase' },
       { icon: '✦', text: 'React' },
-      { icon: '⟡', text: 'Next.js' },
+      { icon: '⟠', text: 'Next.js' },
     ],
   },
   experience: {

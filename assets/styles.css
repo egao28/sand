@@ -612,7 +612,7 @@ section {
   justify-self: end;
   margin-left: auto;
 }
-/* Header stack: tight rhythm; detail block uses --ct-layer-* for Motivation/Technology */
+/* Header stack: tight rhythm */
 .ct-head {
   display: grid;
   gap: 0.35rem;
@@ -1120,7 +1120,7 @@ section {
 }
 .detail-tool-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
   gap: 0.75rem;
 }
 .detail-tool-card {

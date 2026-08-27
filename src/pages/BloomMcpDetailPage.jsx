@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
+import { getExperienceBySlug } from '../data/siteContent.js'
 
 export default function BloomMcpDetailPage() {
   const techRef = useRef(null)
   useRevealOnScroll()
+  const bloomExperience = getExperienceBySlug('bloom-mcp')
 
   useEffect(() => {
     const el = techRef.current
@@ -41,9 +43,7 @@ export default function BloomMcpDetailPage() {
       <header className="project-detail-hero reveal project-detail-hero--plain">
         <div className="sec-inner project-detail-hero-inner">
           <h1 className="project-detail-title">Bloom MCP</h1>
-          <p className="experience-detail-subtitle">
-            Research Software Engineering Intern · Harnessing Plants Initiative · Jun – Aug 2026
-          </p>
+          <p className="experience-detail-subtitle">{bloomExperience.sub}</p>
           <p className="about-body project-detail-prose">
             Between June and August 2026 I designed and built <strong>bloom-mcp</strong> — the
             service that lets Claude and other AI agents run real, validated plant-phenotyping
@@ -65,7 +65,7 @@ export default function BloomMcpDetailPage() {
               <span className="detail-stat-label">test functions</span>
             </div>
             <div>
-              <span className="detail-stat-num">42.9k</span>
+              <span className="detail-stat-num">41.8k</span>
               <span className="detail-stat-label">lines of Python</span>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function BloomMcpDetailPage() {
           </div>
 
           <figure className="detail-diagram">
-            <div className="detail-diagram-scroll">
+            <div className="detail-diagram-scroll" tabIndex="0">
               <svg
                 viewBox="0 0 1360 400"
                 role="img"
@@ -630,9 +630,10 @@ export default function BloomMcpDetailPage() {
             </h2>
           </div>
           <p className="about-body project-detail-prose">
-            The project shipped as a sequence of vertical slices, each one a working, tested
-            capability rather than a scaffold for the next — the tiers below are the project&apos;s
-            own naming, not a retrospective one.
+            The project shipped tier by tier, each one a working, tested capability rather than a
+            scaffold for the next — tiers sometimes overlapped as later work started before earlier
+            work fully closed out. The tiers below are the project&apos;s own naming, not a
+            retrospective one.
           </p>
 
           <div className="detail-timeline">
