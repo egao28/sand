@@ -251,7 +251,7 @@ export const siteContent = {
     href: resumePdf,
     fileName: 'Xinyi Gao Resume.pdf',
     buttonLabel: 'Download PDF',
-    lastUpdated: '8.17.2026',
+    lastUpdated: import.meta.env.VITE_RESUME_LAST_UPDATED,
   },
   contact: {
     panelHeadline: 'Contact',
