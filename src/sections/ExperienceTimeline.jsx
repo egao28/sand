@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import EducationTimeline from './EducationTimeline.jsx'
 
 export default function ExperienceTimeline({ content, education }) {
@@ -19,38 +20,9 @@ export default function ExperienceTimeline({ content, education }) {
                 <div className="ct-sub">{item.sub}</div>
               </header>
 
-              {item.layout === 'layered' && item.motivation && item.technologyTags ? (
-                <div className="ct-detail ct-detail--layered">
-                  <div className="ct-layer-section">
-                    <p className="ct-layer-kicker">Motivation</p>
-                    <div className="ct-layer-body">
-                      {item.motivation.map((p, i) => (
-                        <p key={i} className="ct-motivation-p">
-                          {p}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="ct-layer-section">
-                    <p className="ct-layer-kicker">Technology</p>
-                    <ul className="ct-tech-tags" aria-label="Technologies">
-                      {item.technologyTags.map((t) => (
-                        <li key={t}>
-                          <span className="ct-tech-tag">{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ) : (
-                <div className="ct-detail">
-                  <ul>
-                    {(item.details ?? []).map((d) => (
-                      <li key={d}>{d}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <Link to={item.href} className="ct-more-link">
+                Click here for more <span aria-hidden="true">→</span>
+              </Link>
             </article>
           ))}
         </div>

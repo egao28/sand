@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import SectionLabel from '../components/SectionLabel.jsx'
 import { useTypewriter } from '../hooks/useTypewriter.js'
+import polaroidPhoto from '../assets/about/myself.png'
 
 export default function AboutSection({ content }) {
   const dividerRef = useRef(null)
@@ -29,8 +30,6 @@ export default function AboutSection({ content }) {
     return () => io.disconnect()
   }, [])
 
-  const headlineLines = useMemo(() => content.headline.split('\n'), [content.headline])
-
   return (
     <section id="about">
       <div className="sec-inner">
@@ -46,18 +45,14 @@ export default function AboutSection({ content }) {
         </div>
 
         <div className="about-grid reveal">
-          <div>
-            <h2 className="about-headline">
-              {headlineLines.map((line, i) => (
-                <React.Fragment key={i}>
-                  {i > 0 && <br />}
-                  {i === 1 ? <em>{line}</em> : line}
-                </React.Fragment>
-              ))}
-            </h2>
+          <div className="about-photo-col">
+            <div className="about-polaroid">
+              <img src={polaroidPhoto} alt={content.photo.alt} className="about-polaroid-img" />
+            </div>
           </div>
 
           <div>
+            <p className="about-intro">{content.intro}</p>
             {content.body.map((p) => (
               <p key={p} className="about-body">
                 {p}
