@@ -1534,8 +1534,8 @@ section {
 #contact .sec-inner {
   position: relative;
   z-index: 2;
-  padding-top: 1.75rem;
-  padding-bottom: 0.5rem;
+  padding-top: 2.5rem;
+  padding-bottom: 0.75rem;
 }
 #contact .footer-bar {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
@@ -1545,28 +1545,28 @@ section {
 .contact-panels {
   display: grid;
   grid-template-columns: 0.85fr 1.4fr;
-  gap: 1.15rem;
-  margin-bottom: 0.5rem;
+  gap: 1.35rem;
+  margin-bottom: 0.65rem;
   align-items: start;
 }
 .contact-panel {
   background: var(--paper);
   border-radius: 0;
-  padding: clamp(1.15rem, 2vw, 1.6rem);
+  padding: clamp(1.35rem, 2.3vw, 1.9rem);
   box-shadow: 0 28px 50px -14px rgba(0, 0, 0, 0.5);
 }
 .contact-panel--info {
   /* the "small on the left sits a little lower" stagger */
-  margin-top: clamp(1rem, 2.5vw, 1.75rem);
+  margin-top: clamp(1.5rem, 3.75vw, 2.6rem);
 }
 .contact-panel-headline {
   font-family: var(--serif);
   font-weight: 300;
-  font-size: clamp(24px, 2.9vw, 34px);
+  font-size: clamp(26px, 3.15vw, 37px);
   line-height: 1.05;
   letter-spacing: -0.015em;
   color: var(--ink);
-  margin-bottom: clamp(1.1rem, 2.2vw, 1.5rem);
+  margin-bottom: clamp(1.3rem, 2.6vw, 1.75rem);
 }
 
 /* Small panel: email / linkedin / location */
@@ -1770,7 +1770,7 @@ a.contact-info-link:focus-visible .contact-info-value {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding-top: 0.5rem;
+  padding-top: 0.6rem;
   font-family: var(--mono);
   font-size: 15px;
   letter-spacing: 0.12em;
