@@ -423,12 +423,6 @@ section {
 .page--secondary #projects {
   background: transparent;
 }
-#about .about-grid {
-  display: grid;
-  grid-template-columns: minmax(200px, 300px) 1fr;
-  gap: 4rem;
-  align-items: start;
-}
 .about-headline {
   font-family: var(--serif);
   font-size: clamp(41px, 4.6vw, 65px);
@@ -439,10 +433,6 @@ section {
 }
 .about-headline em {
   font-style: italic;
-}
-.about-photo-col {
-  display: flex;
-  justify-content: center;
 }
 .about-polaroid {
   width: 100%;
@@ -456,16 +446,6 @@ section {
   filter: drop-shadow(0 10px 18px rgba(25, 23, 19, 0.18));
   user-select: none;
 }
-.about-intro {
-  font-family: var(--serif);
-  font-size: clamp(26px, 2.8vw, 36px);
-  font-weight: 500;
-  font-style: italic;
-  line-height: 1.32;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  margin-bottom: 1.75rem;
-}
 .about-body {
   font-size: 19px;
   line-height: 1.8;
@@ -473,29 +453,61 @@ section {
   margin-bottom: 1.25rem;
 }
 
-/* Type-on-scroll divider */
-.type-divider {
-  margin-bottom: 3.5rem;
-}
-.type-divider-text {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  align-items: baseline;
-}
-.type-lead {
+/* Identity line above the headline */
+.about-identity {
   font-family: var(--mono);
-  font-size: 16px;
-  letter-spacing: 0.12em;
+  font-size: 15px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--ink-muted);
+  margin-bottom: 1.5rem;
 }
-.type-name {
-  font-family: var(--serif);
-  font-size: clamp(41px, 4.2vw, 61px);
-  font-weight: 300;
-  letter-spacing: -0.01em;
+
+/* Photo floated inline at the start of the first paragraph, instead of its own grid column */
+.about-lede {
+  overflow: hidden;
+}
+.about-photo-inline {
+  float: left;
+  width: 220px;
+  margin: 0.25rem 2rem 1.25rem 0;
+}
+.about-photo-caption {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+  margin-top: 0.85rem;
+  transform: rotate(-3deg);
+}
+
+/* Compact career-history line */
+.about-work {
+  margin-top: 3.5rem;
+}
+.about-work-label {
+  font-weight: 600;
   color: var(--ink);
+}
+.about-work-note {
+  font-size: 17px;
+  color: var(--ink-soft);
+}
+.about-work-list {
+  margin-top: 1rem;
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--ink-soft);
+  line-height: 2.1;
+}
+
+.about-signoff {
+  margin-top: 4.5rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-style: italic;
+  color: var(--ink-muted);
 }
 
 /* Skills marquee */
@@ -1816,9 +1828,10 @@ a.contact-info-link:focus-visible .contact-info-value {
   .sec-inner {
     padding: 4rem 1.5rem;
   }
-  #about .about-grid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .about-photo-inline {
+    float: none;
+    width: 180px;
+    margin: 0 0 1.5rem 0;
   }
   .ct-item {
     padding: 1.2rem 1.2rem;
