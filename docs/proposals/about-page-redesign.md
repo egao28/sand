@@ -36,14 +36,15 @@ include.
    - `ExperienceDetailPage.jsx` — generic template (hero + bullet list),
      reusing the existing `/projects/:slug` visual system, for Sony and
      Tsinghua.
-   - `BloomMcpDetailPage.jsx` — a bespoke page for Salk Institute/Bloom MCP,
-     using the fuller custom design supplied separately (masthead, stat
-     strip, architecture diagram, tool catalog, build timeline, testing
-     section, process section). Its typography (Fraunces / Source Serif 4 /
-     IBM Plex Mono) and palette are intentionally distinct from the rest of
-     the site, scoped under a `.bloom-detail-page` wrapper class (own CSS
-     file, fonts loaded only while the page is mounted) so nothing leaks
-     onto other routes.
+   - `BloomMcpDetailPage.jsx` — the fuller custom design supplied separately
+     (masthead, stat strip, architecture diagram, tool catalog, build
+     timeline, testing section, process section), but rebuilt on the site's
+     own type system and tokens (Cormorant Garamond / Space Grotesk / Space
+     Mono, `--ink`/`--paper`/`--accent`) and the same `.project-detail-*`
+     classes the other detail pages use, rather than a separate visual
+     identity — an initial version used its own distinct fonts/palette
+     scoped under `.bloom-detail-page`, but that read as inconsistent with
+     the rest of the site and was reworked to match.
 6. **Bug fix** (`ProjectsSection.jsx`): the working tree already has
    `src/assets/projects/photo-1.png` deleted but the file still imports it,
    which breaks the dev/build. Drop `photo1` from the `PHOTOS` pool (down to
@@ -62,12 +63,12 @@ include.
 
 ## Risks
 
-- Scoping the Bloom MCP page's custom CSS under `.bloom-detail-page` (rather
-  than `:root`) is required to avoid clobbering the main site's CSS custom
-  properties and global element selectors (`a`, `h1`–`h3`, `*`) — verified by
-  hand during the CSS port; needs a visual smoke test on both the Bloom page
-  and an adjacent page (e.g. `/projects/proxima`) to confirm no bleed.
 - Converting the source HTML/SVG diagram to JSX requires camelCasing SVG
   presentation attributes (`stroke-width` → `strokeWidth`, etc.) and removing
   HTML comments (`<!-- -->` is invalid inside JSX) — a missed conversion
   would silently drop a style or break the JSX parse.
+- Reusing `.project-detail-motivation`/`.project-detail-demo` twice each
+  (Bloom MCP has five long-form sections vs. one on the project pages) means
+  two section pairs share an identical background gradient — accepted as a
+  reasonable tradeoff for staying inside the existing tone system rather
+  than inventing new gradients per section.
