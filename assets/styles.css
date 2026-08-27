@@ -1440,10 +1440,23 @@ section {
   min-height: calc(100vh - 96px);
   padding-bottom: 0;
 }
+.resume-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
 .resume-photo-link {
   display: inline-block;
   text-decoration: none;
   --resume-lift: translateY(-6px) scale(1.02) rotate(-2deg);
+}
+.resume-updated {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
 }
 .resume-photo-link:focus-visible {
   outline: 2px solid var(--ink);
@@ -1515,16 +1528,8 @@ section {
 #contact .sec-inner {
   position: relative;
   z-index: 2;
-}
-#contact .sec-label {
-  color: rgba(255, 253, 248, 0.85);
-  font-size: 16px;
-  letter-spacing: 0.2em;
-  margin-bottom: 2.75rem;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-}
-#contact .sec-label::after {
-  background: rgba(255, 253, 248, 0.4);
+  padding-top: 3.25rem;
+  padding-bottom: 1rem;
 }
 #contact .footer-bar {
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
@@ -1535,13 +1540,13 @@ section {
   display: grid;
   grid-template-columns: 0.85fr 1.4fr;
   gap: 1.5rem;
-  margin-bottom: 3rem;
+  margin-bottom: 0.75rem;
   align-items: start;
 }
 .contact-panel {
   background: var(--paper);
   border-radius: 0;
-  padding: clamp(1.75rem, 3vw, 2.5rem);
+  padding: clamp(1.5rem, 2.6vw, 2.15rem);
   box-shadow: 0 28px 50px -14px rgba(0, 0, 0, 0.5);
 }
 .contact-panel--info {
@@ -1759,7 +1764,7 @@ a.contact-info-link:focus-visible .contact-info-value {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding-top: 1.75rem;
+  padding-top: 0.75rem;
   font-family: var(--mono);
   font-size: 15px;
   letter-spacing: 0.12em;
