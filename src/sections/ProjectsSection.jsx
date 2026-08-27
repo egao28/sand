@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import photo1 from '../assets/projects/photo-1.png'
 import photo2 from '../assets/projects/photo-2.png'
 import photo3 from '../assets/projects/photo-3.png'
 import photo4 from '../assets/projects/photo-4.png'
 import photo5 from '../assets/projects/photo-5.png'
 
-const PHOTOS = [photo1, photo2, photo3, photo4, photo5]
+const PHOTOS = [photo2, photo3, photo4, photo5]
 
 // Handcrafted cascade wave (percent anchors inside the gallery canvas), sized
 // against the real .sec-inner content width (~988px at desktop, ~673px at
