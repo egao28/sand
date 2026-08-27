@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import SectionLabel from '../components/SectionLabel.jsx'
-import contactPhoto from '../assets/contact.jpg'
+import contactAvif from '../assets/contact.avif'
+import contactWebp from '../assets/contact.webp'
+import contactJpg from '../assets/contact.jpg'
 
 // Public client-side submit key for Web3Forms — safe to expose in source,
 // the service is designed around this (like a Formspree form ID).
@@ -48,11 +49,13 @@ export default function ContactSection({ content }) {
 
   return (
     <section id="contact">
-      <div className="contact-photo-bg" style={{ backgroundImage: `url(${contactPhoto})` }} />
+      <picture className="contact-photo-bg">
+        <source srcSet={contactAvif} type="image/avif" />
+        <source srcSet={contactWebp} type="image/webp" />
+        <img src={contactJpg} alt="" className="contact-photo-bg-img" decoding="async" />
+      </picture>
 
       <div className="sec-inner">
-        <SectionLabel text="contact" noRule />
-
         <div className="contact-panels">
           <div className="contact-panel contact-panel--info reveal">
             <h2 className="contact-panel-headline">{content.panelHeadline}</h2>
