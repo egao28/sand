@@ -1,64 +1,49 @@
-import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import SectionLabel from '../components/SectionLabel.jsx'
-import { useTypewriter } from '../hooks/useTypewriter.js'
 import polaroidPhoto from '../assets/about/myself.png'
 
 export default function AboutSection({ content }) {
-  const dividerRef = useRef(null)
-  const [enabled, setEnabled] = useState(false)
-
-  const typedName = useTypewriter(content.divider.typed, { enabled })
-
-  useEffect(() => {
-    const el = dividerRef.current
-    if (!el) return
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            setEnabled(true)
-            io.disconnect()
-            break
-          }
-        }
-      },
-      { threshold: 0.35 }
-    )
-
-    io.observe(el)
-    return () => io.disconnect()
-  }, [])
-
   return (
     <section id="about">
       <div className="sec-inner">
         <SectionLabel text={content.label} />
 
-        <div className="type-divider reveal" id="type-divider" ref={dividerRef}>
-          <div className="type-divider-text" aria-live="polite">
-            <span className="type-lead">{content.divider.lead}</span>
-            <span id="typed-name" className="type-name">
-              {typedName}
-            </span>
-          </div>
-        </div>
+        <div className="about-intro-block reveal">
+          <div className="about-identity">{content.identity}</div>
 
-        <div className="about-grid reveal">
-          <div className="about-photo-col">
-            <div className="about-polaroid">
-              <img src={polaroidPhoto} alt={content.photo.alt} className="about-polaroid-img" />
+          <h1 className="about-headline">{content.headline}</h1>
+
+          <div className="about-lede">
+            <div className="about-photo-inline">
+              <div className="about-polaroid">
+                <img src={polaroidPhoto} alt={content.photo.alt} className="about-polaroid-img" />
+              </div>
+              <div className="about-photo-caption">{content.photo.caption}</div>
+            </div>
+            <p className="about-body">{content.body[0]}</p>
+          </div>
+
+          {content.body.slice(1).map((p) => (
+            <p key={p} className="about-body">
+              {p}
+            </p>
+          ))}
+
+          <div className="about-work">
+            <span className="about-work-label">Work</span>
+            <span className="about-work-note"> — the short version, most recent first:</span>
+            <div className="about-work-list">
+              {content.work.map((line) => (
+                <div key={line}>{line}</div>
+              ))}
             </div>
           </div>
 
-          <div>
-            <p className="about-intro">{content.intro}</p>
-            {content.body.map((p) => (
-              <p key={p} className="about-body">
-                {p}
-              </p>
-            ))}
-          </div>
+          <p className="about-signoff">{content.signoff}</p>
+
+          <Link to="/projects" className="ct-more-link">
+            See what I&rsquo;ve built <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </div>
     </section>

@@ -29,20 +29,25 @@ export const siteContent = {
   },
   about: {
     label: 'about',
-    divider: {
-      lead: "Hello, I'm",
-      typed: 'Evelyn Gao.',
-    },
+    identity: 'Evelyn Gao — Computer Science & Statistics, University of Chicago',
+    headline: 'I build infrastructure for machine learning systems.',
     photo: {
       alt: 'Polaroid photo of Evelyn Gao pointing at a whiteboard',
+      caption: 'mid-explanation, probably about provenance tracking',
     },
-    intro:
-      'I build infrastructure for machine learning systems, with a focus on reliability, reproducibility, and developer experience.',
     body: [
-      "I'm a Computer Science and Statistics student at the University of Chicago. I'm especially interested in the parts of ML that make a system usable beyond the model itself: data pipelines, validation, testing, tooling, and the infrastructure that keeps things working after the first demo.",
+      "I'm a Computer Science and Statistics student at the University of Chicago, expected graduation 2028. I'm especially interested in the parts of ML that make a system usable beyond the model itself: data pipelines, validation, testing, tooling, and the infrastructure that keeps things working after the first demo.",
       'Most recently, I worked on bloom-mcp at the Salk Institute, an MCP platform that lets AI agents run scientific analyses from plain-English requests. I built and worked across a set of 22 analysis tools with validated input and output contracts, reproducible execution, and provenance tracking for things like random seeds, library versions, and output hashes.',
       "What I like about this kind of work is that the infrastructure is mostly invisible when it's doing its job. A researcher shouldn't have to think about whether an analysis used the right input format, whether a result can be reproduced, or whether something silently broke upstream. I like building systems that take care of those details.",
     ],
+    // Kept as plain display strings rather than derived from siteContent.experience/.education —
+    // the shapes don't line up (e.g. "bloom-mcp" isn't a field there, only the item's slug).
+    // The years should stay in sync with experience.items[0].time and education.items[0].time.
+    work: [
+      'bloom-mcp, Salk Institute — 2026 – Present',
+      'University of Chicago — B.S. Computer Science, B.A. Statistics — 2028',
+    ],
+    signoff: 'Mostly building things researchers never have to think about. — E.G.',
   },
   skills: {
     label: 'skills',
