@@ -1287,6 +1287,22 @@ section {
   color: var(--ink);
 }
 
+.detail-code {
+  display: block;
+  margin: 1.1rem 0 1.5rem;
+  padding: 1rem 1.2rem;
+  background: rgba(25, 23, 19, 0.05);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  overflow-x: auto;
+  white-space: pre;
+  max-width: 38rem;
+}
+
 .projects-stack {
   display: grid;
   gap: 1.5rem;
