@@ -1077,6 +1077,32 @@ section {
   background: linear-gradient(52deg, #f9f6f0 0%, #ebe1d4 85%);
 }
 
+.project-detail-page--tone-e {
+  background: linear-gradient(205deg, #f5f0e4 0%, #fffcf6 100%);
+}
+.project-detail-page--tone-e .project-detail-hero {
+  background: linear-gradient(175deg, #ffffff 0%, #fdfaf4 58%, #ecdfcb 100%);
+}
+.project-detail-page--tone-e .project-detail-motivation {
+  background: linear-gradient(165deg, #fffef9 0%, #f1e2c9 45%, #e6d3b5 100%);
+}
+.project-detail-page--tone-e .project-detail-demo {
+  background: linear-gradient(100deg, #f7f3e9 0%, #e9dbc4 60%, #ddccae 100%);
+}
+
+.project-detail-page--tone-f {
+  background: linear-gradient(150deg, #fffef9 0%, #f0e7d6 100%);
+}
+.project-detail-page--tone-f .project-detail-hero {
+  background: linear-gradient(170deg, #ffffff 0%, #fef9f0 60%, #e9ddc9 100%);
+}
+.project-detail-page--tone-f .project-detail-motivation {
+  background: linear-gradient(210deg, #fffdf8 0%, #eee0c6 40%, #ddc9a8 100%);
+}
+.project-detail-page--tone-f .project-detail-demo {
+  background: linear-gradient(70deg, #f8f5ed 0%, #e6dac2 55%, #d8c8a4 100%);
+}
+
 /* Long-form experience detail pages (e.g. Bloom MCP): extra content blocks
    beyond the base project-detail system, built from the same tokens/type
    scale so a richer write-up doesn't introduce a second visual language. */

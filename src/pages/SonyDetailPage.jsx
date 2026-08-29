@@ -1,35 +1,16 @@
-import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
+import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
+import DiagramArrowMarker from '../components/DiagramArrowMarker.jsx'
+import TechChipGrid from '../components/TechChipGrid.jsx'
 
 export default function SonyDetailPage() {
-  const techRef = useRef(null)
+  const techRef = useDarkSurfaceOnIntersect()
   useRevealOnScroll()
-
-  useEffect(() => {
-    const el = techRef.current
-    if (!el) return
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0]
-        if (!e) return
-        const on = e.isIntersecting && e.intersectionRatio > 0.15
-        document.body.classList.toggle('cursor-dark-surface', on)
-      },
-      { threshold: [0, 0.15, 0.35, 0.6, 1] }
-    )
-
-    io.observe(el)
-    return () => {
-      io.disconnect()
-      document.body.classList.remove('cursor-dark-surface')
-    }
-  }, [])
 
   return (
     <main
-      className="page page--secondary project-detail-page project-detail-page--tone-c"
+      className="page page--secondary project-detail-page project-detail-page--tone-e"
       aria-label="Sony"
     >
       <div className="project-detail-back-wrap sec-inner">
@@ -56,7 +37,7 @@ export default function SonyDetailPage() {
               <span className="detail-stat-label">Releases &amp; assets automated weekly</span>
             </div>
             <div>
-              <span className="detail-stat-num">500+</span>
+              <span className="detail-stat-num">300+</span>
               <span className="detail-stat-label">Feedback comments auto-routed weekly</span>
             </div>
             <div>
@@ -100,7 +81,7 @@ export default function SonyDetailPage() {
 
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The team was receiving 500+ pieces of user feedback a week that needed distributing
+              The team was receiving 300+ pieces of user feedback a week that needed distributing
               across different teams, and the goal was full automation with no manual triage. The
               first version was pure keyword matching, and it didn&apos;t hold up: plenty of
               feedback said the same thing in different words, so the keyword list only grew — and
@@ -124,17 +105,7 @@ export default function SonyDetailPage() {
                 aria-label="A feedback comment is checked by router.py against rules.yaml in priority order. A confident match routes to the owning team; anything below that confidence goes into a manual review queue."
               >
                 <defs>
-                  <marker
-                    id="sy-arrow"
-                    viewBox="0 0 10 10"
-                    refX="9"
-                    refY="5"
-                    markerWidth="6.5"
-                    markerHeight="6.5"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
-                  </marker>
+                  <DiagramArrowMarker id="sy-arrow" />
                 </defs>
                 <rect
                   x="20"
@@ -376,8 +347,8 @@ WHERE format_version = 'v1';`}</code>
               Technical
             </h2>
           </div>
-          <div className="project-tech-grid" aria-label="Technical stack">
-            {[
+          <TechChipGrid
+            chips={[
               'Python',
               'regex & YAML rule engine',
               'pandas',
@@ -386,12 +357,8 @@ WHERE format_version = 'v1';`}</code>
               'replica-gated migrations',
               'data-quality auditing',
               'config-driven routing',
-            ].map((label) => (
-              <span key={label} className="project-tech-chip">
-                {label}
-              </span>
-            ))}
-          </div>
+            ]}
+          />
         </div>
       </section>
     </main>

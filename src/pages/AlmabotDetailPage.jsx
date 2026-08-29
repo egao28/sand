@@ -1,40 +1,23 @@
-import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
+import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
 import { getProjectBySlug } from '../data/siteContent.js'
+import { splitTechnical } from '../utils/splitTechnical.js'
+import DiagramArrowMarker from '../components/DiagramArrowMarker.jsx'
+import TechChipGrid from '../components/TechChipGrid.jsx'
 
 export default function AlmabotDetailPage() {
-  const techRef = useRef(null)
+  const techRef = useDarkSurfaceOnIntersect()
   useRevealOnScroll()
   const project = getProjectBySlug('almabot')
 
-  useEffect(() => {
-    const el = techRef.current
-    if (!el) return
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0]
-        if (!e) return
-        const on = e.isIntersecting && e.intersectionRatio > 0.15
-        document.body.classList.toggle('cursor-dark-surface', on)
-      },
-      { threshold: [0, 0.15, 0.35, 0.6, 1] }
-    )
-
-    io.observe(el)
-    return () => {
-      io.disconnect()
-      document.body.classList.remove('cursor-dark-surface')
-    }
-  }, [])
-
-  const demoUrl = project?.demoUrl?.trim()
-  const demoLabel = project?.demoLabel?.trim() || 'Open project'
+  if (!project) {
+    return <Navigate to="/projects" replace />
+  }
 
   return (
     <main
-      className="page page--secondary project-detail-page project-detail-page--tone-b"
+      className={`page page--secondary project-detail-page project-detail-page--tone-${project.detailTone}`}
       aria-label="AlmaBot"
     >
       <div className="project-detail-back-wrap sec-inner">
@@ -134,17 +117,7 @@ export default function AlmabotDetailPage() {
                 aria-label="A natural language request is parsed by LangChain into structured constraints. Separately, 800,000+ course records form a prerequisite dependency graph, ordered by Kahn's topological sort into a valid schedule, or a detected cycle meaning no valid schedule exists."
               >
                 <defs>
-                  <marker
-                    id="ab-arrow"
-                    viewBox="0 0 10 10"
-                    refX="9"
-                    refY="5"
-                    markerWidth="6.5"
-                    markerHeight="6.5"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
-                  </marker>
+                  <DiagramArrowMarker id="ab-arrow" />
                 </defs>
 
                 <text
@@ -418,26 +391,14 @@ export default function AlmabotDetailPage() {
             </h2>
           </div>
           <p className="project-detail-demo-lead">
-            {demoUrl ? (
-              <a
-                href={demoUrl}
-                className="project-detail-demo-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${demoLabel} (opens in a new tab)`}
-              >
-                {demoLabel}
-              </a>
-            ) : (
-              <a
-                href="#"
-                className="project-detail-demo-link"
-                onClick={(e) => e.preventDefault()}
-                aria-label={`${demoLabel} (link coming soon)`}
-              >
-                {demoLabel} <span className="project-detail-demo-soon">(coming soon)</span>
-              </a>
-            )}
+            <a
+              href="#"
+              className="project-detail-demo-link"
+              onClick={(e) => e.preventDefault()}
+              aria-label={`${project.demoLabel} (link coming soon)`}
+            >
+              {project.demoLabel} <span className="project-detail-demo-soon">(coming soon)</span>
+            </a>
           </p>
         </div>
       </section>
@@ -456,24 +417,7 @@ export default function AlmabotDetailPage() {
               Technical
             </h2>
           </div>
-          <div className="project-tech-grid" aria-label="Technical stack">
-            {[
-              'course scheduling',
-              'constraint solving',
-              'prerequisite graph',
-              "Kahn's algorithm",
-              'cycle detection',
-              'dataset processing',
-              'LLM integration',
-              'LangChain',
-              'Gradio',
-              'planning system design',
-            ].map((label) => (
-              <span key={label} className="project-tech-chip">
-                {label}
-              </span>
-            ))}
-          </div>
+          <TechChipGrid chips={splitTechnical(project.technical)} />
         </div>
       </section>
     </main>

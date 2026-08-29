@@ -1,33 +1,13 @@
-import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
+import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
 import { getExperienceBySlug } from '../data/siteContent.js'
+import DiagramArrowMarker from '../components/DiagramArrowMarker.jsx'
 
 export default function BloomMcpDetailPage() {
-  const techRef = useRef(null)
+  const techRef = useDarkSurfaceOnIntersect()
   useRevealOnScroll()
   const bloomExperience = getExperienceBySlug('bloom-mcp')
-
-  useEffect(() => {
-    const el = techRef.current
-    if (!el) return
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0]
-        if (!e) return
-        const on = e.isIntersecting && e.intersectionRatio > 0.15
-        document.body.classList.toggle('cursor-dark-surface', on)
-      },
-      { threshold: [0, 0.15, 0.35, 0.6, 1] }
-    )
-
-    io.observe(el)
-    return () => {
-      io.disconnect()
-      document.body.classList.remove('cursor-dark-surface')
-    }
-  }, [])
 
   return (
     <main
@@ -139,17 +119,7 @@ export default function BloomMcpDetailPage() {
                 aria-label="A tool call flows from a pluggable ExperimentReader backend, through a contract wrapper that validates parameters, resolves a seed, delegates execution to sleap-roots-analyze, and validates and hashes the output, into a pluggable ResultStore backend; any undeclared exception is intercepted before it reaches the agent."
               >
                 <defs>
-                  <marker
-                    id="bloom-arrow"
-                    viewBox="0 0 10 10"
-                    refX="9"
-                    refY="5"
-                    markerWidth="6.5"
-                    markerHeight="6.5"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
-                  </marker>
+                  <DiagramArrowMarker id="bloom-arrow" />
                 </defs>
 
                 {/* contract wrapper boundary */}

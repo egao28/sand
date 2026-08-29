@@ -103,11 +103,6 @@ export const siteContent = {
         title: 'Sony',
         editorialTitle: true,
         sub: 'Computer Science Operations & Maintenance Intern · May – Sep 2025',
-        details: [
-          'Built Python pipelines handling 100+ releases and assets weekly, automating retrieval, metadata cleaning, batch processing, and delivery dispatch — making release preparation approximately 60% faster and eliminating manual trivial-detail errors.',
-          'Designed a configurable keyword- and regex-based classifier that categorized and routed 300+ user feedback comments weekly, creating a consistent workflow for recurring feedback triage.',
-          'Executed data-quality and migration updates across a 100,000+ row production database, supporting dependable records and downstream operations.',
-        ],
       },
       {
         slug: 'tsinghua',
@@ -117,11 +112,6 @@ export const siteContent = {
         title: 'Tsinghua University',
         editorialTitle: true,
         sub: 'Research Assistant, Vehicle Emission Research Group · Spatiotemporal Modeling and Forecasting · Jul 2024 – Jan 2025',
-        details: [
-          'Built a supervised pipeline forecasting vehicle emission trajectories 24 hours ahead from 30 days of time-series data, using lagged and seasonal features with time-based splits to prevent leakage.',
-          "Detected statistically significant emission hotspots with Moran's I and Getis-Ord Gi* in GeoPandas, prioritizing regions for potential regulatory investigation.",
-          'Synthesized temporal, spatial, and category-level analyses in a report, clarifying practical patterns in vehicle emissions for research interpretation.',
-        ],
       },
     ],
   },
@@ -190,14 +180,13 @@ export const siteContent = {
         detailTone: 'a',
         demoLabel: 'Open Proxima',
         demoUrl: 'https://proxima.vercel.app',
-        backgroundImage: '/background/proxima.jpg',
         motivation: [
           'I built this because I struggled with finding research opportunities myself.',
           'Using Google or keyword search did not work well. Even when I had similar interests as professors, we were not using the same words.',
           'So I wanted to build something that helps people find research more efficiently and make better use of the information already online.',
         ],
         technical:
-          'semantic search · embeddings · similarity matching · ranking system · API design · full-stack development · data indexing · recommendation logic',
+          'semantic search · embeddings · cosine similarity · GPT-4o rerank · keyword fallback · ranking system · API design · full-stack development · data indexing · recommendation logic',
       },
       {
         slug: 'almabot',
@@ -207,13 +196,12 @@ export const siteContent = {
         href: '/projects/almabot',
         detailTone: 'b',
         demoLabel: 'Open project',
-        backgroundImage: '/background/almabot.jpg',
         motivation: [
           'I built this at UIUC because I did not have an academic advisor and had to figure out course planning on my own.',
           'Since I had access to the course dataset, I wanted to build something that takes user preferences and automatically generates a workable schedule.',
         ],
         technical:
-          'course scheduling · constraint solving · prerequisite graph · dataset processing · LLM integration · LangChain · Gradio · planning system design',
+          "course scheduling · constraint solving · prerequisite graph · Kahn's algorithm · cycle detection · dataset processing · LLM integration · LangChain · Gradio · planning system design",
       },
       {
         slug: 'carelink',

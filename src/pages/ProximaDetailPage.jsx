@@ -1,40 +1,23 @@
-import { useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
+import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
 import { getProjectBySlug } from '../data/siteContent.js'
+import { splitTechnical } from '../utils/splitTechnical.js'
+import DiagramArrowMarker from '../components/DiagramArrowMarker.jsx'
+import TechChipGrid from '../components/TechChipGrid.jsx'
 
 export default function ProximaDetailPage() {
-  const techRef = useRef(null)
+  const techRef = useDarkSurfaceOnIntersect()
   useRevealOnScroll()
   const project = getProjectBySlug('proxima')
 
-  useEffect(() => {
-    const el = techRef.current
-    if (!el) return
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0]
-        if (!e) return
-        const on = e.isIntersecting && e.intersectionRatio > 0.15
-        document.body.classList.toggle('cursor-dark-surface', on)
-      },
-      { threshold: [0, 0.15, 0.35, 0.6, 1] }
-    )
-
-    io.observe(el)
-    return () => {
-      io.disconnect()
-      document.body.classList.remove('cursor-dark-surface')
-    }
-  }, [])
-
-  const demoUrl = project?.demoUrl?.trim()
-  const demoLabel = project?.demoLabel?.trim() || 'Open project'
+  if (!project) {
+    return <Navigate to="/projects" replace />
+  }
 
   return (
     <main
-      className="page page--secondary project-detail-page project-detail-page--tone-a"
+      className={`page page--secondary project-detail-page project-detail-page--tone-${project.detailTone}`}
       aria-label="Proxima"
     >
       <div className="project-detail-back-wrap sec-inner">
@@ -138,17 +121,7 @@ export default function ProximaDetailPage() {
                 aria-label="1500 professor profiles are embedded offline into cached vectors. A student query is embedded online, compared by cosine similarity against the cached vectors, narrowed to a top-10, then reranked by GPT-4o into a top-3 with an explanation. If the external API is unreliable, the path falls back to keyword matching."
               >
                 <defs>
-                  <marker
-                    id="px-arrow"
-                    viewBox="0 0 10 10"
-                    refX="9"
-                    refY="5"
-                    markerWidth="6.5"
-                    markerHeight="6.5"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
-                  </marker>
+                  <DiagramArrowMarker id="px-arrow" />
                 </defs>
 
                 <text
@@ -474,26 +447,15 @@ export default function ProximaDetailPage() {
             </h2>
           </div>
           <p className="project-detail-demo-lead">
-            {demoUrl ? (
-              <a
-                href={demoUrl}
-                className="project-detail-demo-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${demoLabel} (opens in a new tab)`}
-              >
-                {demoLabel}
-              </a>
-            ) : (
-              <a
-                href="#"
-                className="project-detail-demo-link"
-                onClick={(e) => e.preventDefault()}
-                aria-label={`${demoLabel} (link coming soon)`}
-              >
-                {demoLabel} <span className="project-detail-demo-soon">(coming soon)</span>
-              </a>
-            )}
+            <a
+              href={project.demoUrl}
+              className="project-detail-demo-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${project.demoLabel} (opens in a new tab)`}
+            >
+              {project.demoLabel}
+            </a>
           </p>
         </div>
       </section>
@@ -512,24 +474,7 @@ export default function ProximaDetailPage() {
               Technical
             </h2>
           </div>
-          <div className="project-tech-grid" aria-label="Technical stack">
-            {[
-              'semantic search',
-              'embeddings',
-              'cosine similarity',
-              'GPT-4o rerank',
-              'keyword fallback',
-              'ranking system',
-              'API design',
-              'full-stack development',
-              'data indexing',
-              'recommendation logic',
-            ].map((label) => (
-              <span key={label} className="project-tech-chip">
-                {label}
-              </span>
-            ))}
-          </div>
+          <TechChipGrid chips={splitTechnical(project.technical)} />
         </div>
       </section>
     </main>
