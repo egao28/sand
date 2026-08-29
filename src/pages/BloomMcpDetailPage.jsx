@@ -12,7 +12,7 @@ export default function BloomMcpDetailPage() {
   return (
     <main
       className="page page--secondary project-detail-page project-detail-page--tone-a"
-      aria-label="Bloom MCP"
+      aria-label="Salk Institute"
     >
       <div className="project-detail-back-wrap sec-inner">
         <Link className="project-detail-back" to="/about">
@@ -22,14 +22,14 @@ export default function BloomMcpDetailPage() {
 
       <header className="project-detail-hero reveal project-detail-hero--plain">
         <div className="sec-inner project-detail-hero-inner">
-          <h1 className="project-detail-title">Bloom MCP</h1>
+          <h1 className="project-detail-title">Salk Institute</h1>
           <p className="experience-detail-subtitle">{bloomExperience.sub}</p>
           <p className="about-body project-detail-prose">
-            Between June and August 2026 I designed and built <strong>bloom-mcp</strong> — the
-            service that lets Claude and other AI agents run real, validated plant-phenotyping
-            analyses against Bloom&apos;s research database, from a plain-English request.
-            Twenty-two tools, a contract layer that makes every run reproducible, and a test suite
-            big enough to trust it.
+            Between June and August 2026, I designed and built <strong>bloom-mcp</strong>, the
+            service that lets Claude and other AI agents run validated plant-phenotyping analyses
+            against Bloom&apos;s research database from plain-English requests. It includes 22
+            tools, a shared contract layer for validation and reproducibility, and a large test
+            suite covering the service end to end.
           </p>
           <div className="detail-stat-strip">
             <div>
@@ -63,18 +63,20 @@ export default function BloomMcpDetailPage() {
             <p className="about-body project-detail-prose">
               <strong>Bloom</strong> is a research platform for the Salk Institute&apos;s Harnessing
               Plants Initiative, where plant biologists explore phenotype, genotype,
-              gene-expression, and root-scan data — including cylinder-grown root systems traced
-              through the lab&apos;s SLEAP-based pipeline. My job was to make that data usable by an
-              AI agent, not just a human clicking through dashboards: a researcher can ask, in plain
-              English, to clean an experiment, remove outliers, and show the PCA, and bloom-mcp
-              resolves the raw data, validates and cleans it, runs the analysis, renders the plot,
-              and hands back signed download links with full provenance — no custom glue code per
-              request.
+              gene-expression, and root-scan data, including cylinder-grown root systems traced
+              through the lab&apos;s SLEAP-based pipeline.
             </p>
             <p className="about-body project-detail-prose">
-              I own this service end to end: the tool surface, the reproducibility guarantees
-              underneath it, the storage and identity layers around it, and the test suite that
-              keeps all of it honest.
+              My job was to make those analyses available through an AI agent rather than only
+              through the existing research interfaces. A researcher can ask, in plain English, to
+              clean an experiment, remove outliers, and generate a PCA. Bloom-mcp resolves the raw
+              data, validates and cleans it, runs the analysis, renders the plot, and returns signed
+              download links together with the provenance needed to reproduce the run.
+            </p>
+            <p className="about-body project-detail-prose">
+              My work covered the service end to end: the tool surface, the reproducibility layer
+              underneath it, the storage and identity infrastructure around it, and the tests used
+              to verify each piece.
             </p>
           </div>
         </div>
@@ -94,20 +96,28 @@ export default function BloomMcpDetailPage() {
           <h3 className="detail-subheading">A thin, hardened surface</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Every analysis tool delegates its actual math to{' '}
+              Every analysis tool delegates its numerical work to{' '}
               <a href="https://github.com/talmolab/sleap-roots-analyze">sleap-roots-analyze</a>, a
               separate scientific-computing package maintained by the Pereira Lab. Bloom-mcp is
-              deliberately a thin surface over it, not a second home for analysis code — what it
-              owns instead is everything the science package doesn&apos;t: input/output validation,
-              reproducibility, access control, storage, and the test suite that holds it together.
+              intentionally a thin layer over that package rather than a second implementation of
+              the same analysis code. Its responsibility is the surrounding infrastructure: input
+              and output validation, reproducibility, access control, persistence, and error
+              handling.
             </p>
             <p className="about-body project-detail-prose">
-              That wasn&apos;t always true. Early on, bloom-mcp vendored its own copies of the PCA,
-              clustering, and outlier-detection logic; once the upstream package matured, I led the
-              effort to delete all of it and repoint every call site to the real library. Today
-              there are zero direct <code>scikit-learn</code>/<code>scipy</code>/
-              <code>seaborn</code> imports in bloom-mcp&apos;s shipped code — an invariant pinned by
-              its own dedicated test.
+              That separation was not there at the beginning. Early versions of bloom-mcp carried
+              their own copies of the PCA, clustering, and outlier-detection logic. Once the
+              upstream package matured, I moved every call site onto the shared library and removed
+              the duplicated implementations. Today, bloom-mcp&apos;s shipped code contains no
+              direct <code>scikit-learn</code>, <code>scipy</code>, or <code>seaborn</code> imports,
+              and a dedicated test enforces that boundary.
+            </p>
+            <p className="about-body project-detail-prose">
+              A tool call starts from a pluggable ExperimentReader, passes through a shared contract
+              wrapper that validates parameters and resolves the random seed, delegates the analysis
+              to sleap-roots-analyze, validates and hashes the output, and writes the result through
+              a pluggable ResultStore. Exceptions that have not been explicitly declared by a tool
+              are caught and sanitized before they can reach the agent.
             </p>
           </div>
 
@@ -437,8 +447,8 @@ export default function BloomMcpDetailPage() {
 
           <h3 className="detail-subheading">The tool catalog</h3>
           <p className="about-body project-detail-prose">
-            22 tools across three sections — one Python file per tool, one FastMCP sub-server per
-            contributor.
+            22 tools across three sections, with one Python file per tool and one FastMCP sub-server
+            per contributor.
           </p>
 
           <div className="detail-tool-group">
@@ -453,7 +463,7 @@ export default function BloomMcpDetailPage() {
               <div className="detail-tool-card">
                 <span className="name">load_experiment_data</span>
                 <span className="desc">
-                  Summary of one experiment: sample/genotype/trait counts, missing-data preview
+                  Summary of one experiment: sample/genotype/trait counts and missing-data preview
                 </span>
               </div>
               <div className="detail-tool-card">
@@ -463,13 +473,15 @@ export default function BloomMcpDetailPage() {
               <div className="detail-tool-card">
                 <span className="name">get_download_links</span>
                 <span className="desc">
-                  Re-signs fresh download URLs, SHA-256, and size for an already-committed run
+                  Re-signs fresh download URLs and returns SHA-256 and file size for an
+                  already-committed run
                 </span>
               </div>
               <div className="detail-tool-card">
                 <span className="name">list_experiment_sources</span>
                 <span className="desc">
-                  Distinct raw DB sources backing an experiment, to pin a run to one version
+                  Distinct raw database sources backing an experiment, allowing a run to be pinned
+                  to one source version
                 </span>
               </div>
             </div>
@@ -487,7 +499,7 @@ export default function BloomMcpDetailPage() {
               <div className="detail-tool-card">
                 <span className="name">qc_clean</span>
                 <span className="desc">
-                  The sole producer of the analysis-ready cleaned dataset
+                  The sole producer of the cleaned dataset used by downstream analyses
                 </span>
               </div>
               <div className="detail-tool-card">
@@ -502,7 +514,10 @@ export default function BloomMcpDetailPage() {
               </div>
               <div className="detail-tool-card">
                 <span className="name">clustering</span>
-                <span className="desc">k-means, GMM, or hierarchical — auto- or user-selected</span>
+                <span className="desc">
+                  k-means, GMM, or hierarchical clustering, either automatically or explicitly
+                  selected
+                </span>
               </div>
               <div className="detail-tool-card">
                 <span className="name">umap_analysis</span>
@@ -510,7 +525,9 @@ export default function BloomMcpDetailPage() {
               </div>
               <div className="detail-tool-card">
                 <span className="name">descriptive_stats</span>
-                <span className="desc">Per-trait mean, std, quantiles, skewness, kurtosis</span>
+                <span className="desc">
+                  Per-trait mean, standard deviation, quantiles, skewness, and kurtosis
+                </span>
               </div>
               <div className="detail-tool-card">
                 <span className="name">cross_experiment_correlations</span>
@@ -547,39 +564,54 @@ export default function BloomMcpDetailPage() {
               <div className="detail-tool-card">
                 <span className="name">summarize_trait · compute_min/median/mode</span>
                 <span className="desc">
-                  Trait summary statistics, built by a labmate on the same infrastructure
+                  Trait summary statistics built by a labmate on top of the same infrastructure
                 </span>
               </div>
             </div>
           </div>
 
-          <h3 className="detail-subheading">Reproducibility, by construction</h3>
+          <h3 className="detail-subheading">Reproducibility</h3>
           <p className="about-body project-detail-prose">
-            Every run stamps its own <strong>provenance</strong>: a resolved random seed (rejected
-            if it&apos;s a bool, a float, or out of range; drawn from <code>secrets.randbelow</code>{' '}
-            when none is given), the installed version of every scientific dependency, and a SHA-256
-            hash computed over the <em>exact staged output bytes</em> — never a storage
-            provider&apos;s ETag, which can lie. All of it lands in a versioned, append-only
-            manifest schema I&apos;ve grown from v3 to v5 as new guarantees were needed, so a
-            two-month-old manifest still validates against today&apos;s schema.
+            Every run records its own <strong>provenance</strong>: the resolved random seed, the
+            installed versions of the scientific dependencies, and a SHA-256 hash of the exact
+            output bytes that were staged for persistence.
+          </p>
+          <p className="about-body project-detail-prose">
+            Seeds are validated before execution: booleans, floats, and values outside the supported
+            range are rejected, and a seed is generated with <code>secrets.randbelow</code> when the
+            caller does not provide one. Output hashes are computed from the actual bytes rather
+            than a storage provider&apos;s ETag.
+          </p>
+          <p className="about-body project-detail-prose">
+            This metadata is stored in a versioned, append-only manifest schema that I extended from
+            v3 through v5 as new guarantees were added. Older manifests remain valid against the
+            current schema.
           </p>
 
           <h3 className="detail-subheading">Persistence &amp; security</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Reading raw data and writing results are two separate, swappable ports — Supabase in
-              production, a local filesystem backend for offline or private-data deployments, and
-              fakes for tests. I replaced what would have been{' '}
-              <strong>649–880 sequential per-trait database round trips</strong> — one real
-              experiment carries up to 880 raw trait columns — with a single Postgres RPC that
-              returns every trait in one call, then applied the same bulk-aggregate pattern to a
-              second endpoint that was hanging in production under load.
+              Reading experiment data and writing analysis results are handled through separate,
+              swappable interfaces. Production uses Supabase; local or private-data deployments can
+              use the filesystem backend; tests use lightweight fakes.
             </p>
             <p className="about-body project-detail-prose">
-              On the identity side: OAuth caller-identity verification and per-tool usage
-              attribution so every call traces to a real user, signed-URL downloads with structural
-              key-scoping guards against cross-run access, and systematic error redaction so no tool
-              ever leaks a host path, stack trace, or internal identifier back to an agent.
+              One experiment can contain as many as 880 raw trait columns. The original access
+              pattern could require{' '}
+              <strong>649–880 sequential per-trait database round trips</strong> to assemble a
+              dataset. I replaced that path with a Postgres RPC that returns all of the required
+              trait data in one call, then used the same bulk-aggregation approach on a second
+              endpoint that was timing out under production load.
+            </p>
+            <p className="about-body project-detail-prose">
+              For identity and access control, bloom-mcp verifies OAuth caller identity and records
+              per-tool usage against the authenticated user. Result downloads use signed URLs, with
+              structural key-scoping checks to prevent one run from accessing another run&apos;s
+              files.
+            </p>
+            <p className="about-body project-detail-prose">
+              Error responses are also scrubbed before being returned so internal paths, stack
+              traces, and storage identifiers are not exposed to the agent.
             </p>
           </div>
         </div>
@@ -600,76 +632,68 @@ export default function BloomMcpDetailPage() {
             </h2>
           </div>
           <p className="about-body project-detail-prose">
-            The project shipped tier by tier, each one a working, tested capability rather than a
-            scaffold for the next — tiers sometimes overlapped as later work started before earlier
-            work fully closed out. The tiers below are the project&apos;s own naming, not a
-            retrospective one.
+            The project was developed in tiers, with each tier adding a working and tested
+            capability. Some tiers overlapped as later work began before earlier work was fully
+            closed out. These are the project&apos;s original tier names rather than categories
+            added afterward.
           </p>
 
           <div className="detail-timeline">
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Tier 0</span>
-              <span className="detail-tl-date">Jun 15–16</span>
               <span className="detail-tl-body">
-                <strong>Package baseline.</strong> Restructured into an installable package with a
-                CI gate that builds and imports it clean.
+                <strong>Package baseline.</strong> Restructured bloom-mcp into an installable
+                package with a CI gate that builds and imports it cleanly.
               </span>
             </div>
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Tier 1</span>
-              <span className="detail-tl-date">Jun 18</span>
               <span className="detail-tl-body">
-                <strong>Contract layer.</strong> <code>@as_mcp_tool</code>, provenance stamping,
-                manifest schema v3.
+                <strong>Contract layer.</strong> Added <code>@as_mcp_tool</code>, provenance
+                stamping, and manifest schema v3.
               </span>
             </div>
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Tier 2</span>
-              <span className="detail-tl-date">Jun 22–24</span>
               <span className="detail-tl-body">
-                <strong>Persistence ports.</strong> ExperimentReader/ResultStore abstractions, plus
-                a live-Supabase smoke test.
+                <strong>Persistence ports.</strong> Introduced the ExperimentReader and ResultStore
+                abstractions, together with a live-Supabase smoke test.
               </span>
             </div>
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Tier 3</span>
-              <span className="detail-tl-date">Jun 25 – Jul 8</span>
               <span className="detail-tl-body">
-                <strong>QC &amp; outliers.</strong> <code>qc_clean</code>, read-only{' '}
+                <strong>QC &amp; outliers.</strong> Added <code>qc_clean</code>, read-only{' '}
                 <code>qc_inspect</code>, and Mahalanobis/Isolation-Forest{' '}
                 <code>remove_outliers</code>.
               </span>
             </div>
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Tier 4</span>
-              <span className="detail-tl-date">Jul 1–24</span>
               <span className="detail-tl-body">
-                <strong>Dimensionality reduction.</strong> <code>pca_analysis</code>, then{' '}
-                <code>umap_analysis</code>.
+                <strong>Dimensionality reduction.</strong> Added <code>pca_analysis</code>, followed
+                by <code>umap_analysis</code>.
               </span>
             </div>
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Tier 5</span>
-              <span className="detail-tl-date">Jul 10–14</span>
               <span className="detail-tl-body">
-                <strong>Clustering.</strong> Polymorphic k-means / GMM / hierarchical clustering
-                tool.
+                <strong>Clustering.</strong> Added a polymorphic clustering tool supporting k-means,
+                GMM, and hierarchical clustering.
               </span>
             </div>
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Hardening</span>
-              <span className="detail-tl-date">Jul 27 – Aug 12</span>
               <span className="detail-tl-body">
-                <strong>Cross-experiment stats &amp; scale.</strong> <code>descriptive_stats</code>,{' '}
-                <code>cross_experiment_correlations</code>, the bulk-read RPC, OAuth verification,
-                and signed-URL downloads.
+                <strong>Cross-experiment stats &amp; scale.</strong> Added{' '}
+                <code>descriptive_stats</code>, <code>cross_experiment_correlations</code>, the
+                bulk-read RPC, OAuth verification, and signed-URL downloads.
               </span>
             </div>
             <div className="detail-tl-row">
               <span className="detail-tl-tag">Current</span>
-              <span className="detail-tl-date">Aug 13–27</span>
               <span className="detail-tl-body">
-                <strong>Polish &amp; release.</strong> Plot style overrides, a PyPI release
+                <strong>Polish &amp; release.</strong> Added plot-style overrides, a PyPI release
                 pipeline, pixel-diff snapshot tests, and plot-parameter safety guards.
               </span>
             </div>
@@ -686,29 +710,22 @@ export default function BloomMcpDetailPage() {
           </div>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              I delivered every tool test-first, through peer-reviewed pull requests:{' '}
+              I developed the tools test-first and shipped them through peer-reviewed pull requests:{' '}
               <strong>1,229 test functions across 87 files</strong> (~27,900 lines) against ~13,900
-              lines of implementation — roughly a 2:1 test-to-code ratio. Fifteen golden JSON
-              fixtures, sourced independently from the upstream package&apos;s own published
-              wheat-phenotyping results rather than re-derived from the code under test, work as a
-              genuine cross-tier oracle instead of a tautology.
+              lines of implementation, or roughly a 2:1 test-to-code ratio.
             </p>
             <p className="about-body project-detail-prose">
-              The newest addition is pixel-level snapshot testing for the five plotting tools — the
-              old tests only checked that a PNG existed, so a silent color-mapping regression could
-              ship undetected.
+              Fifteen golden JSON fixtures provide independent reference outputs for the analysis
+              layer. They come from the upstream package&apos;s published wheat-phenotyping results
+              rather than being regenerated from bloom-mcp itself, so the tests compare against an
+              external reference instead of reproducing the same implementation on both sides.
+            </p>
+            <p className="about-body project-detail-prose">
+              The newest addition is pixel-level snapshot testing for the five plotting tools. The
+              previous tests verified that a PNG was produced, but they could not detect visual
+              regressions such as an incorrect color mapping.
             </p>
           </div>
-
-          <blockquote className="detail-pull-quote">
-            &quot;I didn&apos;t guess the tolerance — I measured it. I dimmed a baseline plot by 2%,
-            5%, and 10% brightness and scored each against the real image-diff metric, then set the
-            threshold above the noise a different operating system&apos;s font rendering produces,
-            and below what a real regression looks like. Then I wrote a test that reproduces that
-            10% regression live, so the threshold has to prove itself on every run — not just the
-            day I picked it.&quot;
-            <footer>on calibrating the pixel-snapshot tolerance</footer>
-          </blockquote>
         </div>
       </section>
 
@@ -720,18 +737,21 @@ export default function BloomMcpDetailPage() {
             </h2>
           </div>
           <p className="about-body project-detail-prose">
-            Every non-trivial change started as a written design proposal, reviewed before a line of
-            code landed, and every pull request then went through structured, often multi-round,
-            adversarial review before merging — the kind that catches real defects, not style nits:
-            a join bug in a bulk-RPC migration, a race condition in result-store durability, a
-            silent-inconsistency case in outlier removal. All caught and fixed before reaching
-            production, not after.
+            For non-trivial changes, I wrote a design proposal before implementation and used it to
+            get feedback on the approach before the code landed. Pull requests then went through
+            structured, often multi-round review.
           </p>
-          <div className="detail-callout">
-            <strong>Discipline over velocity.</strong> Design docs before code, tests before
-            implementation, and review before merge — for a service where &quot;the analysis was
-            wrong&quot; is a much worse failure than &quot;the analysis was slow.&quot;
-          </div>
+          <p className="about-body project-detail-prose">
+            Those reviews caught issues that affected behavior, not just style: a join bug in a
+            bulk-RPC migration, a durability race in the result store, and a case where outlier
+            removal could silently produce inconsistent state. Each was fixed before the change was
+            merged.
+          </p>
+          <p className="about-body project-detail-prose">
+            The process throughout the project was consistent: design the interface first, test the
+            expected behavior, implement it, and review the result before merging. For research
+            software, a wrong analysis is much more costly than a slow one.
+          </p>
         </div>
       </section>
     </main>

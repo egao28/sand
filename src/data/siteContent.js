@@ -186,7 +186,7 @@ export const siteContent = {
           'So I wanted to build something that helps people find research more efficiently and make better use of the information already online.',
         ],
         technical:
-          'semantic search · embeddings · cosine similarity · GPT-4o rerank · keyword fallback · ranking system · API design · full-stack development · data indexing · recommendation logic',
+          'semantic search · embeddings · cosine similarity · GPT-4o reranking · keyword fallback · ranking systems · API design · full-stack development',
       },
       {
         slug: 'almabot',
@@ -201,7 +201,7 @@ export const siteContent = {
           'Since I had access to the course dataset, I wanted to build something that takes user preferences and automatically generates a workable schedule.',
         ],
         technical:
-          "course scheduling · constraint solving · prerequisite graph · Kahn's algorithm · cycle detection · dataset processing · LLM integration · LangChain · Gradio · planning system design",
+          "course scheduling · constraint solving · prerequisite graphs · Kahn's algorithm · topological sort · cycle detection · dataset processing · LLM integration · LangChain · Gradio",
       },
       {
         slug: 'carelink',

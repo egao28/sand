@@ -26,27 +26,26 @@ export default function SonyDetailPage() {
             Computer Science Operations &amp; Maintenance Intern · May – Sep 2025
           </p>
           <p className="about-body project-detail-prose">
-            Over four months I built and hardened three internal systems: a Python pipeline
-            automating release and asset delivery, a configurable rules engine routing weekly user
-            feedback to the right team, and safety-gated tooling for migrating a live,
-            100,000-plus-row production database.
+            Over four months, I worked on three internal systems: a Python pipeline for release and
+            asset delivery, a configurable rules engine for routing weekly user feedback, and
+            migration tooling for changes to a live production database with more than 100,000 rows.
           </p>
           <div className="detail-stat-strip">
             <div>
               <span className="detail-stat-num">100+</span>
-              <span className="detail-stat-label">Releases &amp; assets automated weekly</span>
+              <span className="detail-stat-label">releases and assets automated weekly</span>
             </div>
             <div>
-              <span className="detail-stat-num">300+</span>
-              <span className="detail-stat-label">Feedback comments auto-routed weekly</span>
+              <span className="detail-stat-num">500+</span>
+              <span className="detail-stat-label">feedback comments routed weekly</span>
             </div>
             <div>
               <span className="detail-stat-num">100k+</span>
-              <span className="detail-stat-label">Rows migrated under guardrails</span>
+              <span className="detail-stat-label">production rows migrated</span>
             </div>
             <div>
               <span className="detail-stat-num">~60%</span>
-              <span className="detail-stat-label">Faster release preparation</span>
+              <span className="detail-stat-label">faster release preparation</span>
             </div>
           </div>
         </div>
@@ -61,11 +60,14 @@ export default function SonyDetailPage() {
           </div>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Every change followed the same shape: requirement analysis, design, launch, then
-              rollout — and launch always needed sign-off from the operations team it would actually
-              affect, not just a passing test suite. That discipline mattered more once these
-              systems were touching production data and routing real user complaints, not just
-              moving files around.
+              My work usually followed the same process: understand the operational requirement,
+              design the change, test it against real workflows, and get approval from the team that
+              would use it before rollout.
+            </p>
+            <p className="about-body project-detail-prose">
+              That mattered because these systems were part of day-to-day operations. A change could
+              affect production data, release preparation, or where real user feedback was sent, so
+              passing a unit test was only one part of deciding whether something was ready to ship.
             </p>
           </div>
         </div>
@@ -75,25 +77,34 @@ export default function SonyDetailPage() {
         <div className="sec-inner project-detail-demo-inner">
           <div className="section-title-row">
             <h2 id="sony-rules-heading" className="about-headline project-detail-section-title">
-              A rules engine that ships without a redeploy
+              A configurable feedback-routing system
             </h2>
           </div>
 
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The team was receiving 300+ pieces of user feedback a week that needed distributing
-              across different teams, and the goal was full automation with no manual triage. The
-              first version was pure keyword matching, and it didn&apos;t hold up: plenty of
-              feedback said the same thing in different words, so the keyword list only grew — and
-              the more it grew, the more bloated and unmaintainable it got.
+              The team received more than 500 pieces of user feedback each week that had to be
+              distributed across different teams.
             </p>
             <p className="about-body project-detail-prose">
-              The second version replaced the hardcoded keyword list with two pieces: a{' '}
-              <code>rules.yaml</code> holding the rule definitions, and a <code>router.py</code>{' '}
-              that applies them. Every rule carries a rule ID, a category, a routing team, a
-              priority for resolving overlaps, and a match pattern — loaded with{' '}
-              <code>yaml.safe_load</code> into a plain list of dicts, so adding a new category is a
-              config edit, not a code change or a redeploy.
+              The first version used a hardcoded keyword list. It worked for simple cases, but
+              became difficult to maintain as more categories and wording variations were added.
+            </p>
+            <p className="about-body project-detail-prose">
+              I replaced that structure with two components: a <code>rules.yaml</code> file
+              containing the routing rules and a <code>router.py</code> module responsible for
+              applying them. Each rule defines an ID, category, destination team, priority, and
+              keyword or regex pattern.
+            </p>
+            <p className="about-body project-detail-prose">
+              The router loads the configuration with <code>yaml.safe_load</code> and evaluates
+              comments in priority order. Matches are routed to the corresponding team, while
+              comments that cannot be classified reliably are sent to a manual review queue instead
+              of being assigned automatically.
+            </p>
+            <p className="about-body project-detail-prose">
+              Because routing behavior lives in configuration rather than application logic, adding
+              or changing a category only requires updating the rules file.
             </p>
           </div>
 
@@ -234,45 +245,54 @@ export default function SonyDetailPage() {
             </div>
             <div className="detail-tool-card">
               <span className="name">category</span>
-              <span className="desc">The feedback bucket it maps to</span>
+              <span className="desc">Feedback category assigned by the rule</span>
             </div>
             <div className="detail-tool-card">
               <span className="name">route_to</span>
-              <span className="desc">Which team receives it</span>
+              <span className="desc">Team that receives the feedback</span>
             </div>
             <div className="detail-tool-card">
               <span className="name">priority</span>
-              <span className="desc">Resolves overlapping-pattern conflicts</span>
+              <span className="desc">Determines which rule wins when multiple patterns match</span>
             </div>
             <div className="detail-tool-card">
               <span className="name">pattern</span>
-              <span className="desc">The keyword/regex it matches against</span>
+              <span className="desc">Keyword or regular-expression pattern used for matching</span>
             </div>
           </div>
 
-          <h3 className="detail-subheading">Why not machine learning</h3>
+          <h3 className="detail-subheading">Why I used rules instead of machine learning</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Two reasons, both practical rather than principled: there was no labeled data to train
-              on yet, and a rules file can be corrected the moment someone spots a miscategorization
-              — no retraining cycle in between. If I rebuilt this today, I&apos;d add a semantic
-              layer on top: embeddings and cosine similarity to catch phrasing a literal rule misses
-              entirely — the same technique behind Proxima&apos;s search — plus quietly logging
-              human corrections as a labeled set for a real classifier down the line.
+              There was no labeled dataset available for training a classifier, and the routing
+              logic needed to be easy for the operations team to inspect and change.
+            </p>
+            <p className="about-body project-detail-prose">
+              A rules file made both possible. When a comment was misclassified, the corresponding
+              rule could be adjusted immediately without retraining or redeploying a model.
+            </p>
+            <p className="about-body project-detail-prose">
+              The main limitation was semantic coverage: two comments could describe the same issue
+              using completely different language and miss the same literal pattern. A later version
+              could add embedding-based matching for those cases while recording human corrections
+              as labeled examples for future evaluation or model training.
             </p>
           </div>
 
-          <h3 className="detail-subheading">Thinking like SRE, on a small scale</h3>
+          <h3 className="detail-subheading">Operational reliability</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Checked against a short list of what actually makes something SRE-relevant:
-              automation, yes; a fallback path, no — a gap I noticed but didn&apos;t close; config
-              kept separate from code, yes; and it should keep improving against precision and
-              recall, not against a gut feeling that a rule &quot;looks right.&quot; The natural
-              next step was proactive rather than reactive — alerting when one feedback category
-              spikes against its recent baseline, not just classifying it after the fact — but that
-              only works with a persistence threshold: a sustained run over several periods, not a
-              single noisy day, or every minor blip pages someone for nothing.
+              The routing system was designed to avoid forcing an answer when the rules were
+              uncertain. Unmatched or ambiguous cases stayed in a manual review path, and the
+              routing logic remained separate from the application code so it could be inspected and
+              changed independently.
+            </p>
+            <p className="about-body project-detail-prose">
+              The next reliability problem I looked at was not classification itself, but
+              monitoring. If one category suddenly became much more common, that could indicate a
+              product or operational issue worth surfacing. Any alerting around that would need to
+              look for sustained changes over multiple periods rather than reacting to a single
+              noisy spike.
             </p>
           </div>
         </div>
@@ -285,38 +305,48 @@ export default function SonyDetailPage() {
         <div className="sec-inner project-detail-motivation-inner">
           <div className="section-title-row">
             <h2 id="sony-migration-heading" className="about-headline project-detail-section-title">
-              Migrating a live database without breaking it
+              Migrating a live database safely
             </h2>
           </div>
 
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Day-to-day operational tasks — service maintenance, batch jobs, scheduled tasks and
-              alerts — ran through a lightweight automation platform kept separate from the
-              production web app, so none of that load or risk touched the frontend users actually
-              saw.
+              I also worked on operational tooling for service maintenance, batch jobs, scheduled
+              tasks, and database changes. These workflows ran through a lightweight automation
+              environment kept separate from the production web application.
             </p>
           </div>
 
-          <h3 className="detail-subheading">Guardrails before any UPDATE</h3>
+          <h3 className="detail-subheading">Guardrails before an UPDATE</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Every change to the 100,000+ row production database went through the same three
-              checks before it was allowed near real data: confirm a replica is actually available,
-              run the exact statement against a non-live replica first, and compare row counts and a
-              sample of values before and after — not just trust that the statement looked right.
+              Changes to the 100,000+ row production database were tested against a non-production
+              replica before being run on live data.
             </p>
             <p className="about-body project-detail-prose">
-              Migrations ran serially, on purpose: it gives a clean audit trail, and it guarantees
-              every server executes the identical script under one unified set of permissions rather
-              than ad hoc credentials per machine. If something did break, recovery was always the
-              same shape — a backup taken beforehand, then roll back, re-run in smaller batches, and
-              re-verify each batch before moving to the next.
+              For each migration, I checked three things:
+            </p>
+            <ol className="detail-ordered-list">
+              <li>A usable replica was available.</li>
+              <li>The exact SQL statement completed successfully against that replica.</li>
+              <li>
+                Row counts and sampled values matched the expected result before and after the
+                change.
+              </li>
+            </ol>
+            <p className="about-body project-detail-prose">
+              That validation mattered more than simply reviewing the SQL itself. A syntactically
+              correct query could still modify the wrong rows or transform values incorrectly.
             </p>
             <p className="about-body project-detail-prose">
-              Most of the actual migration work was translating operational metadata into a new
-              schema — flipping row-level format flags and standardizing fields, roughly in the
-              shape of:
+              Migrations were run serially rather than in parallel so each execution could be
+              checked before proceeding. A backup was taken beforehand, and larger changes could be
+              rerun in smaller batches if verification exposed a problem.
+            </p>
+            <p className="about-body project-detail-prose">
+              Much of the migration work involved translating operational metadata into a new
+              schema, including updating format flags and normalizing stored fields. A simplified
+              example looked like:
             </p>
           </div>
 
@@ -324,12 +354,10 @@ export default function SonyDetailPage() {
 SET   format_version = 'v2', metadata = normalize(metadata)
 WHERE format_version = 'v1';`}</code>
 
-          <blockquote className="detail-pull-quote">
-            &quot;I didn&apos;t trust a migration because the query looked right — I trusted it
-            because the replica had already run it, the row counts matched, and a sample of the
-            actual values matched too.&quot;
-            <footer>on the database migration checklist</footer>
-          </blockquote>
+          <p className="about-body project-detail-prose">
+            The goal was to make the migration process repeatable: test the exact change on a
+            replica, verify the resulting data, then apply the same operation to production.
+          </p>
         </div>
       </section>
 
@@ -350,11 +378,13 @@ WHERE format_version = 'v1';`}</code>
           <TechChipGrid
             chips={[
               'Python',
-              'regex & YAML rule engine',
+              'regex',
+              'YAML',
               'pandas',
               'cron / scheduled automation',
               'SQL',
-              'replica-gated migrations',
+              'database replicas',
+              'migration validation',
               'data-quality auditing',
               'config-driven routing',
             ]}

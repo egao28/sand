@@ -940,6 +940,20 @@ section {
 .experience-detail-list li:last-child {
   margin-bottom: 0;
 }
+.detail-ordered-list {
+  list-style: decimal;
+  padding-left: 1.3rem;
+  max-width: 38rem;
+  font-size: 17px;
+  line-height: 1.72;
+  margin: 0 0 0.65rem;
+}
+.detail-ordered-list li {
+  margin-bottom: 0.4rem;
+}
+.detail-ordered-list li:last-child {
+  margin-bottom: 0;
+}
 .project-detail-demo {
   /* Try it here: off-white start, diagonal, cooler beige — distinct from Motivation */
   background: linear-gradient(128deg, #f7f5f0 0%, #ebe3d6 55%, #dfd4c6 100%);
@@ -1237,7 +1251,7 @@ section {
 }
 .detail-tl-row {
   display: grid;
-  grid-template-columns: 6.5rem 8.5rem 1fr;
+  grid-template-columns: 6.5rem 1fr;
   gap: 1.2rem;
   padding: 1.05rem 0;
   border-top: 1px solid var(--line);
@@ -1252,12 +1266,6 @@ section {
   font-weight: 700;
   color: var(--accent);
   white-space: nowrap;
-}
-.detail-tl-date {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 13.5px;
-  color: var(--ink-muted);
 }
 .detail-tl-body {
   font-family: var(--sans);
@@ -1277,9 +1285,6 @@ section {
 }
 .project-detail-tech .detail-tl-tag {
   color: rgba(212, 184, 148, 0.95);
-}
-.project-detail-tech .detail-tl-date {
-  color: rgba(255, 253, 248, 0.55);
 }
 .project-detail-tech .detail-tl-body {
   color: rgba(255, 253, 248, 0.88);

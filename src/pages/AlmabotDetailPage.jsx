@@ -33,27 +33,29 @@ export default function AlmabotDetailPage() {
             Course-planning agent · LangChain + graph scheduling · UIUC
           </p>
           <p className="about-body project-detail-prose">
-            AlmaBot turns a plain-English planning request into a schedule that actually satisfies
-            prerequisites. An LLM only handles the entry point — parsing intent into structured
-            constraints; the schedule itself comes out of a deterministic topological sort over a
-            prerequisite dependency graph built from 800,000+ UIUC course records.
+            AlmaBot turns a plain-English course-planning request into a schedule that respects
+            prerequisite dependencies. An LLM handles the language layer by translating a
+            student&apos;s request into structured constraints; the schedule itself is produced
+            deterministically from a prerequisite graph built from 800,000+ UIUC course records.
           </p>
           <div className="detail-stat-strip">
             <div>
               <span className="detail-stat-num">800k+</span>
-              <span className="detail-stat-label">Course records → dependency graph</span>
+              <span className="detail-stat-label">course records processed</span>
             </div>
             <div>
               <span className="detail-stat-num">2</span>
-              <span className="detail-stat-label">Layers: language + graph scheduling</span>
+              <span className="detail-stat-label">layers: language + graph scheduling</span>
             </div>
             <div>
               <span className="detail-stat-num">4</span>
-              <span className="detail-stat-label">Constraint types, resolved in order</span>
+              <span className="detail-stat-label">constraint types</span>
             </div>
             <div>
               <span className="detail-stat-num">Kahn&apos;s</span>
-              <span className="detail-stat-label">Proves a plan valid — or that none exists</span>
+              <span className="detail-stat-label">
+                algorithm for topological ordering and cycle detection
+              </span>
             </div>
           </div>
         </div>
@@ -74,13 +76,15 @@ export default function AlmabotDetailPage() {
           </div>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              I built this at UIUC because I didn&apos;t have an academic advisor and had to figure
-              out course planning on my own.
+              I built AlmaBot at UIUC because I had to do much of my own course planning and found
+              it difficult to reason through prerequisites, degree requirements, and scheduling
+              preferences at the same time.
             </p>
             <p className="about-body project-detail-prose">
-              Since I had access to the course dataset, I wanted to build something that takes a
-              student&apos;s preferences and automatically generates a workable schedule — one
-              that&apos;s actually guaranteed to respect prerequisites, not just plausible-looking.
+              Since I had access to the course dataset, I wanted to build something that could take
+              those preferences in natural language and turn them into a schedule whose prerequisite
+              ordering could actually be checked, rather than asking an LLM to generate a plan that
+              only looked plausible.
             </p>
           </div>
         </div>
@@ -93,19 +97,25 @@ export default function AlmabotDetailPage() {
               id="almabot-howitworks-heading"
               className="about-headline project-detail-section-title"
             >
-              Two layers, two very different jobs
+              Two layers, two different jobs
             </h2>
           </div>
 
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              AlmaBot splits cleanly into a language layer and a scheduling layer, and they
-              don&apos;t share responsibility for the same decision. The language layer, built with
-              LangChain, turns a student&apos;s natural-language request into a structured
-              constraint object, resolved in a fixed order: prerequisites already completed,
-              preferred time slots, gen-ed requirements, then remaining completed coursework. Its
-              whole job is translation — turning something ambiguous into something the scheduler
-              can act on deterministically.
+              AlmaBot separates language understanding from scheduling.
+            </p>
+            <p className="about-body project-detail-prose">
+              The language layer, built with LangChain, parses a student&apos;s request into
+              structured constraints: courses and prerequisites already satisfied, preferred time
+              slots, remaining general-education requirements, and other completed coursework.
+            </p>
+            <p className="about-body project-detail-prose">
+              Those constraints are then passed to a separate scheduling layer. Course prerequisites
+              are represented as a dependency graph, and the scheduler uses Kahn&apos;s
+              topological-sort algorithm to determine a valid prerequisite ordering. The LLM does
+              not decide which prerequisite relationships are valid or generate the final ordering
+              itself.
             </p>
           </div>
 
@@ -335,51 +345,60 @@ export default function AlmabotDetailPage() {
             </figcaption>
           </figure>
 
-          <h3 className="detail-subheading">A schedule that&apos;s provable, not guessed</h3>
+          <h3 className="detail-subheading">Building a valid course order</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The scheduling layer builds a prerequisite dependency graph from 800,000+ course
-              records, then runs Kahn&apos;s topological-sort algorithm to actually produce an
-              ordering: courses with no unmet prerequisites become eligible first and get selected,
-              and the graph unwinds one layer at a time until the plan is filled. When several
-              courses are eligible at once, ties break toward the one available soonest. The same
-              property that makes this work is what makes an unsatisfiable request provable instead
-              of silently wrong — a genuine prerequisite cycle is exactly what Kahn&apos;s algorithm
-              surfaces directly: if the graph can&apos;t be fully ordered, there is no valid
-              schedule, and AlmaBot can say so instead of returning something incomplete.
+              The scheduling layer constructs a directed prerequisite graph from the UIUC course
+              data. A course becomes eligible once all of its prerequisite dependencies have been
+              satisfied.
+            </p>
+            <p className="about-body project-detail-prose">
+              Kahn&apos;s algorithm starts with courses that have no unmet prerequisites, removes
+              them from the graph as they are scheduled, and continues until the required courses
+              have been ordered. When multiple courses are eligible at the same point, the scheduler
+              can apply additional preferences, such as choosing the course available sooner.
+            </p>
+            <p className="about-body project-detail-prose">
+              The algorithm also provides a direct check for prerequisite cycles. If all nodes
+              cannot be removed during the topological sort, the graph contains a cycle and no valid
+              prerequisite ordering exists for that dependency structure.
+            </p>
+            <p className="about-body project-detail-prose">
+              This keeps prerequisite correctness in deterministic code rather than relying on the
+              model to reason through a long chain of course dependencies.
             </p>
           </div>
 
           <h3 className="detail-subheading">Turning language into constraints</h3>
+          <p className="about-body project-detail-prose">
+            The language layer converts a student&apos;s request into four types of information used
+            by the scheduler:
+          </p>
           <div className="detail-tool-grid">
             <div className="detail-tool-card">
               <span className="name">1 · Prerequisites</span>
-              <span className="desc">Courses already completed, resolved first</span>
+              <span className="desc">Courses and prerequisite requirements already satisfied</span>
             </div>
             <div className="detail-tool-card">
               <span className="name">2 · Time slots</span>
-              <span className="desc">The student&apos;s preferred windows</span>
+              <span className="desc">Preferred scheduling windows</span>
             </div>
             <div className="detail-tool-card">
-              <span className="name">3 · Gen-ed</span>
-              <span className="desc">Remaining general-education requirements</span>
+              <span className="name">3 · Gen-ed requirements</span>
+              <span className="desc">
+                General-education requirements that still need to be completed
+              </span>
             </div>
             <div className="detail-tool-card">
-              <span className="name">4 · Completed courses</span>
-              <span className="desc">Everything else already satisfied</span>
+              <span className="name">4 · Completed coursework</span>
+              <span className="desc">Other courses that should not be scheduled again</span>
             </div>
           </div>
-
-          <div className="detail-callout">
-            <strong>Where the LLM actually sits.</strong> Across these projects, the model ends up
-            in a different place each time, doing a different amount of work. In AlmaBot, it&apos;s
-            the entry point — it parses the request, but the schedule itself is produced by a
-            deterministic graph algorithm it never touches. In Proxima, it&apos;s the exit point —
-            recall is pure embeddings and cosine similarity, and the model only reranks and explains
-            a shortlist search already produced. And in bloom-mcp, it&apos;s neither: the model just
-            selects which validated tool to call — the computation itself is fully delegated to a
-            science library.
-          </div>
+          <p className="about-body project-detail-prose">
+            The parser resolves these into a structured representation before the scheduling
+            algorithm runs, so the graph layer works with explicit constraints rather than the
+            original natural-language request.
+          </p>
         </div>
       </section>
 
@@ -387,19 +406,10 @@ export default function AlmabotDetailPage() {
         <div className="sec-inner project-detail-demo-inner">
           <div className="section-title-row">
             <h2 id="almabot-demo-heading" className="about-headline project-detail-section-title">
-              Try it here
+              Demo
             </h2>
           </div>
-          <p className="project-detail-demo-lead">
-            <a
-              href="#"
-              className="project-detail-demo-link"
-              onClick={(e) => e.preventDefault()}
-              aria-label={`${project.demoLabel} (link coming soon)`}
-            >
-              {project.demoLabel} <span className="project-detail-demo-soon">(coming soon)</span>
-            </a>
-          </p>
+          <p className="about-body project-detail-prose">Coming soon.</p>
         </div>
       </section>
 

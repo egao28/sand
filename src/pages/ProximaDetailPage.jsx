@@ -33,28 +33,28 @@ export default function ProximaDetailPage() {
             Semantic research-matching search · embeddings + LLM rerank
           </p>
           <p className="about-body project-detail-prose">
-            Proxima matches students to research opportunities by meaning, not by shared vocabulary.
-            Every professor&apos;s research profile is embedded once, offline; a student&apos;s
-            stated interests are embedded the same way at request time, ranked against all of them
-            by cosine similarity, and the shortlist is reranked by an LLM that also explains why
-            each match makes sense.
+            Proxima matches students with research opportunities based on the meaning of their
+            interests rather than exact keyword overlap. Professor research profiles are embedded
+            and cached offline. When a student searches, their interests are embedded in the same
+            space, ranked against the professor profiles by cosine similarity, and then reranked by
+            an LLM that returns the strongest matches with an explanation for each one.
           </p>
           <div className="detail-stat-strip">
             <div>
               <span className="detail-stat-num">1,500</span>
-              <span className="detail-stat-label">Professor profiles indexed</span>
+              <span className="detail-stat-label">professor profiles indexed</span>
             </div>
             <div>
               <span className="detail-stat-num">10</span>
-              <span className="detail-stat-label">Candidates sent to rerank</span>
+              <span className="detail-stat-label">candidates sent to rerank</span>
             </div>
             <div>
               <span className="detail-stat-num">97%</span>
-              <span className="detail-stat-label">Correct match in top-3</span>
+              <span className="detail-stat-label">correct match in top-3</span>
             </div>
             <div>
               <span className="detail-stat-num">89%</span>
-              <span className="detail-stat-label">Correct match ranked #1</span>
+              <span className="detail-stat-label">correct match ranked #1</span>
             </div>
           </div>
         </div>
@@ -75,18 +75,18 @@ export default function ProximaDetailPage() {
           </div>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              I built this because I struggled with finding research opportunities myself.
+              I built Proxima because I had trouble finding research opportunities myself.
             </p>
             <p className="about-body project-detail-prose">
-              Using Google or keyword search did not work well. Even when I had similar interests as
-              a professor, we were not using the same words to describe them.
+              Google and keyword search worked when I already knew the terminology a professor used,
+              but often missed professors whose work was relevant to me because we described similar
+              ideas differently.
             </p>
             <p className="about-body project-detail-prose">
-              So I wanted to build something that helps people find research more efficiently, and
-              make better use of the information that&apos;s already online — an embedding turns a
-              passage of text into a vector of numbers such that texts with similar meaning point in
-              a similar direction, and cosine similarity quantifies exactly that: 1 means identical
-              meaning, 0 means unrelated.
+              I wanted the search to work on meaning instead. Embeddings make that possible by
+              representing text as vectors, where semantically similar passages are placed near each
+              other. Cosine similarity then gives a simple way to rank how closely a student&apos;s
+              interests align with each professor&apos;s research profile.
             </p>
           </div>
         </div>
@@ -106,10 +106,18 @@ export default function ProximaDetailPage() {
           <h3 className="detail-subheading">Offline once, online every time</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The expensive part happens exactly once: every one of roughly 1,500 professor profiles
-              gets embedded and cached offline. A search itself is cheap — a student&apos;s
-              interests are embedded on request and compared against every cached vector by cosine
-              similarity, sorted highest to lowest, and the top candidates move forward.
+              The expensive part is done ahead of time. Roughly 1,500 professor profiles are
+              embedded once and stored as cached vectors.
+            </p>
+            <p className="about-body project-detail-prose">
+              At search time, Proxima embeds the student&apos;s interests and compares that vector
+              against every cached professor vector using cosine similarity. The results are sorted
+              by similarity, and the top 10 candidates are passed to the reranking stage.
+            </p>
+            <p className="about-body project-detail-prose">
+              Because professor embeddings do not have to be recomputed for every request, most of
+              the search path only requires one new embedding plus vector comparisons over the
+              existing index.
             </p>
           </div>
 
@@ -371,70 +379,90 @@ export default function ProximaDetailPage() {
             </figcaption>
           </figure>
 
-          <h3 className="detail-subheading">Recall wide, rerank narrow</h3>
+          <h3 className="detail-subheading">From similarity to a final ranking</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Cosine similarity alone gets the shortlist to roughly the right neighborhood, but it
-              doesn&apos;t know what actually makes a match good for a specific student — it only
-              knows what&apos;s close in vector space. So the pipeline recalls broadly by
-              similarity, then hands a narrower shortlist to GPT-4o, which reads the student&apos;s
-              actual profile against each finalist and returns a top-3 with an explanation of why.
-              That shortlist width was tuned down from an original top-20 to a top-10 — wide enough
-              to protect recall, narrow enough that the reranker&apos;s judgment on each candidate
-              stays sharp.
+              Cosine similarity is useful for finding professors whose work is semantically close to
+              a student&apos;s interests, but similarity alone does not capture every part of a good
+              research match.
+            </p>
+            <p className="about-body project-detail-prose">
+              The top 10 candidates therefore go to GPT-4o for a second-stage rerank. The model
+              reads the student&apos;s full profile alongside each candidate, returns the top three,
+              and explains why each professor may be relevant.
+            </p>
+            <p className="about-body project-detail-prose">
+              I originally sent the top 20 similarity results into this stage, then reduced the
+              shortlist to 10. That kept enough candidates to preserve recall while giving the
+              reranker a smaller set to compare in more detail.
             </p>
           </div>
 
-          <h3 className="detail-subheading">Telling meaning from noise</h3>
+          <h3 className="detail-subheading">Why embeddings</h3>
           <p className="about-body project-detail-prose">
-            None of the cruder approaches actually reach for the same thing an embedding does:
+            Several simpler approaches can improve keyword search, but they solve different
+            problems.
           </p>
           <div className="detail-tool-grid">
             <div className="detail-tool-card">
               <span className="name">Stopword filtering</span>
-              <span className="desc">Strips words that carry no signal on their own</span>
+              <span className="desc">Removes common words that add little matching signal</span>
             </div>
             <div className="detail-tool-card">
               <span className="name">Rule-based matching</span>
-              <span className="desc">Catches literal word variants, nothing else</span>
+              <span className="desc">
+                Handles known word variants and explicitly defined relationships
+              </span>
             </div>
             <div className="detail-tool-card">
               <span className="name">Statistical classifiers</span>
-              <span className="desc">Model surface word patterns, not what they mean</span>
+              <span className="desc">
+                Learn patterns from the words that appear in training data
+              </span>
             </div>
             <div className="detail-tool-card">
               <span className="name">Embeddings</span>
-              <span className="desc">The only one that represents meaning itself</span>
+              <span className="desc">
+                Represent passages in a shared semantic space, allowing related ideas to match even
+                when they use different vocabulary
+              </span>
             </div>
           </div>
+          <p className="about-body project-detail-prose">
+            That last property is the reason embeddings are the main retrieval mechanism in Proxima.
+          </p>
 
-          <h3 className="detail-subheading">When the match misses</h3>
+          <h3 className="detail-subheading">When a match misses</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              When the right professor doesn&apos;t surface, there&apos;s no single fix — it&apos;s
-              usually one of three levers: widen the candidate pool (raise k), tune the rerank
-              prompt so its judgments are staged and quantified rather than one holistic guess, or
-              expose more of the student&apos;s own query framing so the reranker has more to work
-              with.
+              When the expected professor does not appear near the top, there are a few different
+              parts of the pipeline to inspect.
+            </p>
+            <p className="about-body project-detail-prose">
+              The retrieval stage may need a larger candidate pool if the correct professor is being
+              dropped before reranking. The rerank prompt can be adjusted if the right professor
+              reaches the shortlist but is evaluated poorly. The student&apos;s input can also be
+              expanded when the original query does not provide enough information to distinguish
+              between otherwise similar candidates.
+            </p>
+            <p className="about-body project-detail-prose">
+              Keeping retrieval and reranking separate makes it possible to tell which part of the
+              pipeline caused the miss instead of treating ranking quality as one black-box problem.
             </p>
           </div>
 
           <h3 className="detail-subheading">Falling back gracefully</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Proxima also has a degradation path: when the external embedding or rerank API is
-              unreliable, it falls back to keyword matching rather than failing outright. Quality is
-              measured two ways — a human-annotated evaluation set and an automated scoring script —
-              landing at 97% of the time the correct professor appears somewhere in the top-3, and
-              89% of the time it&apos;s ranked first.
+              Proxima also includes a fallback path for external API failures. If the embedding or
+              reranking service is unavailable, search falls back to keyword matching instead of
+              failing completely.
             </p>
-          </div>
-
-          <div className="detail-callout">
-            <strong>Where the LLM sits.</strong> In Proxima, the model sits at the exit: recall is
-            entirely embeddings and cosine similarity, and the LLM only reranks and explains a
-            shortlist that similarity search already produced. It&apos;s close to the mirror image
-            of AlmaBot, where the LLM sits at the entry instead.
+            <p className="about-body project-detail-prose">
+              I evaluate ranking quality using both a human-annotated evaluation set and an
+              automated scoring script. On that evaluation set, the correct professor appears in the
+              top three 97% of the time and is ranked first 89% of the time.
+            </p>
           </div>
         </div>
       </section>
