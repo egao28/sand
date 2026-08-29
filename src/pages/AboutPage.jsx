@@ -10,8 +10,8 @@ export default function AboutPage() {
   return (
     <main className="page page--secondary">
       <AboutSection content={siteContent.about} />
-      <SkillsMarquee content={siteContent.skills} />
       <ExperienceTimeline content={siteContent.experience} education={siteContent.education} />
+      <SkillsMarquee content={siteContent.skills} />
     </main>
   )
 }
