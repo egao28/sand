@@ -30,7 +30,7 @@ export const siteContent = {
   about: {
     label: 'about',
     identity: 'Evelyn Gao — Computer Science & Statistics, University of Chicago',
-    headline: 'I build infrastructure for machine learning systems.',
+    headline: 'I build infrastructure for AI and machine learning systems.',
     photo: {
       alt: 'Polaroid photo of Evelyn Gao pointing at a whiteboard',
       caption: '@ Salk',
@@ -86,7 +86,7 @@ export const siteContent = {
         title: 'Salk Institute',
         editorialTitle: true,
         sub: 'Research Software Engineering Intern · Harnessing Plants Initiative · Jun – Aug 2026',
-        cardSub: 'Research Software Engineering Intern · Harnessing Plants Initiative',
+        subLine: 'Research Software Engineering Intern · Harnessing Plants Initiative',
       },
       {
         slug: 'sony',
@@ -96,7 +96,7 @@ export const siteContent = {
         title: 'Sony',
         editorialTitle: true,
         sub: 'Computer Science Operations & Maintenance Intern · May – Sep 2025',
-        cardSub: 'Computer Science Operations & Maintenance Intern',
+        subLine: 'Computer Science Operations & Maintenance Intern',
       },
       {
         slug: 'tsinghua',
@@ -106,7 +106,7 @@ export const siteContent = {
         title: 'Tsinghua University',
         editorialTitle: true,
         sub: 'Research Assistant, Vehicle Emission Research Group · Spatiotemporal Modeling and Forecasting · Jul 2024 – Jan 2025',
-        cardSub:
+        subLine:
           'Research Assistant, Vehicle Emission Research Group · Spatiotemporal Modeling and Forecasting',
       },
     ],

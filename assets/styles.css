@@ -564,6 +564,7 @@ section {
 /* Experience + education: section bg comes from parent (.page--secondary = paper2) */
 #experience {
   background: transparent;
+  scroll-margin-top: 7rem;
 }
 .page--secondary #experience .sec-inner {
   padding-top: 2rem;
@@ -1865,6 +1866,12 @@ a.contact-info-link:focus-visible .contact-info-value {
   }
   .sec-inner {
     padding: 4rem 1.5rem;
+  }
+  .page--secondary #about .sec-inner,
+  .page--secondary #skills .sec-inner,
+  .page--secondary #experience .sec-inner {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
   }
   .about-photo-inline {
     float: none;
