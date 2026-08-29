@@ -27,27 +27,26 @@ export default function TsinghuaDetailPage() {
             Forecasting · Jul 2024 – Jan 2025
           </p>
           <p className="about-body project-detail-prose">
-            Working from 30 days of time-series records — monitoring sites, vehicle kilometers
-            traveled, vehicle type, spatial location — I built a pipeline that forecasts emissions
-            24 hours ahead, and a spatial-statistics layer that tells the difference between a noisy
-            neighbor and a genuine hot spot.
+            Using 30 days of vehicle-emission time-series data, including monitoring-site
+            measurements, vehicle kilometers traveled, vehicle type, and spatial location, I built a
+            pipeline for 24-hour emission forecasting and spatial analysis of emission hot spots.
           </p>
           <div className="detail-stat-strip">
             <div>
               <span className="detail-stat-num">30 days</span>
-              <span className="detail-stat-label">Of history behind every forecast</span>
+              <span className="detail-stat-label">of history used for forecasting</span>
             </div>
             <div>
               <span className="detail-stat-num">24</span>
-              <span className="detail-stat-label">Hourly steps, forecast recursively</span>
+              <span className="detail-stat-label">hourly forecast steps</span>
             </div>
             <div>
               <span className="detail-stat-num">RF &gt; ARIMA</span>
-              <span className="detail-stat-label">Chosen for external features, not just lags</span>
+              <span className="detail-stat-label">for incorporating external features</span>
             </div>
             <div>
               <span className="detail-stat-num">Moran&apos;s I + Gi*</span>
-              <span className="detail-stat-label">Confirm, then pinpoint, hot spots</span>
+              <span className="detail-stat-label">for global clustering and local hot spots</span>
             </div>
           </div>
         </div>
@@ -68,10 +67,13 @@ export default function TsinghuaDetailPage() {
           </div>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The same 30-day dataset supported three different questions, each doing different work
-              for the group: characterizing what already happened, forecasting what happens next,
-              and localizing exactly where it&apos;s concentrated. They call for different tools,
-              and treating them as one problem would have blurred all three.
+              The same dataset supported three separate tasks: describing historical emission
+              patterns, forecasting emissions for the next 24 hours, and identifying where
+              high-emission areas were spatially concentrated.
+            </p>
+            <p className="about-body project-detail-prose">
+              I treated these as separate analysis problems rather than trying to solve all three
+              with one model, since each required a different set of assumptions and methods.
             </p>
           </div>
         </div>
@@ -90,11 +92,14 @@ export default function TsinghuaDetailPage() {
 
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The forecast extrapolates the next 24 hours from patterns in the previous 30 days —
-              vehicle-type patterns, time-of-day regularities, and detected change points feed in as
-              features. Rather than one model predicting all 24 hours directly, the forecast is
-              recursive: predict one hour ahead, feed that prediction back in as an input, and
-              repeat 24 times to cover the full day.
+              I transformed the previous 30 days of observations into lagged, seasonal, and
+              contextual features, including vehicle type, time-of-day patterns, and detected change
+              points.
+            </p>
+            <p className="about-body project-detail-prose">
+              The forecast is recursive rather than producing all 24 hours at once. The model
+              predicts the next hour, uses that prediction as part of the input for the following
+              step, and repeats the process until it produces a full 24-hour forecast.
             </p>
           </div>
 
@@ -236,56 +241,85 @@ export default function TsinghuaDetailPage() {
           <h3 className="detail-subheading">Guarding against leakage</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The training set can never see anything that wouldn&apos;t actually be available at
-              prediction time — an easy mistake to make with time-series data specifically. The fix
-              was a time-based split: sliced strictly by date, training on the earlier stretch of
-              days and holding out the final day for evaluation, so no training sample and its test
-              window ever share information from the future relative to that point.
+              Time-series data makes it easy to accidentally train on information that would not
+              have been available at the moment of prediction.
+            </p>
+            <p className="about-body project-detail-prose">
+              I therefore split the data strictly by time rather than randomly. Earlier observations
+              were used for training and the final period was held out for evaluation, so
+              information from the future could not leak into the training set.
             </p>
           </div>
 
           <h3 className="detail-subheading">Choosing Random Forest over ARIMA</h3>
+          <div className="project-detail-body">
+            <p className="about-body project-detail-prose">
+              I compared an ARIMA baseline with a Random Forest model.
+            </p>
+          </div>
           <div className="detail-tool-grid">
             <div className="detail-tool-card">
               <span className="name">ARIMA</span>
-              <span className="desc">Linear autoregression — sees only its own lagged history</span>
+              <span className="desc">
+                Autoregressive baseline based on the series&apos; historical values
+              </span>
             </div>
             <div className="detail-tool-card">
               <span className="name">Random Forest</span>
               <span className="desc">
-                Non-linear ensemble — also ingests vehicle type and time-of-day as real features
+                Non-linear ensemble that can combine lagged values with additional predictors
               </span>
             </div>
           </div>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              ARIMA is a linear autoregressive model that only sees its own lagged history. Random
-              Forest doesn&apos;t carry that linearity assumption, and more importantly, it can
-              actually take in external features — vehicle type, time-of-day — alongside the lag
-              terms, which is signal ARIMA has no way to use at all. Everything was scored on MAE,
-              mean absolute error, because it reads directly as &quot;how far off, on average, in
-              the same units as the measurement&quot; rather than needing translation.
+              Random Forest was a better fit for this dataset because the forecast depended on more
+              than the emission series itself. It could incorporate variables such as vehicle type
+              and time of day alongside lagged emission features, while the ARIMA baseline I tested
+              relied on the historical series.
+            </p>
+            <p className="about-body project-detail-prose">
+              I evaluated the forecasts using mean absolute error (MAE), which reports the average
+              prediction error in the same units as the original measurement.
             </p>
           </div>
 
-          <h3 className="detail-subheading">Where emission is actually concentrated</h3>
+          <h3 className="detail-subheading">Finding where emissions are concentrated</h3>
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              Moran&apos;s I tests whether nearby regions have similar values — confirming that
-              spatial clustering exists at all, globally. Getis-Ord Gi* goes further and identifies
-              exactly which specific locations form the hot-spot clusters, not just that clustering
-              is present somewhere. Run over the spatial dataset in GeoPandas, this prioritized
-              which regions were worth flagging as candidates for the group&apos;s regulatory
-              follow-up.
+              Forecasting answers when emissions may increase, but the group also needed to
+              understand where elevated emissions were spatially concentrated.
+            </p>
+            <p className="about-body project-detail-prose">
+              I used two spatial statistics for different parts of that question.
+            </p>
+            <p className="about-body project-detail-prose">
+              Moran&apos;s I measures global spatial autocorrelation: whether nearby locations tend
+              to have similar emission values more often than would be expected from a random
+              spatial pattern.
+            </p>
+            <p className="about-body project-detail-prose">
+              Getis-Ord Gi* identifies local clusters of unusually high or low values, making it
+              possible to locate the specific areas contributing to that broader spatial pattern.
+            </p>
+            <p className="about-body project-detail-prose">
+              I ran the spatial analysis with GeoPandas and used the resulting hot spots to identify
+              regions that could be prioritized for further investigation by the research group.
             </p>
           </div>
 
-          <div className="detail-callout">
-            <strong>What actually mattered.</strong> Three things stood out past the specific
-            models: representative data plus a well-designed method beats a fancier model on bad
-            data; anomalies need an explicit, checked threshold instead of an eyeballed one; and the
-            point of getting this right wasn&apos;t a one-off script — it became a pipeline the rest
-            of the group could actually reuse.
+          <h3 className="detail-subheading">From analysis to a reusable pipeline</h3>
+          <div className="project-detail-body">
+            <p className="about-body project-detail-prose">
+              The final work combined feature engineering, forecasting, evaluation, and spatial
+              statistics into a repeatable analysis pipeline rather than a collection of one-off
+              notebooks.
+            </p>
+            <p className="about-body project-detail-prose">
+              That also made several modeling decisions explicit: temporal splits were used to
+              prevent leakage, forecast accuracy was evaluated with a fixed metric, and spatial hot
+              spots were identified statistically rather than by visually inspecting a map.
+            </p>
           </div>
         </div>
       </section>
@@ -308,13 +342,14 @@ export default function TsinghuaDetailPage() {
             chips={[
               'Random Forest',
               'ARIMA',
-              'time-based cross-validation',
+              'time-series forecasting',
               'recursive forecasting',
+              'time-based train/test split',
+              'feature engineering',
+              'MAE',
               'GeoPandas',
               "Moran's I",
               'Getis-Ord Gi*',
-              'MAE',
-              'feature engineering',
             ]}
           />
         </div>
