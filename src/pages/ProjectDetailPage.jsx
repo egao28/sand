@@ -1,14 +1,10 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { getProjectBySlug } from '../data/siteContent.js'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
-
-function splitTechnical(technical) {
-  return technical
-    .split('·')
-    .map((s) => s.trim())
-    .filter(Boolean)
-}
+import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
+import { splitTechnical } from '../utils/splitTechnical.js'
+import TechChipGrid from '../components/TechChipGrid.jsx'
 
 /** White → warm beige image wash only (no dark overlays). */
 const HERO_IMAGE_WASH = {
@@ -21,29 +17,8 @@ const HERO_IMAGE_WASH = {
 export default function ProjectDetailPage() {
   const { slug } = useParams()
   const project = useMemo(() => (slug ? getProjectBySlug(slug) : null), [slug])
-  const techRef = useRef(null)
+  const techRef = useDarkSurfaceOnIntersect()
   useRevealOnScroll()
-
-  useEffect(() => {
-    const el = techRef.current
-    if (!el) return
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0]
-        if (!e) return
-        const on = e.isIntersecting && e.intersectionRatio > 0.15
-        document.body.classList.toggle('cursor-dark-surface', on)
-      },
-      { threshold: [0, 0.15, 0.35, 0.6, 1] }
-    )
-
-    io.observe(el)
-    return () => {
-      io.disconnect()
-      document.body.classList.remove('cursor-dark-surface')
-    }
-  }, [project])
 
   if (!project) {
     return <Navigate to="/projects" replace />
@@ -156,13 +131,7 @@ export default function ProjectDetailPage() {
               Technical
             </h2>
           </div>
-          <div className="project-tech-grid" aria-label="Technical stack">
-            {keywords.map((label) => (
-              <span key={label} className="project-tech-chip">
-                {label}
-              </span>
-            ))}
-          </div>
+          <TechChipGrid chips={keywords} />
         </div>
       </section>
     </main>

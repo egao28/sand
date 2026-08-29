@@ -8,6 +8,10 @@ import ProjectsPage from './pages/ProjectsPage.jsx'
 import ProjectDetailPage from './pages/ProjectDetailPage.jsx'
 import ExperienceDetailPage from './pages/ExperienceDetailPage.jsx'
 import BloomMcpDetailPage from './pages/BloomMcpDetailPage.jsx'
+import ProximaDetailPage from './pages/ProximaDetailPage.jsx'
+import AlmabotDetailPage from './pages/AlmabotDetailPage.jsx'
+import SonyDetailPage from './pages/SonyDetailPage.jsx'
+import TsinghuaDetailPage from './pages/TsinghuaDetailPage.jsx'
 import ResumePage from './pages/ResumePage.jsx'
 import { siteContent } from './data/siteContent.js'
 
@@ -31,8 +35,12 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/projects/proxima" element={<ProximaDetailPage />} />
+          <Route path="/projects/almabot" element={<AlmabotDetailPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
           <Route path="/experience/bloom-mcp" element={<BloomMcpDetailPage />} />
+          <Route path="/experience/sony" element={<SonyDetailPage />} />
+          <Route path="/experience/tsinghua" element={<TsinghuaDetailPage />} />
           <Route path="/experience/:slug" element={<ExperienceDetailPage />} />
           <Route path="/resume" element={<ResumePage />} />
           <Route path="/contact" element={<Navigate to="/#contact" replace />} />
