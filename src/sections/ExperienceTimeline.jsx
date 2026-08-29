@@ -16,7 +16,7 @@ export default function ExperienceTimeline({ content, education }) {
                 <div className={`ct-title${item.editorialTitle ? ' ct-title--editorial' : ''}`}>
                   {item.title}
                 </div>
-                <div className="ct-sub">{item.sub}</div>
+                <div className="ct-sub">{item.cardSub ?? item.sub}</div>
               </header>
 
               <Link to={item.href} className="ct-more-link">
