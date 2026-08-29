@@ -36,7 +36,7 @@ export default function SonyDetailPage() {
               <span className="detail-stat-label">releases and assets automated weekly</span>
             </div>
             <div>
-              <span className="detail-stat-num">500+</span>
+              <span className="detail-stat-num">300+</span>
               <span className="detail-stat-label">feedback comments routed weekly</span>
             </div>
             <div>
@@ -83,7 +83,7 @@ export default function SonyDetailPage() {
 
           <div className="project-detail-body">
             <p className="about-body project-detail-prose">
-              The team received more than 500 pieces of user feedback each week that had to be
+              The team received more than 300 pieces of user feedback each week that had to be
               distributed across different teams.
             </p>
             <p className="about-body project-detail-prose">

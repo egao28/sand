@@ -13,7 +13,6 @@ export default function ExperienceTimeline({ content, education }) {
           {content.items.map((item) => (
             <article key={item.title} className={`ct-item ${item.side}`}>
               <header className="ct-head">
-                <div className="ct-time">{item.time}</div>
                 <div className={`ct-title${item.editorialTitle ? ' ct-title--editorial' : ''}`}>
                   {item.title}
                 </div>

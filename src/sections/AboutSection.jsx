@@ -29,21 +29,14 @@ export default function AboutSection({ content }) {
             </p>
           ))}
 
-          <div className="about-work">
-            <span className="about-work-label">Work</span>
-            <span className="about-work-note"> — the short version, most recent first:</span>
-            <div className="about-work-list">
-              {content.work.map((line) => (
-                <div key={line}>{line}</div>
-              ))}
-            </div>
+          <div className="about-more-links">
+            <Link to="/projects" className="ct-more-link">
+              See what I&rsquo;ve built <span aria-hidden="true">→</span>
+            </Link>
+            <a href="#experience" className="ct-more-link">
+              Experience <span aria-hidden="true">→</span>
+            </a>
           </div>
-
-          <p className="about-signoff">{content.signoff}</p>
-
-          <Link to="/projects" className="ct-more-link">
-            See what I&rsquo;ve built <span aria-hidden="true">→</span>
-          </Link>
         </div>
       </div>
     </section>

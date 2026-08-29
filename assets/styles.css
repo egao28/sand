@@ -443,12 +443,11 @@ section {
   display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 10px 18px rgba(25, 23, 19, 0.18));
   user-select: none;
 }
 .about-body {
   font-size: 19px;
-  line-height: 1.8;
+  line-height: 1.6;
   color: var(--ink-soft);
   margin-bottom: 1.25rem;
 }
@@ -469,7 +468,7 @@ section {
 }
 .about-photo-inline {
   float: left;
-  width: 220px;
+  width: 280px;
   margin: 0.25rem 2rem 1.25rem 0;
 }
 .about-photo-caption {
@@ -685,10 +684,11 @@ section {
   display: inline-block;
   margin-top: 0.9rem;
   font-family: var(--mono);
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--ink-muted);
+  color: var(--ink);
   text-decoration: none;
   transition: color 0.2s ease;
 }
