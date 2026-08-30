@@ -35,3 +35,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# raw screen-recording sources — commit the web-encoded mp4 in public/ instead
+*.mov
