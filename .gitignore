@@ -40,3 +40,6 @@ next-env.d.ts
 # web-encoded mp4 in public/ instead. Scoped to the root so an intentional
 # .mov under public/ still gets tracked.
 /*.mov
+
+# compiled helpers for scripts/encode-demo.sh
+/scripts/.build/
