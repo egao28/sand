@@ -36,5 +36,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# raw screen-recording sources — commit the web-encoded mp4 in public/ instead
-*.mov
+# raw screen-recording sources dropped at the repo root — commit the
+# web-encoded mp4 in public/ instead. Scoped to the root so an intentional
+# .mov under public/ still gets tracked.
+/*.mov

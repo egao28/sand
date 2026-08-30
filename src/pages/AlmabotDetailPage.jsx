@@ -416,6 +416,7 @@ export default function AlmabotDetailPage() {
           <figure className="project-detail-video">
             <video
               className="project-detail-video-player"
+              aria-label="Screen recording of an AlmaBot planner run"
               controls
               preload="none"
               playsInline
