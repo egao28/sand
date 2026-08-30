@@ -994,6 +994,31 @@ section {
   opacity: 0.55;
   text-decoration: none;
 }
+.project-detail-video {
+  margin: 1.35rem 0 0;
+}
+.project-detail-video-player {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Poster and frames are light, so a soft border keeps the edge off the beige panel */
+  border: 1px solid rgba(25, 23, 19, 0.12);
+  /* Match the .detail-diagram card radius */
+  border-radius: 12px;
+  background: #f7f5f0;
+  box-shadow: 0 10px 28px rgba(25, 23, 19, 0.1);
+}
+.project-detail-video-player:focus-visible {
+  outline: 1px solid rgba(25, 23, 19, 0.3);
+  outline-offset: 3px;
+}
+.project-detail-video-caption {
+  margin: 0.55rem 0 0;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
 .project-detail-tech {
   background: #0a0908;
   color: rgba(255, 253, 248, 0.94);
