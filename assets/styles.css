@@ -912,6 +912,11 @@ section {
   /* Motivation: warmer, longer ramp — different angle & stops from hero/demo */
   background: linear-gradient(198deg, #fffefb 0%, #f4e9d8 38%, #e8dcc8 100%);
 }
+.project-detail-approach {
+  /* Approach: sits between Motivation and Demo — its own angle so the two
+     prose sections do not read as one undifferentiated block */
+  background: linear-gradient(158deg, #fdfbf6 0%, #f2e8d9 45%, #e6dac9 100%);
+}
 .experience-detail-subtitle {
   font-size: 17px;
   color: rgba(201, 169, 110, 0.95);
@@ -987,12 +992,6 @@ section {
 .project-detail-demo-link:focus-visible {
   outline: 1px solid rgba(25, 23, 19, 0.3);
   outline-offset: 3px;
-}
-.project-detail-demo-soon {
-  font-size: 0.82em;
-  letter-spacing: 0.02em;
-  opacity: 0.55;
-  text-decoration: none;
 }
 .project-detail-video {
   margin: 1.35rem 0 0;
@@ -1103,6 +1102,9 @@ section {
 }
 .project-detail-page--tone-d .project-detail-motivation {
   background: linear-gradient(200deg, #fefdfb 0%, #f0e6da 50%, #e2d4c4 100%);
+}
+.project-detail-page--tone-d .project-detail-approach {
+  background: linear-gradient(168deg, #fdfcf8 0%, #eee3d5 55%, #e0d2c0 100%);
 }
 .project-detail-page--tone-d .project-detail-demo {
   background: linear-gradient(52deg, #f9f6f0 0%, #ebe1d4 85%);
