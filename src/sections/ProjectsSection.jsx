@@ -1,45 +1,52 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import photo2 from '../assets/projects/photo-2.png'
-import photo3 from '../assets/projects/photo-3.png'
-import photo4 from '../assets/projects/photo-4.png'
-import photo5 from '../assets/projects/photo-5.png'
+import photo2Avif from '../assets/projects/photo-2.avif'
+import photo2Webp from '../assets/projects/photo-2.webp'
+import photo2Png from '../assets/projects/photo-2.png'
+import photo3Avif from '../assets/projects/photo-3.avif'
+import photo3Webp from '../assets/projects/photo-3.webp'
+import photo3Png from '../assets/projects/photo-3.png'
+import photo4Avif from '../assets/projects/photo-4.avif'
+import photo4Webp from '../assets/projects/photo-4.webp'
+import photo4Png from '../assets/projects/photo-4.png'
+import photo5Avif from '../assets/projects/photo-5.avif'
+import photo5Webp from '../assets/projects/photo-5.webp'
+import photo5Png from '../assets/projects/photo-5.png'
 
-const PHOTOS = [photo2, photo3, photo4, photo5]
+const PHOTOS = [
+  { avif: photo2Avif, webp: photo2Webp, png: photo2Png },
+  { avif: photo3Avif, webp: photo3Webp, png: photo3Png },
+  { avif: photo4Avif, webp: photo4Webp, png: photo4Png },
+  { avif: photo5Avif, webp: photo5Webp, png: photo5Png },
+]
 
-// Handcrafted cascade wave (percent anchors inside the gallery canvas), sized
-// against the real .sec-inner content width (~988px at desktop, ~673px at
-// the 721px mobile-breakpoint edge) and the card width ceiling (300px, see
-// CSS) so the rightmost slot can't push a card past the container edge even
-// with max jitter applied.
-// Gap is intentionally narrower than CARD_WIDTH_PCT so adjacent cards overlap
-// like a scattered photo pile — but it must track the card width below (both
-// are % of the same canvas) or the overlap balloons. Four 31% cards cannot fit
-// across 100% without overlapping, so the only question is how much: at 23 the
-// overlap is 8% of the canvas, about a quarter of a card.
-// A full row spans 31 + 3*STEP = 100%, which with ±1.5% jitter and up to 6deg
-// of tilt puts the outermost corners a little past the canvas. That is fine and
-// deliberate: .projects-gallery sets no overflow, and .projects-gallery-wrap
-// keeps 3.5rem of padding either side for them to sit in. Push STEP much
-// beyond this and the cards start eating that padding instead.
-const STEP = 23 // percent gap between adjacent slot left-anchors
-// Per-column vertical stagger for the scattered look. The shape is the wave;
-// the shared offset is where the pile sits in the canvas. A card is its image
-// (~187px at the 300px width ceiling) plus a label that wraps to two lines on
-// the longest title, so the pile stands ~249px tall against a 520-680px
-// canvas. Anchored near zero it left roughly half the canvas empty below it,
-// so all four are offset to centre the pile instead. Keep the differences
-// between these if you retune: they are the stagger.
-const TOP_WAVE = [25, 31, 23, 32]
+// Handcrafted cascade wave, as percent anchors inside the gallery canvas.
+//
+// Gap is intentionally narrower than a card so adjacent cards overlap like a
+// scattered photo pile. A card is clamp(190px, 24vw, 300px) against a canvas of
+// min(100vw, 1100px) - 7rem, i.e. 27-30% of it depending on viewport, so four
+// across cannot fit in 100% without overlapping. At 23 the gap leaves roughly a
+// quarter of each card covered.
+//
+// Cards are positioned by their centre (see slotFor), so a row is centred at
+// any card width and the overlap is the only thing this number decides. Raising
+// it much further pushes the outermost cards past the canvas; there is room for
+// that in .projects-gallery-wrap's 3.5rem of padding, and .projects-gallery
+// sets no overflow, but it is padding meant for the section, not for cards.
+const STEP = 23 // percent gap between adjacent slot centres
+
+// Where the pile sits vertically, and the per-column stagger applied on top of
+// it. Kept apart on purpose: TOP_WAVE is the shape, PILE_TOP is the position,
+// and retuning one no longer means preserving the other by hand.
+//
+// A card is its image plus a label that wraps to two lines on the longest
+// title, which comes to roughly 275px at the 300px width ceiling, against a
+// 520-680px canvas. Anchored near zero the pile left about half the canvas
+// empty below it.
+const PILE_TOP = 23
+const TOP_WAVE = [2, 8, 0, 9]
 const ROW_LENGTH = TOP_WAVE.length
 const ROW_GAP = 9 // percent of vertical space between wrapped rows
-// Real card width is clamp(190px, 24vw, 300px) (see CSS), which maxes out at
-// 300px against the ~974px .sec-inner canvas on any normal desktop screen —
-// ~31% of canvas width. ROW_LENGTH is capped at 4 (not 5) so a full row at
-// that real width still leaves comfortable margin for jitter/tilt on both
-// edges; used only to center each row. Keep this in sync with the CSS card
-// width, and re-tune STEP above whenever this changes.
-const CARD_WIDTH_PCT = 31
 
 // One slot per item, independent of PHOTOS.length/ROW_LENGTH: a 5th project
 // (or more) wraps to a new row with a shifted top instead of silently
@@ -50,8 +57,16 @@ function slotFor(index, count) {
   const col = index % ROW_LENGTH
   const row = Math.floor(index / ROW_LENGTH)
   const itemsInRow = Math.min(ROW_LENGTH, count - row * ROW_LENGTH)
-  const rowStart = (100 - CARD_WIDTH_PCT - STEP * (itemsInRow - 1)) / 2
-  return { top: `${TOP_WAVE[col] + row * ROW_GAP}%`, left: `${rowStart + col * STEP}%` }
+  // Offset of this card's centre from the canvas centre. Anchoring centres
+  // rather than left edges is what keeps a row centred: the previous version
+  // measured from a constant 31% card width, but the real card is 27-30% of the
+  // canvas below a ~1250px viewport, and the difference piled up as dead space
+  // on the right — 42px at 1100px wide.
+  const centreOffset = (col - (itemsInRow - 1) / 2) * STEP
+  return {
+    top: `${PILE_TOP + TOP_WAVE[col] + row * ROW_GAP}%`,
+    centreOffset,
+  }
 }
 
 function shuffledIndices(n) {
@@ -97,14 +112,21 @@ export default function ProjectsSection({ content }) {
               className="project-photo-card reveal"
               style={{
                 top: `calc(${slot.top} + ${jitterY}%)`,
-                left: `calc(${slot.left} + ${jitterX}%)`,
+                // 50% puts the card's left edge at the canvas centre; backing off
+                // half a card width centres the card itself, whatever that width
+                // currently resolves to.
+                left: `calc(50% + ${slot.centreOffset + Number(jitterX)}% - (var(--card-w) / 2))`,
                 '--tilt': `${tilt}deg`,
                 '--delay': `${delay}s`,
                 zIndex,
               }}
             >
               <span className="project-photo-swing">
-                <img src={photo} alt="" className="project-photo-img" decoding="async" />
+                <picture>
+                  <source srcSet={photo.avif} type="image/avif" />
+                  <source srcSet={photo.webp} type="image/webp" />
+                  <img src={photo.png} alt="" className="project-photo-img" decoding="async" />
+                </picture>
               </span>
               <span className="project-photo-label">{item.title}</span>
             </Link>

@@ -43,3 +43,8 @@ next-env.d.ts
 
 # compiled helpers for scripts/encode-demo.sh
 /scripts/.build/
+
+# raw camera captures dropped at the repo root while swapping gallery photos —
+# commit the processed assets under src/assets/projects/ instead. Scoped to the
+# root so an intentional PNG elsewhere still gets tracked.
+/*.png
