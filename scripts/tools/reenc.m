@@ -1,3 +1,8 @@
+// Re-encode a video at an explicit bitrate. AVFoundation's export presets do
+// not expose one, which is the whole reason this exists.
+//
+//   reenc <in> <out> <kbps>
+
 #import <AVFoundation/AVFoundation.h>
 
 int main(int argc, const char **argv) {
@@ -5,13 +10,19 @@ int main(int argc, const char **argv) {
     if (argc < 4) { fprintf(stderr, "usage: reenc <in> <out> <kbps>\n"); return 1; }
     NSURL *inURL = [NSURL fileURLWithPath:@(argv[1])];
     NSURL *outURL = [NSURL fileURLWithPath:@(argv[2])];
-    int kbps = atoi(argv[3]);
+
+    char *end = NULL;
+    long kbps = strtol(argv[3], &end, 10);
+    if (*argv[3] == '\0' || (end && *end != '\0') || kbps <= 0 || kbps > 100000) {
+      fprintf(stderr, "reenc: kbps must be a positive integer, got \"%s\"\n", argv[3]);
+      return 1;
+    }
     [[NSFileManager defaultManager] removeItemAtURL:outURL error:nil];
 
     AVURLAsset *asset = [AVURLAsset URLAssetWithURL:inURL options:nil];
     AVAssetTrack *vt = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
     AVAssetTrack *at = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
-    if (!vt) { fprintf(stderr, "no video track\n"); return 1; }
+    if (!vt) { fprintf(stderr, "reenc: no video track in %s\n", argv[1]); return 1; }
     CGSize size = vt.naturalSize;
     fprintf(stderr, "in: %.0fx%.0f %.2f fps %.0f kbps dur %.1fs audio:%s\n",
             size.width, size.height, vt.nominalFrameRate,
@@ -20,7 +31,7 @@ int main(int argc, const char **argv) {
 
     NSError *err = nil;
     AVAssetReader *reader = [AVAssetReader assetReaderWithAsset:asset error:&err];
-    if (err) { fprintf(stderr, "reader: %s\n", err.description.UTF8String); return 1; }
+    if (err) { fprintf(stderr, "reenc: reader: %s\n", err.description.UTF8String); return 1; }
     AVAssetReaderTrackOutput *vOut = [AVAssetReaderTrackOutput
         assetReaderTrackOutputWithTrack:vt
                          outputSettings:@{(id)kCVPixelBufferPixelFormatTypeKey:
@@ -39,7 +50,7 @@ int main(int argc, const char **argv) {
     AVAssetWriter *writer = [AVAssetWriter assetWriterWithURL:outURL
                                                      fileType:AVFileTypeMPEG4
                                                         error:&err];
-    if (err) { fprintf(stderr, "writer: %s\n", err.description.UTF8String); return 1; }
+    if (err) { fprintf(stderr, "reenc: writer: %s\n", err.description.UTF8String); return 1; }
     writer.shouldOptimizeForNetworkUse = YES;  // faststart: moov atom first
 
     AVAssetWriterInput *vIn = [AVAssetWriterInput
@@ -55,6 +66,9 @@ int main(int argc, const char **argv) {
                            AVVideoAllowFrameReorderingKey: @YES,
                          }}];
     vIn.expectsMediaDataInRealTime = NO;
+    // Identity for macOS screen recordings, but a phone-captured source carries
+    // its orientation here — without it the output comes out sideways.
+    vIn.transform = vt.preferredTransform;
     [writer addInput:vIn];
     AVAssetWriterInput *aIn = nil;
     if (at) {
@@ -75,12 +89,15 @@ int main(int argc, const char **argv) {
 
     dispatch_group_t group = dispatch_group_create();
     dispatch_queue_t vq = dispatch_queue_create("v", NULL);
+    // Written only on vq, read only after the group wait below.
+    __block CMTime lastPTS = kCMTimeZero;
     dispatch_group_enter(group);
     [vIn requestMediaDataWhenReadyOnQueue:vq usingBlock:^{
       while (vIn.isReadyForMoreMediaData) {
         CMSampleBufferRef sb = [vOut copyNextSampleBuffer];
         if (!sb) { [vIn markAsFinished]; dispatch_group_leave(group); return; }
         [vIn appendSampleBuffer:sb];
+        lastPTS = CMSampleBufferGetPresentationTimeStamp(sb);
         CFRelease(sb);
       }
     }];
@@ -98,11 +115,25 @@ int main(int argc, const char **argv) {
     }
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
+    // copyNextSampleBuffer returning nil means end-of-stream OR a read failure,
+    // and the two are indistinguishable from the append loop. Without this
+    // check a corrupt or truncated source yields a silently short video that
+    // still finishes writing cleanly and exits 0.
+    if (reader.status != AVAssetReaderStatusCompleted) {
+      fprintf(stderr, "reenc: read failed %.1fs into a %.1fs source: %s\n",
+              CMTimeGetSeconds(lastPTS), CMTimeGetSeconds(asset.duration),
+              reader.error ? reader.error.description.UTF8String : "unknown error");
+      [writer cancelWriting];
+      [[NSFileManager defaultManager] removeItemAtURL:outURL error:nil];
+      return 1;
+    }
+
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     [writer finishWritingWithCompletionHandler:^{ dispatch_semaphore_signal(sem); }];
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     if (writer.status != AVAssetWriterStatusCompleted) {
-      fprintf(stderr, "write failed: %s\n", writer.error.description.UTF8String);
+      fprintf(stderr, "reenc: write failed: %s\n", writer.error.description.UTF8String);
+      [[NSFileManager defaultManager] removeItemAtURL:outURL error:nil];
       return 1;
     }
     fprintf(stderr, "done\n");

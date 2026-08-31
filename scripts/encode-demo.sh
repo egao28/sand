@@ -29,10 +29,21 @@ die() {
   exit 1
 }
 
-if [ $# -lt 2 ]; then
-  sed -n '3,10p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//' >&2
+usage() {
+  cat >&2 <<'EOF'
+Encode a raw screen recording into the demo assets a project detail page wants:
+a web-sized H.264 mp4 and a matching poster frame, both dropped into public/.
+
+  scripts/encode-demo.sh <source-video> <slug> [poster-seconds] [kbps]
+  scripts/encode-demo.sh almabot-demo.mov almabot 8
+
+Writes public/<slug>-demo.mp4 and public/<slug>-demo-poster.jpg.
+Defaults: poster at 8s, 800 kbps.
+EOF
   exit 1
-fi
+}
+
+[ $# -ge 2 ] || usage
 
 SOURCE="$1"
 SLUG="$2"
@@ -43,6 +54,17 @@ KBPS="${4:-800}"
 case "$SLUG" in
   *[!a-z0-9-]* | '') die "slug must be lowercase letters, digits and dashes: $SLUG" ;;
 esac
+# The helpers parse these with strtod/strtol and would otherwise turn junk into
+# 0 — a poster of the blank first frame, or an aborted encode with a stack trace.
+case "$POSTER_AT" in
+  '' | *[!0-9.]* | *.*.*) die "poster-seconds must be a non-negative number: $POSTER_AT" ;;
+esac
+case "$KBPS" in
+  '' | *[!0-9]* | 0) die "kbps must be a positive integer: $KBPS" ;;
+esac
+
+command -v avconvert >/dev/null || die "avconvert not found (expected at /usr/bin/avconvert)"
+command -v clang >/dev/null || die "clang not found — install the Xcode Command Line Tools"
 
 MP4="$ROOT/public/$SLUG-demo.mp4"
 POSTER="$ROOT/public/$SLUG-demo-poster.jpg"
@@ -66,9 +88,11 @@ trap 'rm -rf "$TMP"' EXIT
 
 # Stage 1: avconvert caps the long edge at 1280 and normalises the container.
 echo "downscaling..."
-avconvert --source "$SOURCE" --preset Preset1280x720 \
-  --output "$TMP/scaled.mp4" --replace >/dev/null 2>&1 ||
-  die "avconvert failed on $SOURCE"
+if ! AV_OUT="$(avconvert --source "$SOURCE" --preset Preset1280x720 \
+  --output "$TMP/scaled.mp4" --replace 2>&1)"; then
+  echo "$AV_OUT" >&2
+  die "avconvert could not read $SOURCE — is it a video file?"
+fi
 
 # Stage 2: re-encode at a bitrate a web page can afford. 800 kbps keeps
 # screen-recorded UI text legible; raise it if fine detail smears.
