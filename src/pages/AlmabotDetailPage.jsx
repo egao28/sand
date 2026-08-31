@@ -5,6 +5,7 @@ import { getProjectBySlug } from '../data/siteContent.js'
 import { splitTechnical } from '../utils/splitTechnical.js'
 import DiagramArrowMarker from '../components/DiagramArrowMarker.jsx'
 import TechChipGrid from '../components/TechChipGrid.jsx'
+import DemoVideo from '../components/DemoVideo.jsx'
 
 export default function AlmabotDetailPage() {
   const techRef = useDarkSurfaceOnIntersect()
@@ -413,24 +414,13 @@ export default function AlmabotDetailPage() {
             A full run through the planner: picking a major and year, listing coursework already
             taken, and getting back a semester-by-semester path with the remaining Gen Eds.
           </p>
-          <figure className="project-detail-video">
-            <video
-              className="project-detail-video-player"
-              aria-label="Screen recording of an AlmaBot planner run"
-              controls
-              preload="none"
-              playsInline
-              poster="/almabot-demo-poster.jpg"
-              width="1280"
-              height="940"
-            >
-              <source src="/almabot-demo.mp4" type="video/mp4" />
-              Your browser cannot play this video.
-            </video>
-            <figcaption className="project-detail-video-caption">
-              Screen recording — no audio.
-            </figcaption>
-          </figure>
+          <DemoVideo
+            src="/almabot-demo.mp4"
+            poster="/almabot-demo-poster.jpg"
+            width={1280}
+            height={940}
+            ariaLabel="Screen recording of an AlmaBot planner run"
+          />
         </div>
       </section>
 

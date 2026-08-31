@@ -5,6 +5,7 @@ import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
 import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
 import { splitTechnical } from '../utils/splitTechnical.js'
 import TechChipGrid from '../components/TechChipGrid.jsx'
+import DemoVideo from '../components/DemoVideo.jsx'
 
 /** White → warm beige image wash only (no dark overlays). */
 const HERO_IMAGE_WASH = {
@@ -27,6 +28,10 @@ export default function ProjectDetailPage() {
   const keywords = splitTechnical(project.technical)
   const demoLabel = project.demoLabel?.trim() || 'Open project'
   const demoUrl = project.demoUrl?.trim()
+  const demoVideo = project.demoVideo ?? null
+  // A "(coming soon)" placeholder directly under a clip of the thing working
+  // reads as a contradiction, so the panel has to earn its place with a link.
+  const showDemoLink = Boolean(demoUrl) || !demoVideo
   const rawTone = project.detailTone ?? 'a'
   const tone = ['a', 'b', 'c', 'd'].includes(rawTone) ? rawTone : 'a'
 
@@ -85,37 +90,63 @@ export default function ProjectDetailPage() {
         </div>
       </section>
 
-      <section className="project-detail-demo reveal" aria-labelledby="project-demo-heading">
-        <div className="sec-inner project-detail-demo-inner">
-          <div className="section-title-row">
-            <h2 id="project-demo-heading" className="about-headline project-detail-section-title">
-              Try it here
-            </h2>
+      {demoVideo && (
+        <section className="project-detail-demo reveal" aria-labelledby="project-video-heading">
+          <div className="sec-inner project-detail-demo-inner">
+            <div className="section-title-row">
+              <h2
+                id="project-video-heading"
+                className="about-headline project-detail-section-title"
+              >
+                Demo
+              </h2>
+            </div>
+            {demoVideo.lead && <p className="about-body project-detail-prose">{demoVideo.lead}</p>}
+            <DemoVideo
+              src={demoVideo.src}
+              poster={demoVideo.poster}
+              width={demoVideo.width}
+              height={demoVideo.height}
+              ariaLabel={demoVideo.ariaLabel ?? `Screen recording of ${project.title}`}
+              caption={demoVideo.caption}
+            />
           </div>
-          <p className="project-detail-demo-lead">
-            {demoUrl ? (
-              <a
-                href={demoUrl}
-                className="project-detail-demo-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${demoLabel} (opens in a new tab)`}
-              >
-                {demoLabel}
-              </a>
-            ) : (
-              <a
-                href="#"
-                className="project-detail-demo-link"
-                onClick={(e) => e.preventDefault()}
-                aria-label={`${demoLabel} (link coming soon)`}
-              >
-                {demoLabel} <span className="project-detail-demo-soon">(coming soon)</span>
-              </a>
-            )}
-          </p>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {showDemoLink && (
+        <section className="project-detail-demo reveal" aria-labelledby="project-demo-heading">
+          <div className="sec-inner project-detail-demo-inner">
+            <div className="section-title-row">
+              <h2 id="project-demo-heading" className="about-headline project-detail-section-title">
+                Try it here
+              </h2>
+            </div>
+            <p className="project-detail-demo-lead">
+              {demoUrl ? (
+                <a
+                  href={demoUrl}
+                  className="project-detail-demo-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${demoLabel} (opens in a new tab)`}
+                >
+                  {demoLabel}
+                </a>
+              ) : (
+                <a
+                  href="#"
+                  className="project-detail-demo-link"
+                  onClick={(e) => e.preventDefault()}
+                  aria-label={`${demoLabel} (link coming soon)`}
+                >
+                  {demoLabel} <span className="project-detail-demo-soon">(coming soon)</span>
+                </a>
+              )}
+            </p>
+          </div>
+        </section>
+      )}
 
       <section
         ref={techRef}
