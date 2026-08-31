@@ -237,10 +237,10 @@ export const siteContent = {
           'Since the campus has a large space, I wanted to see if redistributing them would make a difference. That led to collecting data and analyzing how plant characteristics interact.',
         ],
         approach: [
-          'I clustered the plants by what they need — water, light, nutrients, rooting depth — rather than by what they look like, since two plants can resemble each other closely and still draw on completely different resources.',
-          'Health was deliberately kept out of the feature matrix. It is the outcome I wanted to explain, so letting it shape the clusters would have made the finding circular.',
-          'That let me treat competition as two conditions holding at once: the plants share a demand profile, and they sit close enough that their canopies or root zones actually meet. Proximity on its own is not a problem, and similar needs on their own are not a problem.',
-          'The test is then a comparison rather than an illustration — whether the plants in those crowded pairs are measurably worse off than the rest, reported with group sizes and a significance test so that an effect resting on two plants is not mistaken for a pattern.',
+          'I started with the plant traits we had measured: height, leaf area, root depth, and nitrogen, phosphorus, and potassium levels. Several of these moved together, so clustering directly on the raw measurements would have given correlated features too much influence.',
+          'I standardized the features first, then used PCA to reduce that overlap. The first two principal components captured most of the useful variation in the dataset. Looking at the loadings also made the reduced space easier to interpret: one direction was driven more by overall plant size and root structure, while the other reflected differences in nutrient profile.',
+          'I then ran K-Means on those principal components. Using the elbow method, I settled on four clusters that separated the plants into groups with different growth and resource-use patterns.',
+          'Those groups became the basis for the planting recommendations. Plants with similar growth profiles were given more space from one another, while plants with more complementary traits, such as different rooting patterns, could be placed closer together.',
         ],
         technical:
           'PCA · z-score normalization · K-means · clustering · feature correlation · ecological data analysis · data matrix construction · scree plot · dimensionality reduction · GIS visualization',
