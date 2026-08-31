@@ -29,17 +29,17 @@ export default function ProjectDetailPage() {
   const demoLabel = project.demoLabel?.trim() || 'Open project'
   const demoUrl = project.demoUrl?.trim()
   const demoVideo = project.demoVideo ?? null
-  const approach = project.approach ?? []
+  const approach = Array.isArray(project.approach) ? project.approach : []
   // The panel has to earn its place with a real destination. Without one it used
   // to render a "(coming soon)" anchor that swallowed its own click, which reads
   // as broken rather than forthcoming.
   const showDemoLink = Boolean(demoUrl)
   const rawTone = project.detailTone ?? 'a'
-  const tone = ['a', 'b', 'c', 'd'].includes(rawTone) ? rawTone : 'a'
+  const tone = ['a', 'b', 'c', 'd', 'e', 'f'].includes(rawTone) ? rawTone : 'a'
 
   const hasHeroImage = Boolean(project.backgroundImage?.trim())
   const wash = HERO_IMAGE_WASH[tone] ?? HERO_IMAGE_WASH.a
-  const heroBg = hasHeroImage && `${wash}, url(${project.backgroundImage.trim()})`
+  const heroBg = hasHeroImage && `${wash}, url("${project.backgroundImage.trim()}")`
 
   return (
     <main
@@ -97,7 +97,7 @@ export default function ProjectDetailPage() {
           className="project-detail-approach reveal"
           aria-labelledby="project-approach-heading"
         >
-          <div className="sec-inner project-detail-motivation-inner">
+          <div className="sec-inner project-detail-approach-inner">
             <div className="section-title-row">
               <h2
                 id="project-approach-heading"
