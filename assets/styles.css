@@ -724,13 +724,16 @@ section {
   position: relative;
   width: 100%;
   height: clamp(520px, 64vh, 680px);
+  /* Single source of truth for the card width: the card sizes itself from it,
+     and ProjectsSection offsets each card by half of it to centre a row. */
+  --card-w: clamp(190px, 24vw, 300px);
 }
 .project-photo-card {
   --tilt: 0deg;
   --hover-boost: 0;
   position: absolute;
   display: block;
-  width: clamp(190px, 24vw, 300px);
+  width: var(--card-w);
   text-decoration: none;
   color: inherit;
 }
