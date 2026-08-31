@@ -23,7 +23,14 @@ const PHOTOS = [photo2, photo3, photo4, photo5]
 // keeps 3.5rem of padding either side for them to sit in. Push STEP much
 // beyond this and the cards start eating that padding instead.
 const STEP = 23 // percent gap between adjacent slot left-anchors
-const TOP_WAVE = [3, 9, 1, 10] // per-column vertical stagger for the scattered look
+// Per-column vertical stagger for the scattered look. The shape is the wave;
+// the shared offset is where the pile sits in the canvas. A card is its image
+// (~187px at the 300px width ceiling) plus a label that wraps to two lines on
+// the longest title, so the pile stands ~249px tall against a 520-680px
+// canvas. Anchored near zero it left roughly half the canvas empty below it,
+// so all four are offset to centre the pile instead. Keep the differences
+// between these if you retune: they are the stagger.
+const TOP_WAVE = [25, 31, 23, 32]
 const ROW_LENGTH = TOP_WAVE.length
 const ROW_GAP = 9 // percent of vertical space between wrapped rows
 // Real card width is clamp(190px, 24vw, 300px) (see CSS), which maxes out at
