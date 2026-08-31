@@ -207,6 +207,14 @@ export const siteContent = {
         href: '/projects/carelink',
         detailTone: 'c',
         demoLabel: 'Open project',
+        demoVideo: {
+          src: '/carelink-demo.mp4',
+          poster: '/carelink-demo-poster.jpg',
+          width: 1280,
+          height: 940,
+          lead: 'Filtering the index of 541 organizations down to the pediatric groups that offer financial assistance, with the map narrowing alongside the list, then following one result out to its own site and directions.',
+          ariaLabel: 'Screen recording of a CareLink search',
+        },
         motivation: [
           'I first became aware of this problem when I came across multiple online posts from people seeking help during cancer treatment. But it was surprisingly difficult to find structured, organized information about where to actually access help.',
           'This made me realize that while support systems do exist, they are often fragmented and not easily discoverable, especially for individuals who are already under emotional and physical stress.',

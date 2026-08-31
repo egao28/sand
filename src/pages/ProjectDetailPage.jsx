@@ -27,6 +27,7 @@ export default function ProjectDetailPage() {
   const keywords = splitTechnical(project.technical)
   const demoLabel = project.demoLabel?.trim() || 'Open project'
   const demoUrl = project.demoUrl?.trim()
+  const demoVideo = project.demoVideo ?? null
   const rawTone = project.detailTone ?? 'a'
   const tone = ['a', 'b', 'c', 'd'].includes(rawTone) ? rawTone : 'a'
 
@@ -84,6 +85,40 @@ export default function ProjectDetailPage() {
           </div>
         </div>
       </section>
+
+      {demoVideo && (
+        <section className="project-detail-demo reveal" aria-labelledby="project-video-heading">
+          <div className="sec-inner project-detail-demo-inner">
+            <div className="section-title-row">
+              <h2
+                id="project-video-heading"
+                className="about-headline project-detail-section-title"
+              >
+                Demo
+              </h2>
+            </div>
+            {demoVideo.lead && <p className="about-body project-detail-prose">{demoVideo.lead}</p>}
+            <figure className="project-detail-video">
+              <video
+                className="project-detail-video-player"
+                aria-label={demoVideo.ariaLabel ?? `Screen recording of ${project.title}`}
+                controls
+                preload="none"
+                playsInline
+                poster={demoVideo.poster}
+                width={demoVideo.width}
+                height={demoVideo.height}
+              >
+                <source src={demoVideo.src} type="video/mp4" />
+                Your browser cannot play this video.
+              </video>
+              <figcaption className="project-detail-video-caption">
+                Screen recording — no audio.
+              </figcaption>
+            </figure>
+          </div>
+        </section>
+      )}
 
       <section className="project-detail-demo reveal" aria-labelledby="project-demo-heading">
         <div className="sec-inner project-detail-demo-inner">
