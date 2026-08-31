@@ -14,10 +14,15 @@ const PHOTOS = [photo2, photo3, photo4, photo5]
 // with max jitter applied.
 // Gap is intentionally narrower than CARD_WIDTH_PCT so adjacent cards overlap
 // like a scattered photo pile — but it must track the card width below (both
-// are % of the same canvas) or the overlap balloons. At the old 220px card
-// width this gap gave ~25% overlap; at the current 300px width, 21 preserves
-// that same ~25% ratio while still leaving room for jitter at the row edges.
-const STEP = 21 // percent gap between adjacent slot left-anchors
+// are % of the same canvas) or the overlap balloons. Four 31% cards cannot fit
+// across 100% without overlapping, so the only question is how much: at 23 the
+// overlap is 8% of the canvas, about a quarter of a card.
+// A full row spans 31 + 3*STEP = 100%, which with ±1.5% jitter and up to 6deg
+// of tilt puts the outermost corners a little past the canvas. That is fine and
+// deliberate: .projects-gallery sets no overflow, and .projects-gallery-wrap
+// keeps 3.5rem of padding either side for them to sit in. Push STEP much
+// beyond this and the cards start eating that padding instead.
+const STEP = 23 // percent gap between adjacent slot left-anchors
 const TOP_WAVE = [3, 9, 1, 10] // per-column vertical stagger for the scattered look
 const ROW_LENGTH = TOP_WAVE.length
 const ROW_GAP = 9 // percent of vertical space between wrapped rows
