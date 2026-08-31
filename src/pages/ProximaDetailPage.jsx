@@ -10,6 +10,8 @@ export default function ProximaDetailPage() {
   const techRef = useDarkSurfaceOnIntersect()
   useRevealOnScroll()
   const project = getProjectBySlug('proxima')
+  const demoUrl = project?.demoUrl?.trim()
+  const demoLabel = project?.demoLabel?.trim() || 'Open project'
 
   if (!project) {
     return <Navigate to="/projects" replace />
@@ -467,26 +469,28 @@ export default function ProximaDetailPage() {
         </div>
       </section>
 
-      <section className="project-detail-demo reveal" aria-labelledby="proxima-demo-heading">
-        <div className="sec-inner project-detail-demo-inner">
-          <div className="section-title-row">
-            <h2 id="proxima-demo-heading" className="about-headline project-detail-section-title">
-              Try it here
-            </h2>
+      {demoUrl && (
+        <section className="project-detail-demo reveal" aria-labelledby="proxima-demo-heading">
+          <div className="sec-inner project-detail-demo-inner">
+            <div className="section-title-row">
+              <h2 id="proxima-demo-heading" className="about-headline project-detail-section-title">
+                Try it here
+              </h2>
+            </div>
+            <p className="project-detail-demo-lead">
+              <a
+                href={demoUrl}
+                className="project-detail-demo-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${demoLabel} (opens in a new tab)`}
+              >
+                {demoLabel}
+              </a>
+            </p>
           </div>
-          <p className="project-detail-demo-lead">
-            <a
-              href={project.demoUrl}
-              className="project-detail-demo-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`${project.demoLabel} (opens in a new tab)`}
-            >
-              {project.demoLabel}
-            </a>
-          </p>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section
         ref={techRef}

@@ -29,15 +29,17 @@ export default function ProjectDetailPage() {
   const demoLabel = project.demoLabel?.trim() || 'Open project'
   const demoUrl = project.demoUrl?.trim()
   const demoVideo = project.demoVideo ?? null
-  // A "(coming soon)" placeholder directly under a clip of the thing working
-  // reads as a contradiction, so the panel has to earn its place with a link.
-  const showDemoLink = Boolean(demoUrl) || !demoVideo
+  const approach = Array.isArray(project.approach) ? project.approach : []
+  // The panel has to earn its place with a real destination. Without one it used
+  // to render a "(coming soon)" anchor that swallowed its own click, which reads
+  // as broken rather than forthcoming.
+  const showDemoLink = Boolean(demoUrl)
   const rawTone = project.detailTone ?? 'a'
-  const tone = ['a', 'b', 'c', 'd'].includes(rawTone) ? rawTone : 'a'
+  const tone = ['a', 'b', 'c', 'd', 'e', 'f'].includes(rawTone) ? rawTone : 'a'
 
   const hasHeroImage = Boolean(project.backgroundImage?.trim())
   const wash = HERO_IMAGE_WASH[tone] ?? HERO_IMAGE_WASH.a
-  const heroBg = hasHeroImage && `${wash}, url(${project.backgroundImage.trim()})`
+  const heroBg = hasHeroImage && `${wash}, url("${project.backgroundImage.trim()}")`
 
   return (
     <main
@@ -90,6 +92,31 @@ export default function ProjectDetailPage() {
         </div>
       </section>
 
+      {approach.length > 0 && (
+        <section
+          className="project-detail-approach reveal"
+          aria-labelledby="project-approach-heading"
+        >
+          <div className="sec-inner project-detail-approach-inner">
+            <div className="section-title-row">
+              <h2
+                id="project-approach-heading"
+                className="about-headline project-detail-section-title"
+              >
+                Approach
+              </h2>
+            </div>
+            <div className="project-detail-body">
+              {approach.map((p, i) => (
+                <p key={i} className="about-body project-detail-prose">
+                  {p}
+                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {demoVideo && (
         <section className="project-detail-demo reveal" aria-labelledby="project-video-heading">
           <div className="sec-inner project-detail-demo-inner">
@@ -123,26 +150,15 @@ export default function ProjectDetailPage() {
               </h2>
             </div>
             <p className="project-detail-demo-lead">
-              {demoUrl ? (
-                <a
-                  href={demoUrl}
-                  className="project-detail-demo-link"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`${demoLabel} (opens in a new tab)`}
-                >
-                  {demoLabel}
-                </a>
-              ) : (
-                <a
-                  href="#"
-                  className="project-detail-demo-link"
-                  onClick={(e) => e.preventDefault()}
-                  aria-label={`${demoLabel} (link coming soon)`}
-                >
-                  {demoLabel} <span className="project-detail-demo-soon">(coming soon)</span>
-                </a>
-              )}
+              <a
+                href={demoUrl}
+                className="project-detail-demo-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${demoLabel} (opens in a new tab)`}
+              >
+                {demoLabel}
+              </a>
             </p>
           </div>
         </section>

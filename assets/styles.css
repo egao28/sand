@@ -866,6 +866,11 @@ section {
   padding-top: clamp(1.75rem, 4vh, 2.35rem);
   padding-bottom: clamp(1.75rem, 4vh, 2.35rem);
 }
+.project-detail-approach-inner {
+  /* Match the Motivation column so the two prose sections share a rhythm. */
+  padding-top: clamp(1.75rem, 4vh, 2.35rem);
+  padding-bottom: clamp(1.75rem, 4vh, 2.35rem);
+}
 .project-detail-page .about-headline.project-detail-section-title {
   font-size: clamp(26px, 3vw, 40px);
   font-weight: 300;
@@ -911,6 +916,11 @@ section {
 .project-detail-motivation {
   /* Motivation: warmer, longer ramp — different angle & stops from hero/demo */
   background: linear-gradient(198deg, #fffefb 0%, #f4e9d8 38%, #e8dcc8 100%);
+}
+.project-detail-approach {
+  /* Approach: sits between Motivation and Demo — its own angle so the two
+     prose sections do not read as one undifferentiated block */
+  background: linear-gradient(158deg, #fdfbf6 0%, #f2e8d9 45%, #e6dac9 100%);
 }
 .experience-detail-subtitle {
   font-size: 17px;
@@ -988,12 +998,6 @@ section {
   outline: 1px solid rgba(25, 23, 19, 0.3);
   outline-offset: 3px;
 }
-.project-detail-demo-soon {
-  font-size: 0.82em;
-  letter-spacing: 0.02em;
-  opacity: 0.55;
-  text-decoration: none;
-}
 .project-detail-video {
   margin: 1.35rem 0 0;
 }
@@ -1065,6 +1069,9 @@ section {
 .project-detail-page--tone-a .project-detail-motivation {
   background: linear-gradient(185deg, #fffffe 0%, #f2e6d4 42%, #e4d6c4 100%);
 }
+.project-detail-page--tone-a .project-detail-approach {
+  background: linear-gradient(152deg, #fffffd 0%, #f4eade 44%, #e7dbcb 100%);
+}
 .project-detail-page--tone-a .project-detail-demo {
   background: linear-gradient(95deg, #faf7f1 0%, #ede4d6 72%, #e0d2c0 100%);
 }
@@ -1077,6 +1084,9 @@ section {
 }
 .project-detail-page--tone-b .project-detail-motivation {
   background: linear-gradient(220deg, #ffffff 0%, #f7efe4 55%, #dccfbf 100%);
+}
+.project-detail-page--tone-b .project-detail-approach {
+  background: linear-gradient(172deg, #fffdfa 0%, #f5ece0 52%, #e2d7c8 100%);
 }
 .project-detail-page--tone-b .project-detail-demo {
   background: linear-gradient(140deg, #f5f2eb 0%, #e9dfd0 100%);
@@ -1091,6 +1101,9 @@ section {
 .project-detail-page--tone-c .project-detail-motivation {
   background: linear-gradient(180deg, #fffef7 0%, #eedfc8 35%, #e3d0b8 100%);
 }
+.project-detail-page--tone-c .project-detail-approach {
+  background: linear-gradient(146deg, #fffef8 0%, #f1e5d2 40%, #e6d6bf 100%);
+}
 .project-detail-page--tone-c .project-detail-demo {
   background: linear-gradient(118deg, #f8f4ec 0%, #e8ddd0 50%, #d9cbb8 100%);
 }
@@ -1103,6 +1116,9 @@ section {
 }
 .project-detail-page--tone-d .project-detail-motivation {
   background: linear-gradient(200deg, #fefdfb 0%, #f0e6da 50%, #e2d4c4 100%);
+}
+.project-detail-page--tone-d .project-detail-approach {
+  background: linear-gradient(168deg, #fdfcf8 0%, #eee3d5 55%, #e0d2c0 100%);
 }
 .project-detail-page--tone-d .project-detail-demo {
   background: linear-gradient(52deg, #f9f6f0 0%, #ebe1d4 85%);
@@ -1117,6 +1133,9 @@ section {
 .project-detail-page--tone-e .project-detail-motivation {
   background: linear-gradient(165deg, #fffef9 0%, #f1e2c9 45%, #e6d3b5 100%);
 }
+.project-detail-page--tone-e .project-detail-approach {
+  background: linear-gradient(140deg, #fffef9 0%, #f3e7d2 48%, #e9d9be 100%);
+}
 .project-detail-page--tone-e .project-detail-demo {
   background: linear-gradient(100deg, #f7f3e9 0%, #e9dbc4 60%, #ddccae 100%);
 }
@@ -1129,6 +1148,9 @@ section {
 }
 .project-detail-page--tone-f .project-detail-motivation {
   background: linear-gradient(210deg, #fffdf8 0%, #eee0c6 40%, #ddc9a8 100%);
+}
+.project-detail-page--tone-f .project-detail-approach {
+  background: linear-gradient(162deg, #fffdf8 0%, #f1e5cf 43%, #e0cfb2 100%);
 }
 .project-detail-page--tone-f .project-detail-demo {
   background: linear-gradient(70deg, #f8f5ed 0%, #e6dac2 55%, #d8c8a4 100%);

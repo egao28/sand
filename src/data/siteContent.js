@@ -206,7 +206,6 @@ export const siteContent = {
         title: 'CareLink',
         href: '/projects/carelink',
         detailTone: 'c',
-        demoLabel: 'Open project',
         demoVideo: {
           src: '/carelink-demo.mp4',
           poster: '/carelink-demo-poster.jpg',
@@ -230,11 +229,15 @@ export const siteContent = {
         title: 'Campus Vegetation Renovation Project',
         href: '/projects/campus-vegetation',
         detailTone: 'd',
-        demoLabel: 'Open project',
-        backgroundImage: '/background/campus-vegetation.jpg',
         motivation: [
           'I noticed that some plant species on campus were placed next to others that compete for the same resources, and one of them was withering.',
           'Since the campus has a large space, I wanted to see if redistributing them would make a difference. That led to collecting data and analyzing how plant characteristics interact.',
+        ],
+        approach: [
+          'I started with the plant traits we had measured: height, leaf area, root depth, and nitrogen, phosphorus, and potassium levels. Several of these moved together, so clustering directly on the raw measurements would have given correlated features too much influence.',
+          'I standardized the features first, then used PCA to reduce that overlap. The first two principal components captured most of the useful variation in the dataset. Looking at the loadings also made the reduced space easier to interpret: one direction was driven more by overall plant size and root structure, while the other reflected differences in nutrient profile.',
+          'I then ran K-Means on those principal components. Using the elbow method, I settled on four clusters that separated the plants into groups with different growth and resource-use patterns.',
+          'Those groups became the basis for the planting recommendations. Plants with similar growth profiles were given more space from one another, while plants with more complementary traits, such as different rooting patterns, could be placed closer together.',
         ],
         technical:
           'PCA · z-score normalization · K-means · clustering · feature correlation · ecological data analysis · data matrix construction · scree plot · dimensionality reduction · GIS visualization',
