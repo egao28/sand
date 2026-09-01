@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://whitesand.vercel.app/sitemap.xml
+Sitemap: https://whitesandooz.vercel.app/sitemap.xml
