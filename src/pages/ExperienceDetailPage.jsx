@@ -1,7 +1,8 @@
 import { useMemo } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { getExperienceBySlug } from '../data/siteContent.js'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
+import NotFoundPage from './NotFoundPage.jsx'
 
 export default function ExperienceDetailPage() {
   const { slug } = useParams()
@@ -9,7 +10,7 @@ export default function ExperienceDetailPage() {
   useRevealOnScroll()
 
   if (!item) {
-    return <Navigate to="/about" replace />
+    return <NotFoundPage />
   }
 
   return (
