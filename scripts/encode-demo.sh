@@ -123,5 +123,5 @@ done.
 next:
   - set width/height on the <video> to $DIMS, or the reserved box will be wrong
   - check the lead sentence and aria-label still describe what the clip shows
-  - npm run build   (dist/ is tracked in this repo)
+  - npm run build   (sanity check only — dist/ is not committed; the host builds)
 EOF

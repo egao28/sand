@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hand-maintained. The routes come from src/App.jsx and the slugs from
+  src/data/siteContent.js — add an entry here when you add either. /contact is
+  left out on purpose: it only redirects to the homepage anchor.
+  No <lastmod>: a stale one is worse than none.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://whitesand.vercel.app/</loc><priority>1.0</priority></url>
+  <url><loc>https://whitesand.vercel.app/about</loc><priority>0.8</priority></url>
+  <url><loc>https://whitesand.vercel.app/projects</loc><priority>0.8</priority></url>
+  <url><loc>https://whitesand.vercel.app/resume</loc><priority>0.8</priority></url>
+  <url><loc>https://whitesand.vercel.app/projects/proxima</loc><priority>0.6</priority></url>
+  <url><loc>https://whitesand.vercel.app/projects/almabot</loc><priority>0.6</priority></url>
+  <url><loc>https://whitesand.vercel.app/projects/carelink</loc><priority>0.6</priority></url>
+  <url><loc>https://whitesand.vercel.app/projects/campus-vegetation</loc><priority>0.6</priority></url>
+  <url><loc>https://whitesand.vercel.app/experience/bloom-mcp</loc><priority>0.6</priority></url>
+  <url><loc>https://whitesand.vercel.app/experience/sony</loc><priority>0.6</priority></url>
+  <url><loc>https://whitesand.vercel.app/experience/tsinghua</loc><priority>0.6</priority></url>
+</urlset>
