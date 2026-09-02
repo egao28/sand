@@ -259,7 +259,7 @@ export const siteContent = {
     formTopics: ['Say hello', 'Job or internship', 'Collaboration', 'Something else'],
     // A row with an href shows text derived from it, so the link and the label
     // for the link cannot disagree. `value` is only for rows that have no href
-    // to derive from — or, set to '', to hide a row without deleting it.
+    // to derive from. To hide a row, delete it or comment it out.
     items: [
       { key: 'Email', label: 'Email', href: 'mailto:evelyneyi@outlook.com' },
       { key: 'LinkedIn', label: 'LinkedIn', href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/' },

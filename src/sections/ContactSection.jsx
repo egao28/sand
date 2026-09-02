@@ -14,11 +14,14 @@ const EMPTY_FORM = { name: '', email: '', message: '' }
 // used to display linkedin.com/in/xinyi-evelyn-gao next to an href of
 // https://www.linkedin.com/in/xinyi-evelyn-gao/, the same destination spelled
 // two ways with nothing holding them together.
+// Only as general as its one caller needs: a query string or fragment passes
+// straight through, so `mailto:a@b.com?subject=Hi` would display the prefill.
+// Harden it before reusing this anywhere the hrefs are not hand-written here.
 function displayTarget(href) {
   return href
-    .replace(/^mailto:/, '')
-    .replace(/^https?:\/\//, '')
-    .replace(/^www\./, '')
+    .replace(/^mailto:/i, '')
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
     .replace(/\/+$/, '')
 }
 
@@ -94,13 +97,11 @@ export default function ContactSection({ content }) {
             <h2 className="contact-panel-headline">{content.panelHeadline}</h2>
             <ul className="contact-info-list">
               {content.items
-                // ?? rather than ||, so an explicit '' still hides a row the
-                // way it always has: '' is not nullish, so it survives the
-                // coalesce and then reads falsy here. Only an absent value
-                // falls through to the href.
-                .filter((it) => Boolean(it.value ?? it.href))
+                // A row needs something to show: its own text, or an href to
+                // derive it from.
+                .filter((it) => it.value || it.href)
                 .map((item) => {
-                  const text = item.value ?? displayTarget(item.href)
+                  const text = item.value || displayTarget(item.href)
                   const isExternal = item.href?.startsWith('http')
                   const inner = (
                     <>
