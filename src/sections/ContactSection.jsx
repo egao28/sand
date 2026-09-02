@@ -9,6 +9,19 @@ const WEB3FORMS_ACCESS_KEY = '582a6f18-f79d-4578-bf3e-a29378790498'
 
 const EMPTY_FORM = { name: '', email: '', message: '' }
 
+// What a contact row shows for a link: its href with the parts nobody wants to
+// read stripped off. Derived rather than typed a second time — the LinkedIn row
+// used to display linkedin.com/in/xinyi-evelyn-gao next to an href of
+// https://www.linkedin.com/in/xinyi-evelyn-gao/, the same destination spelled
+// two ways with nothing holding them together.
+function displayTarget(href) {
+  return href
+    .replace(/^mailto:/, '')
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .replace(/\/+$/, '')
+}
+
 export default function ContactSection({ content }) {
   const [form, setForm] = useState({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
   // Honeypot. Held outside `form` so it can never be spread into the payload.
@@ -81,13 +94,18 @@ export default function ContactSection({ content }) {
             <h2 className="contact-panel-headline">{content.panelHeadline}</h2>
             <ul className="contact-info-list">
               {content.items
-                .filter((it) => it.value)
+                // ?? rather than ||, so an explicit '' still hides a row the
+                // way it always has: '' is not nullish, so it survives the
+                // coalesce and then reads falsy here. Only an absent value
+                // falls through to the href.
+                .filter((it) => Boolean(it.value ?? it.href))
                 .map((item) => {
+                  const text = item.value ?? displayTarget(item.href)
                   const isExternal = item.href?.startsWith('http')
                   const inner = (
                     <>
                       <span className="contact-info-label">{item.label}</span>
-                      <span className="contact-info-value">{item.value}</span>
+                      <span className="contact-info-value">{text}</span>
                       {item.href && (
                         <span className="contact-info-arrow" aria-hidden="true">
                           ↗
@@ -108,7 +126,7 @@ export default function ContactSection({ content }) {
                                 // The only visual cue is the ↗, and that is
                                 // aria-hidden. Same wording the project pages
                                 // use on their external demo links.
-                                'aria-label': `${item.label}: ${item.value} (opens in a new tab)`,
+                                'aria-label': `${item.label}: ${text} (opens in a new tab)`,
                               }
                             : {})}
                         >
