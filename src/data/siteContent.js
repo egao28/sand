@@ -257,28 +257,20 @@ export const siteContent = {
     panelHeadline: 'Contact',
     formHeadline: "Let's get in touch!",
     formTopics: ['Say hello', 'Job or internship', 'Collaboration', 'Something else'],
+    // A row with an href shows text derived from it, so the link and the label
+    // for the link cannot disagree. `value` is only for rows that have no href
+    // to derive from. To hide a row, delete it or comment it out.
     items: [
-      {
-        key: 'Email',
-        label: 'Email',
-        value: 'evelyneyi@outlook.com',
-        href: 'mailto:evelyneyi@outlook.com',
-      },
-      {
-        key: 'LinkedIn',
-        label: 'LinkedIn',
-        value: 'linkedin.com/in/xinyi-evelyn-gao',
-        href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/',
-      },
-      {
-        key: 'GitHub',
-        label: 'GitHub',
-        value: 'github.com/egao28',
-        href: 'https://github.com/egao28',
-      },
+      { key: 'Email', label: 'Email', href: 'mailto:evelyneyi@outlook.com' },
+      { key: 'LinkedIn', label: 'LinkedIn', href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/' },
+      { key: 'GitHub', label: 'GitHub', href: 'https://github.com/egao28' },
       { key: 'Location', label: 'Location', value: 'Chicago, IL / Beijing, CN', href: null },
     ],
-    footerLeft: '© 2026 Evelyn Gao',
+    // Read at page load, not baked in: the site can sit undeployed for months,
+    // and a footer that still says last year on January 1st is the kind of
+    // wrong nobody reports. Uses the visitor's clock, which is the usual and
+    // correct trade for a copyright line.
+    footerLeft: `© ${new Date().getFullYear()} Evelyn Gao`,
     footerRight: '',
   },
 }
