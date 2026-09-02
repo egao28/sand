@@ -33,7 +33,7 @@ export const siteContent = {
     headline: 'I build infrastructure for AI and machine learning systems.',
     photo: {
       alt: 'Polaroid photo of Evelyn Gao pointing at a whiteboard',
-      caption: '@ Salk',
+      caption: 'Aug 14, 2026',
     },
     body: [
       "I'm a Computer Science and Statistics student at the University of Chicago, expected graduation 2028. I'm especially interested in the parts of ML that make a system usable beyond the model itself: data pipelines, validation, testing, tooling, and the infrastructure that keeps things working after the first demo.",
