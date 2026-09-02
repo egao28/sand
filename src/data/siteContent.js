@@ -270,6 +270,12 @@ export const siteContent = {
         value: 'linkedin.com/in/xinyi-evelyn-gao',
         href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/',
       },
+      {
+        key: 'GitHub',
+        label: 'GitHub',
+        value: 'github.com/egao28',
+        href: 'https://github.com/egao28',
+      },
       { key: 'Location', label: 'Location', value: 'Chicago, IL / Beijing, CN', href: null },
     ],
     footerLeft: '© 2026 Evelyn Gao',
