@@ -1,11 +1,12 @@
 import { useMemo } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { getProjectBySlug } from '../data/siteContent.js'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
 import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
 import { splitTechnical } from '../utils/splitTechnical.js'
 import TechChipGrid from '../components/TechChipGrid.jsx'
 import DemoVideo from '../components/DemoVideo.jsx'
+import NotFoundPage from './NotFoundPage.jsx'
 
 /** White → warm beige image wash only (no dark overlays). */
 const HERO_IMAGE_WASH = {
@@ -22,7 +23,7 @@ export default function ProjectDetailPage() {
   useRevealOnScroll()
 
   if (!project) {
-    return <Navigate to="/projects" replace />
+    return <NotFoundPage />
   }
 
   const keywords = splitTechnical(project.technical)

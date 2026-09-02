@@ -1,5 +1,6 @@
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
+import NotFoundPage from './NotFoundPage.jsx'
 import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
 import { getProjectBySlug } from '../data/siteContent.js'
 import { splitTechnical } from '../utils/splitTechnical.js'
@@ -14,7 +15,7 @@ export default function ProximaDetailPage() {
   const demoLabel = project?.demoLabel?.trim() || 'Open project'
 
   if (!project) {
-    return <Navigate to="/projects" replace />
+    return <NotFoundPage />
   }
 
   return (

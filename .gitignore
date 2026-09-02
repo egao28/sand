@@ -15,6 +15,9 @@
 
 # production
 /build
+# build output — the host runs `npm run build` itself; a committed dist/ is
+# just a stale 31MB copy that conflicts on every merge.
+/dist
 
 # misc
 .DS_Store

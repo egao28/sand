@@ -1,4 +1,4 @@
-import { Link, Navigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
 import { useDarkSurfaceOnIntersect } from '../hooks/useDarkSurfaceOnIntersect.js'
 import { getProjectBySlug } from '../data/siteContent.js'
@@ -6,6 +6,7 @@ import { splitTechnical } from '../utils/splitTechnical.js'
 import DiagramArrowMarker from '../components/DiagramArrowMarker.jsx'
 import TechChipGrid from '../components/TechChipGrid.jsx'
 import DemoVideo from '../components/DemoVideo.jsx'
+import NotFoundPage from './NotFoundPage.jsx'
 
 export default function AlmabotDetailPage() {
   const techRef = useDarkSurfaceOnIntersect()
@@ -13,7 +14,7 @@ export default function AlmabotDetailPage() {
   const project = getProjectBySlug('almabot')
 
   if (!project) {
-    return <Navigate to="/projects" replace />
+    return <NotFoundPage />
   }
 
   return (

@@ -13,6 +13,7 @@ import AlmabotDetailPage from './pages/AlmabotDetailPage.jsx'
 import SonyDetailPage from './pages/SonyDetailPage.jsx'
 import TsinghuaDetailPage from './pages/TsinghuaDetailPage.jsx'
 import ResumePage from './pages/ResumePage.jsx'
+import NotFoundPage from './pages/NotFoundPage.jsx'
 import { siteContent } from './data/siteContent.js'
 
 function ScrollToTop() {
@@ -44,7 +45,7 @@ export default function App() {
           <Route path="/experience/:slug" element={<ExperienceDetailPage />} />
           <Route path="/resume" element={<ResumePage />} />
           <Route path="/contact" element={<Navigate to="/#contact" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -3,8 +3,8 @@
 # Encode a raw screen recording into the demo assets a project detail page wants:
 # a web-sized H.264 mp4 and a matching poster frame, both dropped into public/.
 #
-#   scripts/encode-demo.sh <source-video> <slug> [poster-seconds] [kbps]
-#   scripts/encode-demo.sh almabot-demo.mov almabot 8
+#   scripts/encode-demo.sh <source-video> <slug> [poster-seconds] [kbps] [fps]
+#   scripts/encode-demo.sh almabot-demo.mov almabot 8 450 15
 #
 # Writes public/<slug>-demo.mp4 and public/<slug>-demo-poster.jpg.
 #
@@ -34,11 +34,15 @@ usage() {
 Encode a raw screen recording into the demo assets a project detail page wants:
 a web-sized H.264 mp4 and a matching poster frame, both dropped into public/.
 
-  scripts/encode-demo.sh <source-video> <slug> [poster-seconds] [kbps]
-  scripts/encode-demo.sh almabot-demo.mov almabot 8
+  scripts/encode-demo.sh <source-video> <slug> [poster-seconds] [kbps] [fps]
+  scripts/encode-demo.sh almabot-demo.mov almabot 8 450 15
 
 Writes public/<slug>-demo.mp4 and public/<slug>-demo-poster.jpg.
-Defaults: poster at 8s, 800 kbps.
+Defaults: poster at 8s, 800 kbps, every frame of the source kept.
+
+fps thins the frame rate before encoding. Screen recordings arrive at 33-60fps
+of a mostly static UI, so halving it roughly halves the file at the same
+per-frame quality. 15 is comfortable for a UI walkthrough.
 EOF
   exit 1
 }
@@ -49,6 +53,7 @@ SOURCE="$1"
 SLUG="$2"
 POSTER_AT="${3:-8}"
 KBPS="${4:-800}"
+FPS="${5:-}"
 
 [ -f "$SOURCE" ] || die "no such file: $SOURCE"
 case "$SLUG" in
@@ -62,6 +67,11 @@ esac
 case "$KBPS" in
   '' | *[!0-9]* | 0) die "kbps must be a positive integer: $KBPS" ;;
 esac
+if [ -n "$FPS" ]; then
+  case "$FPS" in
+    '' | *[!0-9.]* | *.*.* | 0) die "fps must be a positive number: $FPS" ;;
+  esac
+fi
 
 command -v avconvert >/dev/null || die "avconvert not found (expected at /usr/bin/avconvert)"
 command -v clang >/dev/null || die "clang not found — install the Xcode Command Line Tools"
@@ -96,8 +106,8 @@ fi
 
 # Stage 2: re-encode at a bitrate a web page can afford. 800 kbps keeps
 # screen-recorded UI text legible; raise it if fine detail smears.
-echo "encoding at ${KBPS}kbps..."
-"$BUILD/reenc" "$TMP/scaled.mp4" "$TMP/out.mp4" "$KBPS" || die "encode failed"
+echo "encoding at ${KBPS}kbps${FPS:+, thinned to ${FPS}fps}..."
+"$BUILD/reenc" "$TMP/scaled.mp4" "$TMP/out.mp4" "$KBPS" ${FPS:+"$FPS"} || die "encode failed"
 
 # Poster comes from the encoded file, so its dimensions match the video track
 # exactly — that is what keeps the reserved box right and avoids layout shift.
@@ -123,5 +133,5 @@ done.
 next:
   - set width/height on the <video> to $DIMS, or the reserved box will be wrong
   - check the lead sentence and aria-label still describe what the clip shows
-  - npm run build   (dist/ is tracked in this repo)
+  - npm run build   (sanity check only — dist/ is not committed; the host builds)
 EOF

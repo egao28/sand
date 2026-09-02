@@ -1533,6 +1533,71 @@ section {
   }
 }
 
+/* 404 — same centred canvas as the resume page, text instead of a photo */
+/* Compound selector on purpose: .page {padding-bottom: 6rem} lives in
+   global.css, which @imports this file, so its rules land after these at equal
+   specificity and win. A bare .not-found-page would lose, leaving 6rem of
+   padding inside the flex box and centring the content ~48px high. */
+.page.not-found-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 96px);
+  padding-bottom: 0;
+}
+.not-found-content {
+  max-width: 32rem;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+.not-found-code {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  color: var(--accent);
+}
+.not-found-headline {
+  margin: 0.85rem 0 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 2.9rem);
+  line-height: 1.15;
+  color: var(--ink);
+}
+.not-found-body {
+  margin: 1rem 0 0;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+}
+.not-found-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.6rem;
+  margin-top: 2.1rem;
+}
+.not-found-link {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  color: var(--ink-muted);
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid transparent;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease;
+}
+.not-found-link:hover,
+.not-found-link:focus-visible {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
 /* Resume — centered polaroid-photo download link (see .resume-page-minimal) */
 .resume-page-minimal {
   display: flex;
@@ -1586,7 +1651,8 @@ section {
   }
 }
 @media (max-width: 760px) {
-  .resume-page-minimal {
+  .resume-page-minimal,
+  .page.not-found-page {
     min-height: calc(100vh - 88px);
   }
   .resume-photo {
@@ -1743,6 +1809,18 @@ a.contact-info-link:focus-visible .contact-info-value {
   display: flex;
   flex-direction: column;
 }
+/* Honeypot. Positioned off-screen rather than display:none — a bot parsing
+   the DOM skips what is explicitly hidden, but happily fills what is merely
+   somewhere else. aria-hidden plus tabindex="-1" on the input keeps it away
+   from screen readers and the tab order, so no person can reach it. */
+.contact-botcheck {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .contact-field {
   display: flex;
   flex-direction: column;

@@ -11,6 +11,8 @@ const EMPTY_FORM = { name: '', email: '', message: '' }
 
 export default function ContactSection({ content }) {
   const [form, setForm] = useState({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
+  // Honeypot. Held outside `form` so it can never be spread into the payload.
+  const [botcheck, setBotcheck] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [hasError, setHasError] = useState(false)
@@ -22,6 +24,24 @@ export default function ContactSection({ content }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
+
+    // Nobody who can see the form can fill this field, so anything in it came
+    // from a script walking the DOM. Drop it on the floor and report success:
+    // a bot told it was caught just retries with the field left blank.
+    if (botcheck) {
+      // Clear it too. The field is off-screen rather than display:none, which
+      // is what makes a bot fill it — and also what can make a password
+      // manager fill it, since autocomplete="off" is only advisory. Left
+      // sticky, one stray autofill would silently swallow every message a real
+      // visitor sends for the rest of the page load while still saying "Sent".
+      // Resetting caps the worst case at a single dropped message either way.
+      setBotcheck('')
+      setHasError(false)
+      setIsSubmitted(true)
+      setForm({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
+      return
+    }
+
     setIsSending(true)
     setIsSubmitted(false)
     setHasError(false)
@@ -96,6 +116,19 @@ export default function ContactSection({ content }) {
 
           <form className="contact-panel contact-panel--form reveal" onSubmit={handleSubmit}>
             <h3 className="contact-panel-headline">{content.formHeadline}</h3>
+
+            <div className="contact-botcheck" aria-hidden="true">
+              <label htmlFor="contact-botcheck">Leave this field empty</label>
+              <input
+                id="contact-botcheck"
+                type="text"
+                name="botcheck"
+                tabIndex={-1}
+                autoComplete="off"
+                value={botcheck}
+                onChange={(e) => setBotcheck(e.target.value)}
+              />
+            </div>
 
             <label className="contact-field">
               <span>Topic</span>
