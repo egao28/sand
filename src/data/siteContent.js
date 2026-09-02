@@ -278,7 +278,11 @@ export const siteContent = {
       },
       { key: 'Location', label: 'Location', value: 'Chicago, IL / Beijing, CN', href: null },
     ],
-    footerLeft: '© 2026 Evelyn Gao',
+    // Read at page load, not baked in: the site can sit undeployed for months,
+    // and a footer that still says last year on January 1st is the kind of
+    // wrong nobody reports. Uses the visitor's clock, which is the usual and
+    // correct trade for a copyright line.
+    footerLeft: `© ${new Date().getFullYear()} Evelyn Gao`,
     footerRight: '',
   },
 }
