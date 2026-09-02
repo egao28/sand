@@ -1534,7 +1534,11 @@ section {
 }
 
 /* 404 — same centred canvas as the resume page, text instead of a photo */
-.not-found-page {
+/* Compound selector on purpose: .page {padding-bottom: 6rem} lives in
+   global.css, which @imports this file, so its rules land after these at equal
+   specificity and win. A bare .not-found-page would lose, leaving 6rem of
+   padding inside the flex box and centring the content ~48px high. */
+.page.not-found-page {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1648,7 +1652,7 @@ section {
 }
 @media (max-width: 760px) {
   .resume-page-minimal,
-  .not-found-page {
+  .page.not-found-page {
     min-height: calc(100vh - 88px);
   }
   .resume-photo {

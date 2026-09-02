@@ -127,13 +127,25 @@ int main(int argc, const char **argv) {
       // ink over pale paper is exactly "make the pen wider". Doing it here,
       // before the downscale, is what leaves a stroke to average.
       CIImage *image = [[CIImage alloc] initWithBitmapImageRep:canvas];
-      image = [image imageByApplyingFilter:@"CIMorphologyMinimum"
-                       withInputParameters:@{@"inputRadius" : @(thicken * ss / 2)}];
-      image = [image imageByApplyingFilter:@"CILanczosScaleTransform"
-                       withInputParameters:@{@"inputScale" : @(1.0 / ss)}];
-      CGImageRef scaled = [[CIContext contextWithOptions:nil]
-          createCGImage:image
-               fromRect:CGRectMake(0, 0, width, height)];
+      CGRect stage = image.extent;
+      CGRect final = CGRectMake(0, 0, width, height);
+
+      // Both filters sample past the edge of their input, and a CIImage is
+      // transparent black out there. Unclamped, the minimum filter pulls that
+      // rim inward and Lanczos then averages it into the border pixels: the
+      // 32px icon came out with 232 of 1024 pixels translucent, corners at
+      // alpha 99. That is the one size that lands in a tab strip, where the
+      // whole point of compositing onto paper is to not be see-through.
+      // Clamp to extend the edge pixels outward, filter, then crop back.
+      image = [[image imageByClampingToExtent]
+          imageByApplyingFilter:@"CIMorphologyMinimum"
+            withInputParameters:@{@"inputRadius" : @(thicken * ss / 2)}];
+      image = [[[image imageByCroppingToRect:stage] imageByClampingToExtent]
+          imageByApplyingFilter:@"CILanczosScaleTransform"
+            withInputParameters:@{@"inputScale" : @(1.0 / ss)}];
+
+      CGImageRef scaled =
+          [[CIContext contextWithOptions:nil] createCGImage:image fromRect:final];
       if (!scaled) {
         fprintf(stderr, "icon: could not downscale the thickened mark\n");
         return 1;

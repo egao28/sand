@@ -16,12 +16,49 @@ const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
 function getResumeLastUpdated() {
   const fromEnv = (process.env.RESUME_LAST_UPDATED ?? '').trim()
-  if (ISO_DATE.test(fromEnv)) return formatDate(fromEnv)
+  if (fromEnv) {
+    // Fail the build rather than fall through. This is the one knob the deploy
+    // is documented to reach for, so a typo in it has to be loud — silently
+    // serving the constant instead would look exactly like success.
+    if (!isRealDate(fromEnv)) {
+      throw new Error(`RESUME_LAST_UPDATED must be a real YYYY-MM-DD date, got "${fromEnv}"`)
+    }
+    return formatDate(fromEnv)
+  }
 
   const fromGit = readResumeCommitDate()
-  if (fromGit) return formatDate(fromGit)
+  if (fromGit) {
+    // The two sources never meet: a shallow production clone always takes the
+    // constant, a full local checkout always takes git. Compare them here,
+    // where git is the one answering, or the constant goes stale in silence
+    // and only production shows it.
+    if (fromGit !== RESUME_FALLBACK_DATE) {
+      console.warn(
+        `vite.config: resume.pdf was last committed ${fromGit}, but ` +
+          `RESUME_FALLBACK_DATE is ${RESUME_FALLBACK_DATE}. Deploys build from a shallow ` +
+          `clone and will show the constant — update it in vite.config.js.`
+      )
+    }
+    return formatDate(fromGit)
+  }
 
+  if (!isRealDate(RESUME_FALLBACK_DATE)) {
+    throw new Error(
+      `RESUME_FALLBACK_DATE must be a real YYYY-MM-DD date, got "${RESUME_FALLBACK_DATE}"`
+    )
+  }
   return formatDate(RESUME_FALLBACK_DATE)
+}
+
+// The shape test alone accepts 2026-13-45, which formatDate would cheerfully
+// render as "13.45.2026". Round-tripping through Date rejects it.
+function isRealDate(value) {
+  if (!ISO_DATE.test(value)) return false
+  const [year, month, day] = value.split('-').map(Number)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return (
+    date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day
+  )
 }
 
 function readResumeCommitDate() {
@@ -34,7 +71,7 @@ function readResumeCommitDate() {
     // %cs is the committer date as YYYY-MM-DD, which keeps the displayed day
     // from shifting with the build machine's timezone.
     const date = git('log -1 --format=%cs -- resume.pdf')
-    return ISO_DATE.test(date) ? date : null
+    return isRealDate(date) ? date : null
   } catch {
     // not a git checkout, or git is not on PATH
     return null

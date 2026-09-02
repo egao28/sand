@@ -29,6 +29,14 @@ export default function ContactSection({ content }) {
     // from a script walking the DOM. Drop it on the floor and report success:
     // a bot told it was caught just retries with the field left blank.
     if (botcheck) {
+      // Clear it too. The field is off-screen rather than display:none, which
+      // is what makes a bot fill it — and also what can make a password
+      // manager fill it, since autocomplete="off" is only advisory. Left
+      // sticky, one stray autofill would silently swallow every message a real
+      // visitor sends for the rest of the page load while still saying "Sent".
+      // Resetting caps the worst case at a single dropped message either way.
+      setBotcheck('')
+      setHasError(false)
       setIsSubmitted(true)
       setForm({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
       return
