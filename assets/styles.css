@@ -1736,7 +1736,7 @@ section {
   margin-bottom: clamp(1.3rem, 2.6vw, 1.75rem);
 }
 
-/* Small panel: email / linkedin / location */
+/* Small panel: email / linkedin / github / location */
 .contact-info-list {
   list-style: none;
   margin: 0;

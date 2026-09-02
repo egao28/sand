@@ -101,7 +101,16 @@ export default function ContactSection({ content }) {
                         <a
                           className="contact-info-link"
                           href={item.href}
-                          {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                          {...(isExternal
+                            ? {
+                                target: '_blank',
+                                rel: 'noopener noreferrer',
+                                // The only visual cue is the ↗, and that is
+                                // aria-hidden. Same wording the project pages
+                                // use on their external demo links.
+                                'aria-label': `${item.label}: ${item.value} (opens in a new tab)`,
+                              }
+                            : {})}
                         >
                           {inner}
                         </a>
