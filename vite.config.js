@@ -11,7 +11,7 @@ const { execSync } = require('child_process')
 // clone stamps every file with the checkout time, which made the page claim
 // the resume was updated on whatever day the site happened to deploy. Bump
 // RESUME_FALLBACK_DATE whenever you replace resume.pdf.
-const RESUME_FALLBACK_DATE = '2026-08-17'
+const RESUME_FALLBACK_DATE = '2026-09-03'
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
 function getResumeLastUpdated() {
