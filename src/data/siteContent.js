@@ -79,6 +79,19 @@ export const siteContent = {
     label: 'experience',
     items: [
       {
+        // Ongoing role with no write-up of its own: no slug/href, so the card
+        // stays unclickable and /experience/:slug can't resolve to it.
+        id: 'chai-tan-lab',
+        side: 'right',
+        time: 'Sep 2026 – Present',
+        title: 'University of Chicago',
+        editorialTitle: true,
+        sub: 'Undergraduate Researcher · CHAI (Tan Lab) · Sep 2026 – Present',
+        subLine: 'Undergraduate Researcher · CHAI (Tan Lab)',
+        description:
+          'Investigating causal reasoning and post-hoc rationalization in large language models, developing evaluation pipelines to examine how models recognize, use, and explain evidence.',
+      },
+      {
         slug: 'bloom-mcp',
         href: '/experience/bloom-mcp',
         side: 'left',
