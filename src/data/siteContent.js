@@ -207,10 +207,11 @@ export const siteContent = {
       {
         slug: 'carelink',
         artClass: 'art-d',
-        tags: ['React', 'GSAP', 'Maps'],
+        tags: ['React', 'Leaflet', 'Search & filter'],
         title: 'CareLink',
         href: '/projects/carelink',
         detailTone: 'c',
+        demoLabel: 'Open project',
         demoVideo: {
           src: '/carelink-demo.mp4',
           poster: '/carelink-demo-poster.jpg',
@@ -219,13 +220,15 @@ export const siteContent = {
           lead: 'Filtering the index of 541 organizations down to the pediatric groups that offer financial assistance, with the map narrowing alongside the list, then following one result out to its own site and directions.',
           ariaLabel: 'Screen recording of a CareLink search',
         },
+        // First line is the canonical short description of the project; keep
+        // any other summary of CareLink (README, future cards) in step with it.
         motivation: [
-          'I first became aware of this problem when I came across multiple online posts from people seeking help during cancer treatment. But it was surprisingly difficult to find structured, organized information about where to actually access help.',
-          'This made me realize that while support systems do exist, they are often fragmented and not easily discoverable, especially for individuals who are already under emotional and physical stress.',
-          'CareLink is designed to address this gap by providing a centralized platform where users can easily find relevant support resources in one place. By integrating a map-based interface, the platform also helps users understand what organizations and services are available around them geographically, making support visible.',
+          'An interactive directory of cancer support organizations, explored through keyword search, multi-criteria filters, and a map that narrows alongside the results.',
+          'Support after a cancer diagnosis exists, but finding it means working through separate websites and piecing together which organizations offer the kind of help that is actually needed.',
+          'CareLink puts 541 organizations across all 50 states into one index, tagged by cancer type and service, with the map and the list showing the same filtered set.',
         ],
         technical:
-          'React · GSAP · Google Maps API · multi-criteria filtering · dynamic search · GSAP ScrollTrigger animations · React Router',
+          'React · TypeScript · Leaflet · CARTO basemap tiles · React Router · URL-encoded view state · multi-criteria filtering · derived result set · marker de-collision · city-level geocoding · ProPublica Nonprofit Explorer API · responsive layout',
       },
       {
         slug: 'campus-vegetation',

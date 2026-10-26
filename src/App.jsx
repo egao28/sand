@@ -10,6 +10,7 @@ import ExperienceDetailPage from './pages/ExperienceDetailPage.jsx'
 import BloomMcpDetailPage from './pages/BloomMcpDetailPage.jsx'
 import ProximaDetailPage from './pages/ProximaDetailPage.jsx'
 import AlmabotDetailPage from './pages/AlmabotDetailPage.jsx'
+import CarelinkDetailPage from './pages/CarelinkDetailPage.jsx'
 import SonyDetailPage from './pages/SonyDetailPage.jsx'
 import TsinghuaDetailPage from './pages/TsinghuaDetailPage.jsx'
 import ResumePage from './pages/ResumePage.jsx'
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/projects" element={<ProjectsPage />} />
           <Route path="/projects/proxima" element={<ProximaDetailPage />} />
           <Route path="/projects/almabot" element={<AlmabotDetailPage />} />
+          <Route path="/projects/carelink" element={<CarelinkDetailPage />} />
           <Route path="/projects/:slug" element={<ProjectDetailPage />} />
           <Route path="/experience/bloom-mcp" element={<BloomMcpDetailPage />} />
           <Route path="/experience/sony" element={<SonyDetailPage />} />
