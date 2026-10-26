@@ -12,7 +12,7 @@ single-page app; no backend.
 | `/projects`                   | The four project cards                                                       |
 | `/projects/proxima`           | Research discovery by semantic matching — embeddings, generated explanations |
 | `/projects/almabot`           | Academic advising agent — retrieval + uncertainty evaluation, demo video     |
-| `/projects/carelink`          | Cancer-support directory — React, GSAP, Google Maps, demo video              |
+| `/projects/carelink`          | Cancer-support directory — filtering, Leaflet map, demo video                |
 | `/projects/campus-vegetation` | Campus planting analysis — PCA, K-means, GIS                                 |
 | `/experience/bloom-mcp`       | Salk Institute — MCP platform for scientific analyses, 2026                  |
 | `/experience/sony`            | Sony — CS operations & maintenance intern, 2025                              |
