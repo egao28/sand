@@ -647,6 +647,14 @@ section {
   font-weight: 500;
   line-height: 1.45;
 }
+/* Experience cards that carry their own summary instead of linking out to a
+   detail page — always visible, matching .ct-detail li's body type. */
+.ct-desc {
+  margin-top: 0.9rem;
+  color: var(--ink-soft);
+  font-size: 18px;
+  line-height: 1.65;
+}
 .ct-detail {
   max-height: 0;
   overflow: hidden;
