@@ -187,17 +187,20 @@ export const siteContent = {
       {
         slug: 'almabot',
         artClass: 'art-b',
-        tags: ['LangChain', 'RAG', 'Python'],
+        tags: ['LangGraph', 'Retrieval', 'Evaluation'],
         title: 'AlmaBot',
         href: '/projects/almabot',
         detailTone: 'b',
         demoLabel: 'Open project',
+        // First line is the canonical short description of the project; keep
+        // any other summary of AlmaBot (README, future cards) in step with it.
         motivation: [
-          'I built this at UIUC because I did not have an academic advisor and had to figure out course planning on my own.',
-          'Since I had access to the course dataset, I wanted to build something that takes user preferences and automatically generates a workable schedule.',
+          'An LLM-based academic advising agent used to study retrieval reliability, uncertainty estimation, and selective prediction.',
+          'I originally built AlmaBot to make university course information easier to navigate, integrating 4,502 courses across 187 subjects behind natural-language queries, course retrieval, and structured academic-planning tools.',
+          'As the system grew, the question I cared about shifted from what it could do to whether its answers could be trusted, so it became a testbed for measuring how retrieval quality and model uncertainty affect answer reliability.',
         ],
         technical:
-          "course scheduling · constraint solving · prerequisite graphs · Kahn's algorithm · topological sort · cycle detection · dataset processing · LLM integration · LangChain · Gradio",
+          'Python · LangGraph · Chroma · BM25 · reciprocal rank fusion · MCP · scikit-learn · intent routing · retrieval evaluation · Recall@5 and MRR@5 · paired bootstrap confidence intervals · AUROC · selective prediction · benchmark design',
       },
       {
         slug: 'carelink',

@@ -11,7 +11,7 @@ single-page app; no backend.
 | `/about`                      | Bio and polaroid, experience + education timelines, skills marquee          |
 | `/projects`                   | The four project cards                                                      |
 | `/projects/proxima`           | Research matching by semantic search — embeddings, GPT-4o reranking         |
-| `/projects/almabot`           | UIUC course planner — prerequisite graphs, LangChain, demo video            |
+| `/projects/almabot`           | Academic advising agent — retrieval + uncertainty evaluation, demo video    |
 | `/projects/carelink`          | Cancer-support directory — React, GSAP, Google Maps, demo video             |
 | `/projects/campus-vegetation` | Campus planting analysis — PCA, K-means, GIS                                |
 | `/experience/bloom-mcp`       | Salk Institute — MCP platform for scientific analyses, 2026                 |
