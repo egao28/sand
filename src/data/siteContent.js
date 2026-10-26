@@ -170,19 +170,21 @@ export const siteContent = {
       {
         slug: 'proxima',
         artClass: 'art-a',
-        tags: ['NLP', 'OpenAI', 'React'],
+        tags: ['Next.js', 'OpenAI', 'Semantic search'],
         title: 'Proxima',
         href: '/projects/proxima',
         detailTone: 'a',
         demoLabel: 'Open Proxima',
         demoUrl: 'https://proxima.vercel.app',
+        // First line is the canonical short description of the project; keep
+        // any other summary of Proxima (README, future cards) in step with it.
         motivation: [
-          'I built this because I struggled with finding research opportunities myself.',
-          'Using Google or keyword search did not work well. Even when I had similar interests as professors, we were not using the same words.',
-          'So I wanted to build something that helps people find research more efficiently and make better use of the information already online.',
+          'An AI-powered research discovery platform combining semantic professor matching, interactive comparison, and personalized outreach.',
+          'I built it because finding research opportunities myself meant guessing which keywords a professor would use to describe work I already knew I was interested in.',
+          'Proxima embeds 1,422 UChicago faculty research profiles, ranks them against how a student describes their own interests, and connects that ranking to profiles, comparison, and a drafted outreach email.',
         ],
         technical:
-          'semantic search · embeddings · cosine similarity · GPT-4o reranking · keyword fallback · ranking systems · API design · full-stack development',
+          'Next.js · TypeScript · Tailwind CSS · OpenAI embeddings · cosine similarity · semantic retrieval · embedding cache · gpt-4o-mini · graceful degradation · API route design · client-side state · full-stack development',
       },
       {
         slug: 'almabot',
