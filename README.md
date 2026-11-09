@@ -8,7 +8,7 @@ single-page app; no backend.
 | Route                         | Contents                                                                     |
 | ----------------------------- | ---------------------------------------------------------------------------- |
 | `/`                           | Hero (name, tagline, portrait), links into the three pages, contact section  |
-| `/about`                      | Bio and polaroid, experience and education, tools I work with                |
+| `/about`                      | Name and polaroid, two-paragraph bio, Selected Experience list, links        |
 | `/projects`                   | Project cards linking into the write-ups below                               |
 | `/projects/proxima`           | Research discovery by semantic matching — embeddings, generated explanations |
 | `/projects/almabot`           | Academic advising agent — retrieval + uncertainty evaluation, demo video     |

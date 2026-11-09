@@ -8,7 +8,7 @@ const HOVER_GROUPS = [
     selector: 'img, .hero-photo-wrap, .project-photo-card, .resume-photo-link, .worklist-card',
     className: 'cursor-hover',
   },
-  { selector: 'a, button, .ct-item, .social-btn', className: 'cursor-link' },
+  { selector: 'a, button, .social-btn', className: 'cursor-link' },
   { selector: 'section#contact', className: 'cursor-dark-surface' },
 ]
 
