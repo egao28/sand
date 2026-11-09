@@ -410,109 +410,14 @@ section {
   margin-bottom: 1.25rem;
 }
 
-/* Projects — scattered polaroid gallery, one photo per project */
+/* Projects listing — the page's own text-led layout lives in
+   src/styles/about-projects.css under the .worklist-* namespace. The scattered
+   polaroid gallery that used to sit here (.projects-gallery, .project-photo-*,
+   @keyframes photo-sway) is gone with #59: it was an absolutely-positioned
+   pile inside a fixed-height canvas, which a card carrying a full summary
+   cannot fit. Nothing else on the site referenced those rules. */
 #projects {
   background: transparent;
-}
-.projects-gallery-wrap {
-  padding: clamp(4.25rem, 11vh, 6rem) 3.5rem clamp(2.5rem, 6vh, 4rem);
-}
-.projects-gallery {
-  position: relative;
-  width: 100%;
-  height: clamp(520px, 64vh, 680px);
-  /* Single source of truth for the card width: the card sizes itself from it,
-     and ProjectsSection offsets each card by half of it to centre a row. */
-  --card-w: clamp(190px, 24vw, 300px);
-}
-.project-photo-card {
-  --tilt: 0deg;
-  --hover-boost: 0;
-  position: absolute;
-  display: block;
-  width: var(--card-w);
-  text-decoration: none;
-  color: inherit;
-}
-/* Single merged rule: .reveal (opacity/transform fade-in-on-scroll) and this
-   card's own --hover-boost smoothing both need `transition` on this exact
-   element, and the shorthand doesn't merge across separate rules — whichever
-   selector wins takes the whole property list, silently dropping the other.
-   A compound selector here has higher specificity than either lone class,
-   so it deterministically wins and carries the full merged list. */
-.project-photo-card.reveal {
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s ease,
-    --hover-boost 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.project-photo-card:hover,
-.project-photo-card:focus-visible {
-  --hover-boost: 1;
-  z-index: 10 !important;
-}
-.project-photo-card:focus-visible {
-  outline: 2px solid rgba(25, 23, 19, 0.35);
-  outline-offset: 4px;
-}
-.project-photo-swing {
-  display: block;
-  transform-origin: center;
-  animation: photo-sway 7.4s ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-}
-.project-photo-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 10px 18px rgba(25, 23, 19, 0.18));
-  user-select: none;
-}
-.project-photo-label {
-  display: block;
-  margin-top: 0.65rem;
-  text-align: center;
-  font-family: var(--serif);
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-  color: var(--ink);
-}
-@keyframes photo-sway {
-  0%,
-  100% {
-    transform: rotate(calc(var(--tilt) - (var(--hover-boost) * 2.5deg)))
-      translateY(calc(var(--hover-boost) * -4px));
-  }
-  50% {
-    transform: rotate(calc(var(--tilt) + (var(--hover-boost) * 2.5deg)))
-      translateY(calc(var(--hover-boost) * -8px));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .project-photo-swing {
-    animation: none;
-    transform: rotate(var(--tilt));
-  }
-  .project-photo-card.reveal {
-    transition: opacity 0.7s ease;
-  }
-}
-@media (max-width: 720px) {
-  .projects-gallery-wrap {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-  .projects-gallery {
-    position: static;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2.25rem;
-  }
-  .project-photo-card {
-    position: static;
-    width: min(70vw, 320px);
-  }
 }
 
 /* Project detail — unified editorial system, compact, no section rules */
