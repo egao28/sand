@@ -1,4 +1,8 @@
 @import '../../assets/styles.css';
+/* Scoped `.profile-*` / `.worklist-*` rules for the rewritten /about and
+   /projects pages. Separate sheet so those rules provably cannot touch any
+   selector the homepage or the detail pages depend on. */
+@import './about-projects.css';
 
 /* Smooth local hover “wind” (used in hang-sway keyframes) */
 @property --hover-boost {
