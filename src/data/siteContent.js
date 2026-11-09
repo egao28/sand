@@ -40,7 +40,88 @@ export const siteContent = {
       'Most recently, I worked on bloom-mcp at the Salk Institute, an MCP platform that lets AI agents run scientific analyses from plain-English requests. I built and worked across a set of 22 analysis tools with validated input and output contracts, reproducible execution, and provenance tracking for things like random seeds, library versions, and output hashes.',
       "What I like about this kind of work is that the infrastructure is mostly invisible when it's doing its job. A researcher shouldn't have to think about whether an analysis used the right input format, whether a result can be reproduced, or whether something silently broke upstream. I like building systems that take care of those details.",
     ],
+
+    // --- Fields below are for the rewritten /about (#56). They sit alongside
+    //     `label` / `identity` / `headline` / `photo` / `body` rather than
+    //     replacing them: those five are still rendered by AboutSection today,
+    //     and removing them is the /about rewrite's job, not this one's. ---
+
+    // The single claim the rewritten page is evidence for.
+    positioning:
+      'I build AI research systems, and design the evaluations that decide whether their results can be trusted.',
+
+    // Body paragraphs for the rewritten page. Deliberately omits the Salk tool
+    // count (see #56): the one in `body[1]` above is disputed outside this
+    // repo, so the rewrite states no number at all rather than picking one.
+    narrative: [
+      "I'm a Computer Science and Statistics student at the University of Chicago, expected to graduate in 2028. My work sits where a research system meets the evidence that it does what it claims: build the pipeline, then design the measurement that says whether its output holds up.",
+      'At the Salk Institute I built bloom-mcp, an MCP service that lets AI agents run validated plant-phenotyping analyses from plain-English requests, with input and output contracts, reproducible execution, and provenance tracking for random seeds, library versions, and output hashes.',
+      'At CHAI I work on how language models recognize, use, and explain evidence, building evaluation pipelines for the reasoning failures a final-answer score never surfaces. The work contributes to a broader effort to improve reasoning reliability through causal reasoning.',
+      'The longer-term goal is to make AI a reliable partner in scientific research: not only able to run an analysis, but able to show why its answer should be believed.',
+    ],
+
+    // One line, research interests only — #56 explicitly rules out a scatter of
+    // unrelated ones. Every item here is backed by work already on this site.
+    interests:
+      'Evaluation design for model reasoning, retrieval reliability and uncertainty estimation, and reproducible scientific computing.',
+
+    // Compact experience entries for the rewritten page, which drops
+    // ExperienceTimeline. This intentionally restates `experience.items`
+    // instead of deriving from it: that array survives only to back
+    // /experience/:slug and BloomMcpDetailPage's `sub`, so the two are expected
+    // to diverge. Edit both when a role changes.
+    roles: [
+      {
+        id: 'chai-tan-lab',
+        org: 'University of Chicago',
+        role: 'Undergraduate Researcher · CHAI (Tan Lab)',
+        time: 'Sep 2026 – Present',
+        note: 'Evaluation pipelines for how models recognize, use, and explain evidence, and for the reasoning failures a final-answer score never surfaces.',
+        href: null,
+      },
+      {
+        id: 'bloom-mcp',
+        org: 'Salk Institute',
+        role: 'Research Software Engineering Intern · Harnessing Plants Initiative',
+        time: 'Jun – Aug 2026',
+        note: 'bloom-mcp: validated plant-phenotyping analyses run by AI agents from plain-English requests, with reproducible execution and provenance tracking.',
+        href: '/experience/bloom-mcp',
+      },
+      {
+        id: 'sony',
+        org: 'Sony',
+        role: 'Computer Science Operations & Maintenance Intern',
+        time: 'May – Sep 2025',
+        note: 'Three internal systems: a release and asset delivery pipeline, a configurable rules engine for routing weekly feedback, and migration tooling for a live production database.',
+        href: '/experience/sony',
+      },
+      {
+        id: 'tsinghua',
+        org: 'Tsinghua University',
+        role: 'Research Assistant · Vehicle Emission Research Group',
+        time: 'Jul 2024 – Jan 2025',
+        note: '24-hour emission forecasting and spatial hot-spot analysis built on 30 days of monitoring-site time series.',
+        href: '/experience/tsinghua',
+      },
+    ],
+
+    // Link set for the rewritten page. The three external URLs are copied from
+    // `contact.items` on purpose: `contact` is frozen for #56 and must not be
+    // refactored into shared constants, so this is the one place they are
+    // duplicated. Change a URL in both spots or they will disagree.
+    links: [
+      { label: 'Projects', to: '/projects' },
+      { label: 'Resume', to: '/resume' },
+      { label: 'GitHub', href: 'https://github.com/egao28' },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/' },
+      { label: 'Email', href: 'mailto:evelyneyi@outlook.com' },
+    ],
   },
+  // Read only by SkillsMarquee, which only /about renders. Kept, not
+  // deleted, because /about still renders it on main: this is groundwork
+  // for #56, not the rewrite itself, and deleting the data here would
+  // blank a live page for however long the rewrite PRs take. The /about
+  // rewrite deletes this together with SkillsMarquee.jsx and its CSS.
   skills: {
     label: 'skills',
     title: 'Tools I work with',
@@ -124,6 +205,8 @@ export const siteContent = {
       },
     ],
   },
+  // Read only by EducationTimeline, which only /about renders. Kept for the
+  // same reason as `skills` above, and deleted by the same rewrite PR.
   education: {
     label: 'education',
     items: [
@@ -179,6 +262,14 @@ export const siteContent = {
   },
   projects: {
     label: 'projects',
+    // Projects that have their own /projects/:slug page. `getProjectBySlug`
+    // searches this array and only this array, so anything added here becomes
+    // a reachable route. `slug`, `href`, `title`, `motivation`, `approach`,
+    // `technical`, `detailTone`, `demoUrl`, `demoVideo` and `demoLabel` are
+    // read by ProjectDetailPage and the three bespoke detail pages: renaming
+    // or dropping one of them breaks a live page without failing the build.
+    // The `card` block on each item is new and read only by the /projects
+    // listing (#56); it is kept nested so the two sets never get confused.
     items: [
       {
         slug: 'proxima',
@@ -198,6 +289,17 @@ export const siteContent = {
         ],
         technical:
           'Next.js · TypeScript · Tailwind CSS · OpenAI embeddings · cosine similarity · semantic retrieval · embedding cache · gpt-4o-mini · graceful degradation · API route design · client-side state · full-stack development',
+        card: {
+          order: 4,
+          tier: 'featured',
+          role: 'Independent project',
+          summary:
+            'An AI-powered research discovery platform combining semantic professor matching, interactive comparison, and personalized outreach.',
+          actions: [
+            { label: 'Read the write-up', to: '/projects/proxima' },
+            { label: 'Open Proxima', href: 'https://proxima.vercel.app', external: true },
+          ],
+        },
       },
       {
         slug: 'almabot',
@@ -216,6 +318,14 @@ export const siteContent = {
         ],
         technical:
           'Python · LangGraph · Chroma · BM25 · reciprocal rank fusion · MCP · scikit-learn · intent routing · retrieval evaluation · Recall@5 and MRR@5 · paired bootstrap confidence intervals · AUROC · selective prediction · benchmark design',
+        card: {
+          order: 3,
+          tier: 'featured',
+          role: 'Independent project',
+          summary:
+            'An LLM-based academic advising agent used to study retrieval reliability, uncertainty estimation, and selective prediction.',
+          actions: [{ label: 'Read the write-up', to: '/projects/almabot' }],
+        },
       },
       {
         slug: 'carelink',
@@ -242,6 +352,14 @@ export const siteContent = {
         ],
         technical:
           'React · TypeScript · Leaflet · CARTO basemap tiles · React Router · URL-encoded view state · multi-criteria filtering · derived result set · marker de-collision · city-level geocoding · ProPublica Nonprofit Explorer API · responsive layout',
+        card: {
+          order: 6,
+          tier: 'secondary',
+          role: 'Team lead and frontend developer · Code Ada Women’s Hackathon, team of four',
+          summary:
+            'An interactive directory of cancer support organizations, explored through keyword search, multi-criteria filters, and a map that narrows alongside the results.',
+          actions: [{ label: 'Read the write-up', to: '/projects/carelink' }],
+        },
       },
       {
         slug: 'campus-vegetation',
@@ -262,6 +380,69 @@ export const siteContent = {
         ],
         technical:
           'PCA · z-score normalization · K-means · clustering · feature correlation · ecological data analysis · data matrix construction · scree plot · dimensionality reduction · GIS visualization',
+        card: {
+          order: 7,
+          tier: 'secondary',
+          role: 'Feature analysis, clustering, and the planting recommendation',
+          summary:
+            'Campus plant-trait measurements reduced with PCA and clustered with K-means into four growth and resource-use groups, turned into concrete planting recommendations.',
+          actions: [{ label: 'Read the write-up', to: '/projects/campus-vegetation' }],
+        },
+      },
+    ],
+
+    // Work that belongs on the /projects listing but has no /projects/:slug
+    // page. Kept in its own array rather than in `items` precisely because
+    // `getProjectBySlug` searches `items`: nothing below can ever resolve a
+    // /projects/* URL, whatever it is named. Entries carry `id`, never `slug`,
+    // so the guarantee survives someone later changing that helper.
+    //
+    // `href` is a destination that already exists elsewhere on the site, or
+    // null. It is never a /projects/* URL.
+    listingOnly: [
+      {
+        id: 'chai',
+        title: 'Language-Model Reasoning Under Influence',
+        tags: ['LLM evaluation', 'Causal reasoning', 'Evidence use'],
+        // No write-up anywhere on the site yet, so the card has no destination.
+        href: null,
+        card: {
+          order: 1,
+          tier: 'featured',
+          role: 'Undergraduate Researcher · CHAI (Tan Lab), University of Chicago',
+          summary:
+            'Evaluation pipelines for how language models recognize, use, and explain evidence, examining post-hoc rationalization and the reasoning failures that final-answer accuracy does not reveal. The work contributes to a broader effort to improve reasoning reliability through causal reasoning.',
+          actions: [],
+        },
+      },
+      {
+        id: 'bloom-mcp',
+        title: 'bloom-mcp',
+        tags: ['MCP', 'Reproducibility', 'Scientific computing'],
+        href: '/experience/bloom-mcp',
+        card: {
+          order: 2,
+          tier: 'featured',
+          role: 'Research Software Engineering Intern · Harnessing Plants Initiative, Salk Institute',
+          // No tool count, on purpose — see #56.
+          summary:
+            "An MCP service that lets AI agents run validated plant-phenotyping analyses against Bloom's research database from plain-English requests, with input and output contracts, reproducible execution, and provenance tracking for random seeds, library versions, and output hashes.",
+          actions: [{ label: 'Read the write-up', to: '/experience/bloom-mcp' }],
+        },
+      },
+      {
+        id: 'vehicle-emission-forecasting',
+        title: 'Vehicle-Emission Forecasting',
+        tags: ['Time series', 'Random forest', 'Spatial statistics'],
+        href: '/experience/tsinghua',
+        card: {
+          order: 5,
+          tier: 'secondary',
+          role: 'Research Assistant · Vehicle Emission Research Group, Tsinghua University',
+          summary:
+            'A 24-hour emission forecasting and spatial hot-spot pipeline built on 30 days of monitoring-site time series, vehicle kilometers traveled, vehicle type, and location.',
+          actions: [{ label: 'Read the write-up', to: '/experience/tsinghua' }],
+        },
       },
     ],
   },
@@ -296,8 +477,21 @@ export const siteContent = {
   },
 }
 
+// Backs /projects/:slug. It searches `projects.items` only: `projects.listingOnly`
+// is deliberately out of reach here, which is what keeps CHAI and
+// Vehicle-Emission Forecasting from resolving a project route. Widening this to
+// both arrays would create /projects/* URLs for work that has no such page.
 export function getProjectBySlug(slug) {
   return siteContent.projects.items.find((p) => p.slug === slug) ?? null
+}
+
+// Every card for the /projects listing, from both arrays, in display order.
+// `card.order` is hand-assigned in the data; an entry without a `card` block is
+// dropped rather than rendered half-built.
+export function getProjectCards() {
+  return [...siteContent.projects.items, ...siteContent.projects.listingOnly]
+    .filter((p) => p.card)
+    .sort((a, b) => a.card.order - b.card.order)
 }
 
 export function getExperienceBySlug(slug) {

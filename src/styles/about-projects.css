@@ -1,0 +1,395 @@
+/*
+  Scoped styles for the rewritten /about and /projects pages (#56; this file is
+  the groundwork from #57). Nothing here is shared with any other page.
+
+  Namespaces: `.profile-*` for /about, `.worklist-*` for /projects. Neither
+  prefix appears anywhere in assets/styles.css or global.css, so no rule in this
+  file can reach the homepage, the nine detail pages, or any of the selectors
+  those pages depend on — `.about-headline`, `.about-body`, `.sec-inner`,
+  `.reveal`, `.ct-*`, `.hero-*`, `.home-*`, `#contact`. Keep it that way: if a
+  rule here needs to target an existing class, it belongs in assets/styles.css
+  instead, where its blast radius is visible.
+
+  Design tokens (--paper, --ink, --accent, --serif, --sans, --mono, --line)
+  come from :root in assets/styles.css.
+*/
+
+/* ========================================================== /about ======= */
+
+.profile-kicker {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 1.1rem;
+}
+
+/* The positioning statement. Serif and large, but a step down from
+   .project-detail-title so a detail page still reads as the bigger thing. */
+.profile-claim {
+  font-family: var(--serif);
+  font-size: clamp(34px, 4.1vw, 56px);
+  font-weight: 300;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  max-width: 20ch;
+  margin-bottom: 2.25rem;
+}
+
+.profile-claim em {
+  font-style: italic;
+  color: var(--ink-soft);
+}
+
+.profile-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 3rem;
+  align-items: start;
+}
+
+.profile-portrait {
+  transform: rotate(-3deg);
+}
+
+.profile-portrait-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+.profile-portrait-caption {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin-top: 0.6rem;
+  text-align: center;
+}
+
+.profile-prose {
+  font-size: 19px;
+  line-height: 1.62;
+  color: var(--ink-soft);
+  max-width: 66ch;
+  margin-bottom: 1.25rem;
+}
+
+.profile-interests {
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 66ch;
+  border-left: 2px solid var(--accent);
+  padding-left: 1.1rem;
+  margin-top: 2rem;
+}
+
+/* Compact role list — replaces the hover-reveal timeline, so every line is
+   readable without interaction. */
+.profile-roles {
+  list-style: none;
+  margin: 2.5rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.profile-role {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr);
+  gap: 0 2rem;
+  padding: 1.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.profile-role-time {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  padding-top: 0.35rem;
+}
+
+.profile-role-org {
+  font-family: var(--serif);
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.profile-role-title {
+  font-size: 15px;
+  color: var(--ink-muted);
+  margin-top: 0.3rem;
+}
+
+.profile-role-note {
+  font-size: 17px;
+  line-height: 1.58;
+  color: var(--ink-soft);
+  max-width: 62ch;
+  margin-top: 0.75rem;
+}
+
+.profile-role-link {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  text-decoration: none;
+  margin-top: 0.8rem;
+  border-bottom: 1px solid var(--accent);
+  padding-bottom: 2px;
+  transition: color 0.2s ease;
+}
+
+.profile-role-link:hover,
+.profile-role-link:focus-visible {
+  color: var(--accent);
+}
+
+.profile-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2.75rem;
+}
+
+.profile-link {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.55rem 1.1rem;
+  transition:
+    border-color 0.25s ease,
+    color 0.25s ease,
+    background 0.25s ease;
+}
+
+.profile-link:hover,
+.profile-link:focus-visible {
+  color: var(--ink);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* ======================================================= /projects ======= */
+
+.worklist {
+  display: block;
+}
+
+.worklist-tier + .worklist-tier {
+  margin-top: 4rem;
+}
+
+.worklist-tier-label {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+}
+
+.worklist-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.worklist-tier--featured .worklist-grid {
+  grid-template-columns: 1fr;
+}
+
+.worklist-tier--secondary .worklist-grid {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+/* A card is a container, not a link: the actions inside it are the links, so a
+   card with no destination (CHAI) is still a legitimate card rather than a
+   dead anchor. */
+.worklist-card {
+  position: relative;
+  background: var(--paper2);
+  border: 1px solid var(--line);
+  padding: 2rem 2.1rem;
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.worklist-card:hover,
+.worklist-card:focus-within {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 30px rgba(25, 23, 19, 0.08);
+}
+
+.worklist-card--featured {
+  padding: 2.5rem 2.6rem;
+}
+
+.worklist-card-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: 1.16;
+  font-size: 30px;
+}
+
+.worklist-card--featured .worklist-card-title {
+  font-size: clamp(32px, 3.2vw, 42px);
+}
+
+.worklist-card-role {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.07em;
+  color: var(--ink-muted);
+  margin-top: 0.65rem;
+  line-height: 1.5;
+}
+
+.worklist-card-summary {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  max-width: 68ch;
+  margin-top: 1.1rem;
+}
+
+.worklist-card--featured .worklist-card-summary {
+  font-size: 18px;
+}
+
+.worklist-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 1.35rem 0 0;
+  padding: 0;
+}
+
+.worklist-tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.75rem;
+}
+
+.worklist-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.6rem;
+}
+
+.worklist-action {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.07em;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--line);
+  padding: 0.55rem 1.1rem;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.worklist-action:hover,
+.worklist-action:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.worklist-action--primary {
+  border-color: var(--ink);
+}
+
+.worklist-action--primary:hover,
+.worklist-action--primary:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* Entrance for cards that are present at mount. Deliberately a CSS animation
+   and not the shared `.reveal` class: useRevealOnScroll snapshots `.reveal`
+   once on mount, so anything mounted later would stay at opacity 0 forever. */
+@keyframes worklist-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.worklist-card--animated {
+  animation: worklist-card-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--worklist-delay, 0s);
+}
+
+/* ======================================================== motion ========= */
+
+@media (prefers-reduced-motion: reduce) {
+  .worklist-card,
+  .worklist-action,
+  .profile-link,
+  .profile-role-link {
+    transition: none;
+  }
+  .worklist-card:hover,
+  .worklist-card:focus-within {
+    transform: none;
+    box-shadow: none;
+  }
+  .worklist-card--animated {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ===================================================== responsive ======== */
+
+@media (max-width: 860px) {
+  .profile-intro {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .profile-portrait {
+    max-width: 220px;
+  }
+  .profile-role {
+    grid-template-columns: 1fr;
+    gap: 0.4rem 0;
+  }
+  .profile-role-time {
+    padding-top: 0;
+  }
+  .worklist-card,
+  .worklist-card--featured {
+    padding: 1.6rem 1.5rem;
+  }
+  .worklist-tier--secondary .worklist-grid {
+    grid-template-columns: 1fr;
+  }
+}

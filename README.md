@@ -8,8 +8,8 @@ single-page app; no backend.
 | Route                         | Contents                                                                     |
 | ----------------------------- | ---------------------------------------------------------------------------- |
 | `/`                           | Hero (name, tagline, portrait), links into the three pages, contact section  |
-| `/about`                      | Bio and polaroid, experience + education timelines, skills marquee           |
-| `/projects`                   | The four project cards                                                       |
+| `/about`                      | Bio and polaroid, experience and education, tools I work with                |
+| `/projects`                   | Project cards linking into the write-ups below                               |
 | `/projects/proxima`           | Research discovery by semantic matching — embeddings, generated explanations |
 | `/projects/almabot`           | Academic advising agent — retrieval + uncertainty evaluation, demo video     |
 | `/projects/carelink`          | Cancer-support directory — filtering, Leaflet map, demo video                |
@@ -27,6 +27,18 @@ lands on a 404 page.
 All copy — bio, project write-ups, timeline entries, contact rows — lives in
 `src/data/siteContent.js`. Pages are in `src/pages/`, homepage sections in `src/sections/`,
 styles in `assets/styles.css`.
+
+Two things in that data file are easy to get wrong:
+
+- `projects.items` backs `/projects/:slug`. Adding an entry there adds a route; renaming or
+  dropping `slug`, `href`, `title`, `motivation`, `approach`, `technical`, `detailTone`,
+  `demoUrl`, `demoVideo` or `demoLabel` breaks a detail page without failing the build.
+  Work with no page of its own goes in `projects.listingOnly`, which `getProjectBySlug`
+  never searches. `getProjectCards()` returns both, in `card.order`.
+- `experience.items` backs `/experience/:slug`, and its `sub` is read by the Salk page,
+  so entries there outlive whatever renders them on `/about`.
+
+Add a URL to `public/sitemap.xml` whenever you add a route — it is hand-maintained.
 
 ## Running it
 
