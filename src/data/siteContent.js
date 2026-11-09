@@ -1,5 +1,30 @@
 import resumePdf from '../../resume.pdf'
 
+// Proxima's one public deployment. Declared once so the /projects card and the
+// detail page's "Try it here" panel cannot drift onto different URLs.
+const PROXIMA_URL = 'https://proxima.vercel.app'
+
+// The two screen recordings in public/, with the dimensions their posters were
+// encoded at. Declared once for the same reason: the /projects cards and the
+// detail pages play the same files. AlmabotDetailPage renders the AlmaBot clip
+// from its own literal because that page is bespoke; if either moves, both
+// have to move.
+const ALMABOT_DEMO = {
+  src: '/almabot-demo.mp4',
+  poster: '/almabot-demo-poster.jpg',
+  width: 1280,
+  height: 940,
+  ariaLabel: 'Screen recording of an AlmaBot advising session',
+}
+
+const CARELINK_DEMO = {
+  src: '/carelink-demo.mp4',
+  poster: '/carelink-demo-poster.jpg',
+  width: 1280,
+  height: 940,
+  ariaLabel: 'Screen recording of a CareLink search',
+}
+
 export const siteContent = {
   nav: {
     items: [
@@ -262,6 +287,16 @@ export const siteContent = {
   },
   projects: {
     label: 'projects',
+
+    // The /projects page heading, and the two groups under it. There is no
+    // introductory paragraph on purpose (#59): the first thing below the
+    // heading is the first project.
+    title: 'Selected Research & Projects',
+    tiers: [
+      { id: 'featured', label: 'Featured' },
+      { id: 'secondary', label: 'Other Projects' },
+    ],
+
     // Projects that have their own /projects/:slug page. `getProjectBySlug`
     // searches this array and only this array, so anything added here becomes
     // a reachable route. `slug`, `href`, `title`, `motivation`, `approach`,
@@ -279,7 +314,7 @@ export const siteContent = {
         href: '/projects/proxima',
         detailTone: 'a',
         demoLabel: 'Open Proxima',
-        demoUrl: 'https://proxima.vercel.app',
+        demoUrl: PROXIMA_URL,
         // First line is the canonical short description of the project; keep
         // any other summary of Proxima (README, future cards) in step with it.
         motivation: [
@@ -291,14 +326,14 @@ export const siteContent = {
           'Next.js · TypeScript · Tailwind CSS · OpenAI embeddings · cosine similarity · semantic retrieval · embedding cache · gpt-4o-mini · graceful degradation · API route design · client-side state · full-stack development',
         card: {
           order: 4,
-          tier: 'featured',
-          role: 'Independent project',
+          tier: 'secondary',
+          role: 'Research discovery',
           summary:
-            'An AI-powered research discovery platform combining semantic professor matching, interactive comparison, and personalized outreach.',
-          actions: [
-            { label: 'Read the write-up', to: '/projects/proxima' },
-            { label: 'Open Proxima', href: 'https://proxima.vercel.app', external: true },
-          ],
+            'I built a research-discovery platform that connects student interests with 1,422 UChicago faculty profiles through semantic search. By combining profile exploration, comparison, and outreach drafting, Proxima turns a research interest into a concrete shortlist that students can investigate.',
+          // The listing's only outbound link. /projects/proxima stays reachable
+          // and keeps working; the card simply no longer points at it, because
+          // the summary above is the whole of what the listing promises.
+          actions: [{ label: 'Visit project', href: PROXIMA_URL, external: true }],
         },
       },
       {
@@ -321,10 +356,12 @@ export const siteContent = {
         card: {
           order: 3,
           tier: 'featured',
-          role: 'Independent project',
+          role: 'Independent project · Evaluating AI assistants',
           summary:
-            'An LLM-based academic advising agent used to study retrieval reliability, uncertainty estimation, and selective prediction.',
-          actions: [{ label: 'Read the write-up', to: '/projects/almabot' }],
+            'I built an academic advising agent spanning 4,502 courses and a 127-question benchmark to evaluate its reliability. My experiments informed the choice of BM25 over a tuned hybrid retriever and examined how well model confidence predicts answer correctness. The project connects system design with empirical evaluation of the evidence and uncertainty behind AI-generated answers.',
+          art: 'photo-4',
+          actions: [{ label: 'Technical note', to: '/projects/almabot' }],
+          demo: { label: 'Watch demo', ...ALMABOT_DEMO },
         },
       },
       {
@@ -336,12 +373,8 @@ export const siteContent = {
         detailTone: 'c',
         demoLabel: 'Open project',
         demoVideo: {
-          src: '/carelink-demo.mp4',
-          poster: '/carelink-demo-poster.jpg',
-          width: 1280,
-          height: 940,
+          ...CARELINK_DEMO,
           lead: 'Filtering the index of 541 organizations down to the pediatric groups that offer financial assistance, with the map narrowing alongside the list, then following one result out to its own site and directions.',
-          ariaLabel: 'Screen recording of a CareLink search',
         },
         // First line is the canonical short description of the project; keep
         // any other summary of CareLink (README, future cards) in step with it.
@@ -355,10 +388,11 @@ export const siteContent = {
         card: {
           order: 6,
           tier: 'secondary',
-          role: 'Team lead and frontend developer · Code Ada Women’s Hackathon, team of four',
+          role: 'Structured information access',
           summary:
-            'An interactive directory of cancer support organizations, explored through keyword search, multi-criteria filters, and a map that narrows alongside the results.',
-          actions: [{ label: 'Read the write-up', to: '/projects/carelink' }],
+            'I built a searchable directory of 541 cancer support organizations across all 50 U.S. states. Filters and a synchronized map turn scattered resource information into a structured, inspectable interface, with links back to the organizations so users can investigate the support available.',
+          actions: [],
+          demo: { label: 'Watch demo', ...CARELINK_DEMO },
         },
       },
       {
@@ -383,10 +417,15 @@ export const siteContent = {
         card: {
           order: 7,
           tier: 'secondary',
-          role: 'Feature analysis, clustering, and the planting recommendation',
+          // The listing calls this one "Campus Vegetation Analysis"; the detail
+          // page keeps the longer original title. `card.title` overrides
+          // `title` on the listing only, so the two can differ on purpose
+          // without either being renamed out from under the other.
+          title: 'Campus Vegetation Analysis',
+          role: 'Ecological data analysis',
           summary:
-            'Campus plant-trait measurements reduced with PCA and clustered with K-means into four growth and resource-use groups, turned into concrete planting recommendations.',
-          actions: [{ label: 'Read the write-up', to: '/projects/campus-vegetation' }],
+            'I used principal component analysis and clustering to translate measured plant traits into campus planting recommendations. By examining variation in growth and nutrient profiles, I connected statistical patterns with an ecological question: how to arrange plants with different resource needs.',
+          actions: [],
         },
       },
     ],
@@ -409,9 +448,11 @@ export const siteContent = {
         card: {
           order: 1,
           tier: 'featured',
-          role: 'Undergraduate Researcher · CHAI (Tan Lab), University of Chicago',
+          role: 'Ongoing research · Chicago Human+AI Lab',
           summary:
-            'Evaluation pipelines for how language models recognize, use, and explain evidence, examining post-hoc rationalization and the reasoning failures that final-answer accuracy does not reveal. The work contributes to a broader effort to improve reasoning reliability through causal reasoning.',
+            'I develop failure-mode taxonomies and cross-condition analyses to evaluate how language models use evidence. Across benchmarks, my work identifies unacknowledged reference dependence, changes to problem constraints, and post-hoc rationalization—failures that final-answer accuracy alone can miss. This work contributes to a broader effort to improve reasoning reliability through causal reasoning.',
+          // No button, and no paper link: nothing public about this work exists
+          // in this repo yet, and a placeholder would be worse than nothing.
           actions: [],
         },
       },
@@ -423,11 +464,12 @@ export const siteContent = {
         card: {
           order: 2,
           tier: 'featured',
-          role: 'Research Software Engineering Intern · Harnessing Plants Initiative, Salk Institute',
+          role: 'Scientific analysis tools · Salk Institute',
           // No tool count, on purpose — see #56.
           summary:
-            "An MCP service that lets AI agents run validated plant-phenotyping analyses against Bloom's research database from plain-English requests, with input and output contracts, reproducible execution, and provenance tracking for random seeds, library versions, and output hashes.",
-          actions: [{ label: 'Read the write-up', to: '/experience/bloom-mcp' }],
+            'I developed analysis tools and validation infrastructure that let AI agents execute scientific workflows through natural-language requests. My contributions span data quality checks, dimensionality reduction, clustering, and reproducibility tracking, connecting model-driven tool use with structured, testable analyses. The system records how results were produced so researchers can inspect and reproduce them.',
+          art: 'photo-2',
+          actions: [{ label: 'Technical note', to: '/experience/bloom-mcp' }],
         },
       },
       {
@@ -438,10 +480,12 @@ export const siteContent = {
         card: {
           order: 5,
           tier: 'secondary',
-          role: 'Research Assistant · Vehicle Emission Research Group, Tsinghua University',
+          role: 'Research assistantship · Tsinghua University',
           summary:
-            'A 24-hour emission forecasting and spatial hot-spot pipeline built on 30 days of monitoring-site time series, vehicle kilometers traveled, vehicle type, and location.',
-          actions: [{ label: 'Read the write-up', to: '/experience/tsinghua' }],
+            'I developed a 24-hour vehicle-emission forecasting pipeline, comparing Random Forest and ARIMA models with chronological evaluation. Combining temporal features with spatial analysis, I examined both when emissions rise and where they concentrate, grounding model development in a concrete environmental research problem.',
+          // No button by default (#59). /experience/tsinghua is still reachable
+          // and still linked from the About experience list.
+          actions: [],
         },
       },
     ],
