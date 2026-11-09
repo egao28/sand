@@ -1034,6 +1034,56 @@ section {
   letter-spacing: 0.02em;
   color: var(--ink-muted);
 }
+/* Short technical notes (/projects/almabot, /experience/bloom-mcp — #60).
+   `.tech-note-*` appears on those two pages only. They reuse the detail-page
+   hero, section and video rules above; these three fill the gaps that the long
+   write-ups did not need — the identity line under the subtitle, the demo
+   disclosure, and the closing link back to /projects. */
+.tech-note-identity {
+  margin: 0 0 1.35rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.75;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.tech-note-demo-toggle {
+  display: inline-block;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-color: rgba(25, 23, 19, 0.28);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+.tech-note-demo-toggle:hover {
+  color: rgba(196, 165, 116, 0.95);
+  text-decoration-color: rgba(196, 165, 116, 0.65);
+}
+.tech-note-demo-toggle:focus-visible {
+  outline: 1px solid rgba(25, 23, 19, 0.3);
+  outline-offset: 3px;
+}
+.tech-note-foot {
+  margin: 2.1rem 0 0;
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.72;
+  color: var(--ink-soft);
+}
+
 .project-detail-tech {
   background: #0a0908;
   color: rgba(255, 253, 248, 0.94);
