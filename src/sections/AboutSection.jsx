@@ -1,43 +1,90 @@
 import { Link } from 'react-router-dom'
-import SectionLabel from '../components/SectionLabel.jsx'
 import polaroidPhoto from '../assets/about/myself.png'
 
-export default function AboutSection({ content }) {
+// The page's only <h1> is the name, so the heading order is h1 (name) →
+// h2 (Selected Experience) → h3 (each institution). Deliberately no slogan,
+// tagline or hero headline above it, and the first body sentence is set at
+// body size — enlarging it would recreate the headline this rewrite removed.
+function ProfileLink({ link, resume }) {
+  const label = (
+    <>
+      {link.label}
+      {link.arrow ? <span aria-hidden="true"> →</span> : null}
+    </>
+  )
+  const className = `profile-link${link.lead ? ' profile-link--lead' : ''}`
+
+  if (link.to) {
+    return (
+      <Link to={link.to} className={className}>
+        {label}
+      </Link>
+    )
+  }
+
+  // CV resolves through `resume` so this link and /resume always serve the same
+  // imported resume.pdf under the same filename.
+  const href = link.fromResume ? resume.href : link.href
+  const isExternal = href.startsWith('http')
+
   return (
-    <section id="about">
-      <div className="sec-inner">
-        <SectionLabel text={content.label} />
+    <a
+      href={href}
+      className={className}
+      {...(link.fromResume ? { download: resume.fileName } : {})}
+      {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+    >
+      {label}
+    </a>
+  )
+}
 
-        <div className="about-intro-block reveal">
-          <div className="about-identity">{content.identity}</div>
+export default function AboutSection({ content, resume }) {
+  return (
+    <section id="about" aria-labelledby="profile-name">
+      <div className="sec-inner profile-inner">
+        <div className="profile-intro reveal">
+          <div className="profile-intro-text">
+            <h1 id="profile-name" className="profile-name">
+              {content.name}
+            </h1>
 
-          <h1 className="about-headline">{content.headline}</h1>
+            {content.narrative.map((paragraph) => (
+              <p key={paragraph} className="profile-prose">
+                {paragraph}
+              </p>
+            ))}
 
-          <div className="about-lede">
-            <div className="about-photo-inline">
-              <div className="about-polaroid">
-                <img src={polaroidPhoto} alt={content.photo.alt} className="about-polaroid-img" />
-              </div>
-              <div className="about-photo-caption">{content.photo.caption}</div>
-            </div>
-            <p className="about-body">{content.body[0]}</p>
+            <p className="profile-prose profile-interests">{content.interests}</p>
           </div>
 
-          {content.body.slice(1).map((p) => (
-            <p key={p} className="about-body">
-              {p}
-            </p>
-          ))}
-
-          <div className="about-more-links">
-            <Link to="/projects" className="ct-more-link">
-              See what I&rsquo;ve built <span aria-hidden="true">→</span>
-            </Link>
-            <a href="#experience" className="ct-more-link">
-              Experience <span aria-hidden="true">→</span>
-            </a>
-          </div>
+          <figure className="profile-portrait">
+            <img src={polaroidPhoto} alt={content.photo.alt} className="profile-portrait-img" />
+            <figcaption className="profile-portrait-caption">{content.photo.caption}</figcaption>
+          </figure>
         </div>
+
+        <section className="profile-experience reveal" aria-labelledby="profile-experience-heading">
+          <h2 id="profile-experience-heading" className="profile-section-heading">
+            Selected Experience
+          </h2>
+
+          <ul className="profile-roles">
+            {content.roles.map((role) => (
+              <li key={role.id} className="profile-role">
+                <h3 className="profile-role-org">{role.org}</h3>
+                <p className="profile-role-title">{`${role.role} · ${role.time}`}</p>
+                <p className="profile-role-note">{role.note}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <nav className="profile-links reveal" aria-label="Elsewhere">
+          {content.links.map((link) => (
+            <ProfileLink key={link.label} link={link} resume={resume} />
+          ))}
+        </nav>
       </div>
     </section>
   )

@@ -29,131 +29,73 @@ export const siteContent = {
   },
   about: {
     label: 'about',
-    identity: 'Evelyn Gao — Computer Science & Statistics, University of Chicago',
-    headline: 'I build infrastructure for AI and machine learning systems.',
+    name: 'Evelyn Gao',
     photo: {
       alt: 'Polaroid photo of Evelyn Gao pointing at a whiteboard',
       caption: 'Aug 14, 2026',
     },
-    body: [
-      "I'm a Computer Science and Statistics student at the University of Chicago, expected graduation 2028. I'm especially interested in the parts of ML that make a system usable beyond the model itself: data pipelines, validation, testing, tooling, and the infrastructure that keeps things working after the first demo.",
-      'Most recently, I worked on bloom-mcp at the Salk Institute, an MCP platform that lets AI agents run scientific analyses from plain-English requests. I built and worked across a set of 22 analysis tools with validated input and output contracts, reproducible execution, and provenance tracking for things like random seeds, library versions, and output hashes.',
-      "What I like about this kind of work is that the infrastructure is mostly invisible when it's doing its job. A researcher shouldn't have to think about whether an analysis used the right input format, whether a result can be reproduced, or whether something silently broke upstream. I like building systems that take care of those details.",
-    ],
 
-    // --- Fields below are for the rewritten /about (#56). They sit alongside
-    //     `label` / `identity` / `headline` / `photo` / `body` rather than
-    //     replacing them: those five are still rendered by AboutSection today,
-    //     and removing them is the /about rewrite's job, not this one's. ---
-
-    // The single claim the rewritten page is evidence for.
-    positioning:
-      'I build AI research systems, and design the evaluations that decide whether their results can be trusted.',
-
-    // Body paragraphs for the rewritten page. Deliberately omits the Salk tool
-    // count (see #56): the one in `body[1]` above is disputed outside this
-    // repo, so the rewrite states no number at all rather than picking one.
+    // Copy below is approved verbatim in #58. Wording, numbers and
+    // qualifications are fixed: only typography and markup structure may
+    // change. The old `headline` slogan, `identity` kicker and three-paragraph
+    // `body` were deleted with the rewrite, as was the `positioning` line added
+    // as groundwork in #57 — the page carries no slogan or hero headline, and
+    // the first sentence below must not be enlarged into one.
     narrative: [
-      "I'm a Computer Science and Statistics student at the University of Chicago, expected to graduate in 2028. My work sits where a research system meets the evidence that it does what it claims: build the pipeline, then design the measurement that says whether its output holds up.",
-      'At the Salk Institute I built bloom-mcp, an MCP service that lets AI agents run validated plant-phenotyping analyses from plain-English requests, with input and output contracts, reproducible execution, and provenance tracking for random seeds, library versions, and output hashes.',
-      'At CHAI I work on how language models recognize, use, and explain evidence, building evaluation pipelines for the reasoning failures a final-answer score never surfaces. The work contributes to a broader effort to improve reasoning reliability through causal reasoning.',
-      'The longer-term goal is to make AI a reliable partner in scientific research: not only able to run an analysis, but able to show why its answer should be believed.',
+      "I build AI tools for research and develop evaluations to test whether their outputs can be trusted. I'm an undergraduate studying Computer Science and Statistics at the University of Chicago, working with the Chicago Human+AI Lab led by Chenhao Tan.",
+      'At CHAI, I investigate how language models use evidence and how reference answers and feedback shape their reasoning. Previously, at the Salk Institute, I developed tools that enable AI agents to run reproducible scientific analyses. My goal is to make AI a reliable partner in scientific research, from carrying out an analysis to supporting its conclusions with evidence.',
     ],
 
-    // One line, research interests only — #56 explicitly rules out a scatter of
-    // unrelated ones. Every item here is backed by work already on this site.
+    // Runs as the last line of the body, with no heading of its own.
     interests:
-      'Evaluation design for model reasoning, retrieval reliability and uncertainty estimation, and reproducible scientific computing.',
+      'Outside of research, I play the flute, crochet, read, and follow League of Legends esports.',
 
-    // Compact experience entries for the rewritten page, which drops
-    // ExperienceTimeline. This intentionally restates `experience.items`
-    // instead of deriving from it: that array survives only to back
-    // /experience/:slug and BloomMcpDetailPage's `sub`, so the two are expected
-    // to diverge. Edit both when a role changes.
+    // Selected Experience. Roles and dates are #58's list, not
+    // `experience.items` — that array survives only to back /experience/:slug
+    // and the `sub` string BloomMcpDetailPage renders, so the two differ on
+    // purpose. `role` and `time` are joined with a middot when rendered.
     roles: [
       {
-        id: 'chai-tan-lab',
-        org: 'University of Chicago',
-        role: 'Undergraduate Researcher · CHAI (Tan Lab)',
-        time: 'Sep 2026 – Present',
-        note: 'Evaluation pipelines for how models recognize, use, and explain evidence, and for the reasoning failures a final-answer score never surfaces.',
-        href: null,
+        id: 'chai',
+        org: 'University of Chicago · Chicago Human+AI Lab',
+        role: 'Undergraduate Researcher',
+        time: 'Sep 2026–Present',
+        note: 'Developing evaluations that expose failures in language-model evidence use and reasoning.',
       },
       {
         id: 'bloom-mcp',
-        org: 'Salk Institute',
-        role: 'Research Software Engineering Intern · Harnessing Plants Initiative',
-        time: 'Jun – Aug 2026',
-        note: 'bloom-mcp: validated plant-phenotyping analyses run by AI agents from plain-English requests, with reproducible execution and provenance tracking.',
-        href: '/experience/bloom-mcp',
+        org: 'Salk Institute · Harnessing Plants Initiative',
+        role: 'Research Software Engineering Intern',
+        time: 'Jun–Aug 2026',
+        note: 'Built scientific analysis tools and validation infrastructure for AI-driven research workflows.',
       },
       {
         id: 'sony',
         org: 'Sony',
         role: 'Computer Science Operations & Maintenance Intern',
-        time: 'May – Sep 2025',
-        note: 'Three internal systems: a release and asset delivery pipeline, a configurable rules engine for routing weekly feedback, and migration tooling for a live production database.',
-        href: '/experience/sony',
+        time: 'May–Sep 2025',
+        note: 'Automated music-release preparation and feedback routing through reusable processing pipelines.',
       },
       {
         id: 'tsinghua',
-        org: 'Tsinghua University',
-        role: 'Research Assistant · Vehicle Emission Research Group',
-        time: 'Jul 2024 – Jan 2025',
-        note: '24-hour emission forecasting and spatial hot-spot analysis built on 30 days of monitoring-site time series.',
-        href: '/experience/tsinghua',
+        org: 'Tsinghua University · Vehicle Emission Research Group',
+        role: 'Research Assistant',
+        time: 'Jul 2024–Jan 2025',
+        note: 'Built and evaluated forecasting models for environmental data, linking prediction with spatial analysis.',
       },
     ],
 
-    // Link set for the rewritten page. The three external URLs are copied from
-    // `contact.items` on purpose: `contact` is frozen for #56 and must not be
-    // refactored into shared constants, so this is the one place they are
-    // duplicated. Change a URL in both spots or they will disagree.
+    // CV carries no href on purpose: AboutSection reads `resume.href` and
+    // `resume.fileName`, so this link and /resume serve the same imported
+    // resume.pdf under the same download name and cannot drift apart. Nothing
+    // on the page claims that file is current.
     links: [
-      { label: 'Projects', to: '/projects' },
-      { label: 'Resume', to: '/resume' },
-      { label: 'GitHub', href: 'https://github.com/egao28' },
-      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/' },
+      { label: 'CV', fromResume: true },
       { label: 'Email', href: 'mailto:evelyneyi@outlook.com' },
-    ],
-  },
-  // Read only by SkillsMarquee, which only /about renders. Kept, not
-  // deleted, because /about still renders it on main: this is groundwork
-  // for #56, not the rewrite itself, and deleting the data here would
-  // blank a live page for however long the rewrite PRs take. The /about
-  // rewrite deletes this together with SkillsMarquee.jsx and its CSS.
-  skills: {
-    label: 'skills',
-    title: 'Tools I work with',
-    primary: [
-      { icon: '◆', text: 'Python' },
-      { icon: '▦', text: 'SQL' },
-      { icon: '⌁', text: 'R' },
-      { icon: '◈', text: 'Java' },
-      { icon: '⬡', text: 'C' },
-      { icon: '✶', text: 'TypeScript' },
-      { icon: '⟟', text: 'JavaScript' },
-      { icon: '◌', text: 'HTML/CSS' },
-      { icon: '✳', text: 'MCP' },
-      { icon: '⧈', text: 'FastMCP' },
-      { icon: '⬠', text: 'LangChain' },
-      { icon: '✷', text: 'OpenAI Embeddings' },
-    ],
-    secondary: [
-      { icon: '⬡', text: 'scikit-learn' },
-      { icon: '⬢', text: 'Pandas' },
-      { icon: '◍', text: 'NumPy' },
-      { icon: '⟐', text: 'SciPy' },
-      { icon: '✳', text: 'GeoPandas' },
-      { icon: '⟑', text: 'Matplotlib' },
-      { icon: '⟡', text: 'Git' },
-      { icon: '⟢', text: 'GitHub Actions' },
-      { icon: '⬥', text: 'pytest' },
-      { icon: '⌬', text: 'Docker' },
-      { icon: '◈', text: 'Pydantic' },
-      { icon: '⟟', text: 'Supabase' },
-      { icon: '✦', text: 'React' },
-      { icon: '⟠', text: 'Next.js' },
+      { label: 'GitHub', href: 'https://github.com/egao28' },
+      // The arrow is rendered as a separate aria-hidden span, so the label
+      // stays the approved words and a screen reader doesn't announce it.
+      { label: 'Explore my research and projects', arrow: true, to: '/projects', lead: true },
     ],
   },
   experience: {
@@ -202,61 +144,6 @@ export const siteContent = {
         sub: 'Research Assistant, Vehicle Emission Research Group · Spatiotemporal Modeling and Forecasting · Jul 2024 – Jan 2025',
         subLine:
           'Research Assistant, Vehicle Emission Research Group · Spatiotemporal Modeling and Forecasting',
-      },
-    ],
-  },
-  // Read only by EducationTimeline, which only /about renders. Kept for the
-  // same reason as `skills` above, and deleted by the same rewrite PR.
-  education: {
-    label: 'education',
-    items: [
-      {
-        id: 'uchicago',
-        side: 'right',
-        time: '2025 – 2028',
-        title: 'University of Chicago',
-        eduLines: ['B.S., Computer Science · B.A., Statistics', 'GPA 3.76 / 4.0'],
-        detailLabel: 'Coursework',
-        coursework: [
-          'Machine Learning',
-          'Linear Algebra',
-          'Introduction to Data Science',
-          'Introduction to Computer Science in Python',
-          'Introduction to Computer Science in C',
-        ],
-      },
-      {
-        id: 'uiuc',
-        side: 'left',
-        time: '2024 – 2025',
-        title: 'University of Illinois Urbana-Champaign',
-        sub: '',
-        detailLabel: 'Coursework',
-        coursework: [
-          'Data Structures and Algorithms',
-          'Discrete Mathematics',
-          'Biostatistics',
-          'Data Science Discovery in Python',
-          'Introduction to Computer Science in Java',
-          'Introduction to Computer Science in C++',
-          'Calculus',
-        ],
-      },
-      {
-        id: 'highschool',
-        side: 'right',
-        time: '2021 – 2024',
-        title: 'Beijing National Day School',
-        eduLines: ['International Baccalaureate Diploma', 'GPA 4.17 / 4.3'],
-        detailLabel: 'Coursework',
-        coursework: [
-          'Biology HL',
-          'Mathematics Applications and Interpretation HL',
-          'English B HL',
-          'Economics SL',
-          'Chinese A SL',
-          'Film SL',
-        ],
       },
     ],
   },
