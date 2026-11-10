@@ -1,19 +1,30 @@
 /*
-  Hover and focus motion for the seven nav icons (#70).
+  Hover and focus motion for the seven nav icons, to the V6 timings.
 
-  All of it is CSS transitions on groups inside the inline SVGs, driven by the
-  state of the link or button. That is deliberate: a transition plays once on entry, holds
-  its end state while the pointer stays, and eases back on leave, with no loop
-  to stop and no timer or listener to clean up. Entering and leaving quickly
-  interrupts and reverses mid-flight on its own.
+  All of it is CSS transitions on parts of the inline SVGs, driven by the state
+  of the control they sit in. That is deliberate: a transition plays once on
+  entry, holds its end state while the pointer stays, and eases back on leave,
+  with no loop to stop and no timer or listener to clean up. Entering and
+  leaving quickly interrupts and reverses mid-flight on its own.
 
-  The motion is the whole of it. The two delivered states are where the drawing
-  starts and where it ends up, not how it gets there: nothing here swaps one
-  file for another, cross-fades two bitmaps, or scales a closed envelope up to
-  pass for an open one. Each icon animates the part that actually moves.
+  Two durations per icon, and the split is what makes the second number real:
+  the base rule carries the 200ms return, and the `:hover`/`:focus-visible`
+  rule overrides it with the icon's own entry duration. So the motion plays at
+  320ms (or 280, 300, 260) going in and 200ms coming back, as delivered.
+
+      About     320ms      Resume    300ms
+      Projects  280ms      GitHub    320ms
+      Contact   320ms      LinkedIn  260ms
+
+  Nothing here swaps one file for another, cross-fades two bitmaps, or scales a
+  closed envelope up to pass for an open one. Each icon moves the part that
+  actually moves, and the two delivered files are where that part starts and
+  where it ends up.
 
   `transform-box: view-box` throughout, so every origin and translation below is
-  in the icons' shared 64x64 units rather than in rendered pixels.
+  in the icons' shared 64x64 units rather than in rendered pixels — which is
+  also why the same rules serve the 40px rail icons and the 28px ones in the
+  compact bar without a second set of numbers.
 */
 
 .nav-icon g,
@@ -22,93 +33,131 @@
   transform-box: view-box;
 }
 
-/* --- About: lifts its head 7 degrees, 240ms ------------------------------ */
-
-.nav-icon-about-head {
-  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+/* Every control that holds an icon: the six rail entries, the six in the
+   compact bar, and the theme button in each. Collected here so the motion below
+   is written once and is identical at both sizes. */
+.nav-control {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --leave: 200ms;
 }
 
-.site-rail-link:hover .nav-icon-about-head,
-.site-rail-link:focus-visible .nav-icon-about-head {
-  transform: rotate(-7deg);
+/* --- About: the hand lifts, 320ms --------------------------------------- */
+
+/* The head is outside this and has no transition: the whole motion is the arm,
+   and the shoulder half of it is identical in the two delivered outlines, so
+   what travels is the hand. */
+.nav-icon-about-arm {
+  d: var(--arm-down);
+  transition: d var(--leave) var(--ease-out);
+}
+
+.nav-control:hover .nav-icon-about-arm,
+.nav-control:focus-visible .nav-icon-about-arm {
+  d: var(--arm-raised);
+  transition-duration: 320ms;
 }
 
 /* --- Projects: the pinwheel turns 24 degrees, 280ms ---------------------- */
 
 .nav-icon-pinwheel {
   transform-origin: 32px 32px;
-  transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--leave) var(--ease-out);
 }
 
-.site-rail-link:hover .nav-icon-pinwheel,
-.site-rail-link:focus-visible .nav-icon-pinwheel {
+.nav-control:hover .nav-icon-pinwheel,
+.nav-control:focus-visible .nav-icon-pinwheel {
   transform: rotate(24deg);
+  transition-duration: 280ms;
 }
 
 /* --- Resume: the folded page opens out, 300ms --------------------------- */
 
 .nav-icon-resume-page {
   d: var(--page-closed);
-  transition: d 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: d var(--leave) var(--ease-out);
 }
 
-.site-rail-link:hover .nav-icon-resume-page,
-.site-rail-link:focus-visible .nav-icon-resume-page {
+.nav-control:hover .nav-icon-resume-page,
+.nav-control:focus-visible .nav-icon-resume-page {
   d: var(--page-open);
+  transition-duration: 300ms;
 }
 
-/* --- Contact: the flap opens and the letter rises, 320ms ---------------- */
+/* --- Contact: the top edge gives way and the letter rises, 320ms -------- */
 
-.nav-icon-contact-flap {
-  /* Hinged on the top of its own stroke, so it turns about the fold rather than
-     about the middle of the icon. Through zero it is edge-on, which is what a
-     flap looks like half-way open. The number is CONTACT_FLAP_HINGE after the
-     v3 refit — see iconPaths.js; it is the artwork's own fold, not a guess. */
-  transform-origin: 32px 22.3862px;
-  transition: transform 320ms cubic-bezier(0.33, 0, 0.2, 1);
-}
-
-.site-rail-link:hover .nav-icon-contact-flap,
-.site-rail-link:focus-visible .nav-icon-contact-flap {
-  transform: scaleY(-0.62);
-}
-
-.nav-icon-contact-paper {
-  /* Whatever the hit area is painted — page colour normally, the current-page
-     tint when Contact is the page you are on — so the paper never shows as a
-     patch of the wrong background. */
-  fill: var(--rail-surface, var(--paper));
-}
-
-/* The letter itself. It is clipped by the envelope's own top silhouette, so at
-   rest it is genuinely behind the front panel rather than merely hidden: the
-   reveal is a mask, and the paper slides out from under the ink that was
-   covering it. CONTACT_LETTER_REST_Y, after the v3 refit. */
+/* The letter. It is inside the delivered `paper-reveal` mask, so at rest it is
+   genuinely behind the front fold rather than merely switched off — see the
+   note on CONTACT_LETTER_REST_Y in iconPaths.js for why the rest offset is 28
+   and not the 13 the file writes next to an `opacity: 0`. Nothing here fades:
+   the paper slides out from under the ink that was covering it. */
 .nav-icon-contact-letter {
-  transform: translateY(14.3248px);
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(28px);
+  transition: transform var(--leave) var(--ease-out);
 }
 
-.site-rail-link:hover .nav-icon-contact-letter,
-.site-rail-link:focus-visible .nav-icon-contact-letter {
+.nav-control:hover .nav-icon-contact-letter,
+.nav-control:focus-visible .nav-icon-contact-letter {
   transform: translateY(0);
+  transition-duration: 320ms;
 }
 
-/* --- GitHub: the dot travels the right-hand curve once, 450ms ----------- */
-
-.nav-icon-github-dot {
-  offset-distance: 0%;
-  offset-rotate: 0deg;
-  opacity: 0;
-  transition:
-    offset-distance 450ms cubic-bezier(0.37, 0, 0.3, 1),
-    opacity 120ms ease;
-}
-
-.site-rail-link:hover .nav-icon-github-dot,
-.site-rail-link:focus-visible .nav-icon-github-dot {
-  offset-distance: var(--travel-end);
+/* The closed top edge and the two open wings are the same edge of the same
+   envelope in its two positions, and they hand over rather than overlap: the
+   rim is gone before the wings begin, and on the way back the wings are gone
+   before the rim returns. That is what keeps the end state a single line —
+   there is no moment, and least of all at either end, when both are painted. */
+.nav-icon-contact-rim {
   opacity: 1;
+  transition: opacity 90ms linear 110ms;
+}
+
+.nav-icon-contact-wings {
+  opacity: 0;
+  transition: opacity 80ms linear;
+}
+
+.nav-control:hover .nav-icon-contact-rim,
+.nav-control:focus-visible .nav-icon-contact-rim {
+  opacity: 0;
+  transition: opacity 120ms linear;
+}
+
+.nav-control:hover .nav-icon-contact-wings,
+.nav-control:focus-visible .nav-icon-contact-wings {
+  opacity: 1;
+  transition: opacity 160ms linear 160ms;
+}
+
+/* --- GitHub: the short branch unfolds, 320ms ---------------------------- */
+
+/* The branch grows out of the fork at (27,33) — which is the first point of
+   both outlines, so it stays joined to the stem throughout — and its filled
+   node travels with the end of it.
+
+   The two have to share a duration and an easing exactly. `d` interpolation
+   carries the curve's last point in a straight line from (36,31) to (49,25),
+   and the translate carries the node along that same line; matched easing is
+   what keeps them on the same point at every frame, so no bare stub is ever
+   drawn ahead of its node and the line never runs out through one. */
+.nav-icon-github-branch {
+  d: var(--branch-short);
+  transition: d var(--leave) var(--ease-out);
+}
+
+.nav-icon-github-node {
+  transition: transform var(--leave) var(--ease-out);
+}
+
+.nav-control:hover .nav-icon-github-branch,
+.nav-control:focus-visible .nav-icon-github-branch {
+  d: var(--branch-long);
+  transition-duration: 320ms;
+}
+
+.nav-control:hover .nav-icon-github-node,
+.nav-control:focus-visible .nav-icon-github-node {
+  transform: translate(var(--node-reach), var(--node-rise));
+  transition-duration: 320ms;
 }
 
 /* --- LinkedIn: the dot over the i moves up, 260ms ----------------------- */
@@ -118,12 +167,13 @@
    added alongside it — no arrow, no trail, no second dot, no frame and no
    underline. */
 .nav-icon-linkedin-dot {
-  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--leave) var(--ease-out);
 }
 
-.site-rail-link:hover .nav-icon-linkedin-dot,
-.site-rail-link:focus-visible .nav-icon-linkedin-dot {
+.nav-control:hover .nav-icon-linkedin-dot,
+.nav-control:focus-visible .nav-icon-linkedin-dot {
   transform: translateY(var(--dot-rise));
+  transition-duration: 260ms;
 }
 
 /* --- Theme: a slight turn on hover, and nothing else -------------------- */
@@ -133,69 +183,82 @@
    that happens under the pointer is four degrees. */
 .nav-icon-theme-turn {
   transform-origin: 32px 32px;
-  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform var(--leave) var(--ease-out);
 }
 
-.site-rail-theme:hover .nav-icon-theme-turn,
-.site-rail-theme:focus-visible .nav-icon-theme-turn,
-.site-topbar-theme:hover .nav-icon-theme-turn,
-.site-topbar-theme:focus-visible .nav-icon-theme-turn {
+.nav-control:hover .nav-icon-theme-turn,
+.nav-control:focus-visible .nav-icon-theme-turn {
   transform: rotate(4deg);
+  transition-duration: 240ms;
 }
 
 /* ========================================================== motion ======= */
 
 @media (prefers-reduced-motion: reduce) {
-  /* No rotation and no path motion. The label and the current-page fill are
-     untouched — they are information, not decoration. */
-  .nav-icon-about-head,
+  /* No travel, no rotation, no path motion and no fade. What is left is the
+     function and the current-page state: every control still works, still
+     focuses visibly and still says which page you are on. */
+  .nav-icon-about-arm,
   .nav-icon-pinwheel,
   .nav-icon-resume-page,
-  .nav-icon-contact-flap,
   .nav-icon-contact-letter,
-  .nav-icon-github-dot,
+  .nav-icon-contact-rim,
+  .nav-icon-contact-wings,
+  .nav-icon-github-branch,
+  .nav-icon-github-node,
   .nav-icon-linkedin-dot,
   .nav-icon-theme-turn,
   .site-rail-label,
   /* The current-page tint. It is a colour, so it would otherwise fade when
-     the theme changes under it — which is the one thing #73 asks the theme
-     switch not to do when motion is turned down. */
+     the theme changes under it — which is the one thing the theme switch is
+     asked not to do when motion is turned down. */
   .site-rail-link,
+  .site-topbar-link,
   .site-topbar-theme {
     transition: none;
   }
 
-  .site-rail-link:hover .nav-icon-about-head,
-  .site-rail-link:focus-visible .nav-icon-about-head,
-  .site-rail-link:hover .nav-icon-pinwheel,
-  .site-rail-link:focus-visible .nav-icon-pinwheel,
-  .site-rail-link:hover .nav-icon-contact-flap,
-  .site-rail-link:focus-visible .nav-icon-contact-flap {
-    transform: none;
+  .nav-control:hover .nav-icon-about-arm,
+  .nav-control:focus-visible .nav-icon-about-arm {
+    d: var(--arm-down);
   }
 
-  .site-rail-link:hover .nav-icon-resume-page,
-  .site-rail-link:focus-visible .nav-icon-resume-page {
+  .nav-control:hover .nav-icon-resume-page,
+  .nav-control:focus-visible .nav-icon-resume-page {
     d: var(--page-closed);
   }
 
-  .site-rail-link:hover .nav-icon-github-dot,
-  .site-rail-link:focus-visible .nav-icon-github-dot {
-    offset-distance: 0%;
+  .nav-control:hover .nav-icon-github-branch,
+  .nav-control:focus-visible .nav-icon-github-branch {
+    d: var(--branch-short);
+  }
+
+  .nav-control:hover .nav-icon-contact-rim,
+  .nav-control:focus-visible .nav-icon-contact-rim {
+    opacity: 1;
+  }
+
+  .nav-control:hover .nav-icon-contact-wings,
+  .nav-control:focus-visible .nav-icon-contact-wings {
     opacity: 0;
   }
 
-  /* The letter stays tucked away too. A slide is neither a rotation nor path
-     motion, but nothing here should move when motion has been turned down. */
-  .site-rail-link:hover .nav-icon-contact-letter,
-  .site-rail-link:focus-visible .nav-icon-contact-letter {
-    transform: translateY(14.3248px);
+  /* The letter stays behind the fold too. A slide is neither a rotation nor
+     path motion, but nothing here should move when motion has been turned
+     down. */
+  .nav-control:hover .nav-icon-contact-letter,
+  .nav-control:focus-visible .nav-icon-contact-letter {
+    transform: translateY(28px);
   }
 
-  .site-rail-link:hover .nav-icon-linkedin-dot,
-  .site-rail-link:focus-visible .nav-icon-linkedin-dot,
-  .site-rail-theme:hover .nav-icon-theme-turn,
-  .site-rail-theme:focus-visible .nav-icon-theme-turn {
+  .nav-control:hover .nav-icon-pinwheel,
+  .nav-control:focus-visible .nav-icon-pinwheel,
+  .nav-control:hover .nav-icon-github-node,
+  .nav-control:focus-visible .nav-icon-github-node,
+  .nav-control:hover .nav-icon-linkedin-dot,
+  .nav-control:focus-visible .nav-icon-linkedin-dot,
+  .nav-control:hover .nav-icon-theme-turn,
+  .nav-control:focus-visible .nav-icon-theme-turn {
     transform: none;
   }
 }

@@ -139,11 +139,13 @@ html[data-theme='dark'] {
    never on the icon inside it. That is what keeps it square to the rail while
    the drawing turns, unfolds or slides: the pinwheel rotating cannot take the
    background round with it. */
+/* No `--rail-surface` any more: Contact was the one icon that painted a shape
+   in "the colour behind it", and the V6 drawing is stroked throughout with a
+   mask doing the hiding, so nothing inside an icon needs to know what the hit
+   area is filled with. */
 .site-rail-link--current {
   background: var(--rail-current-bg);
   color: var(--rail-ink-current);
-  /* Anything an icon paints in "the colour behind it" follows the tint. */
-  --rail-surface: var(--rail-current-bg);
 }
 
 .site-rail-link:focus-visible {

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import NavIcon, { ThemeIcon } from './icons/NavIcons.jsx'
+import NavIcon, { DESKTOP_ICON_SIZE, ThemeIcon } from './icons/NavIcons.jsx'
 import { useTheme } from '../hooks/useTheme.js'
 
 /** True when `path` is the section `item` stands for. About owns the experience
@@ -87,18 +87,18 @@ function accessibleName(item) {
  * switching is a click or a key press. Hover only turns it a few degrees
  * (nav-icons.css); it never previews or applies the other theme on its own.
  */
-function ThemeToggle({ className, labelClassName }) {
+function ThemeToggle({ className, labelClassName, iconSize }) {
   const { theme, toggleTheme } = useTheme()
   const label = theme === 'dark' ? 'Light mode' : 'Dark mode'
 
   return (
     <button
       type="button"
-      className={className}
+      className={`nav-control ${className}`}
       onClick={toggleTheme}
       aria-pressed={theme === 'dark'}
     >
-      <ThemeIcon theme={theme} />
+      <ThemeIcon theme={theme} size={iconSize} />
       <span className={labelClassName}>{label}</span>
     </button>
   )
@@ -136,11 +136,11 @@ export function SiteRail({ items, dormant }) {
               >
                 <NavLink
                   item={item}
-                  className={`site-rail-link${current ? ' site-rail-link--current' : ''}`}
+                  className={`nav-control site-rail-link${current ? ' site-rail-link--current' : ''}`}
                   aria-current={current ? 'page' : undefined}
                   aria-label={accessibleName(item)}
                 >
-                  <NavIcon id={item.id} />
+                  <NavIcon id={item.id} size={DESKTOP_ICON_SIZE} />
                   {/* The link's accessible name when there is no aria-label
                       above. Faded out rather than removed, so a screen reader
                       still has something to announce when the icon is all that
@@ -155,7 +155,11 @@ export function SiteRail({ items, dormant }) {
 
       {/* Outside the <nav>: it is a setting, not a destination, so it does not
           belong in a list of places to go. */}
-      <ThemeToggle className="site-rail-link site-rail-theme" labelClassName="site-rail-label" />
+      <ThemeToggle
+        className="site-rail-link site-rail-theme"
+        labelClassName="site-rail-label"
+        iconSize={DESKTOP_ICON_SIZE}
+      />
     </div>
   )
 }
