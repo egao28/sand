@@ -442,24 +442,17 @@ export const siteContent = {
   // thing tracking when resume.pdf was last replaced, and that is a call to
   // make on its own, not inside an icon change.
   contact: {
-    panelHeadline: 'Contact',
-    formHeadline: "Let's get in touch!",
-    formTopics: ['Say hello', 'Job or internship', 'Collaboration', 'Something else'],
-    // A row with an href shows text derived from it, so the link and the label
-    // for the link cannot disagree. `value` is only for rows that have no href
-    // to derive from. To hide a row, delete it or comment it out.
-    items: [
-      { key: 'Email', label: 'Email', href: 'mailto:evelyneyi@outlook.com' },
-      { key: 'LinkedIn', label: 'LinkedIn', href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/' },
-      { key: 'GitHub', label: 'GitHub', href: 'https://github.com/egao28' },
-      { key: 'Location', label: 'Location', value: 'Chicago, IL / Beijing, CN', href: null },
-    ],
+    title: 'Contact',
+    // The one address on the page, under the form. It is also the address the
+    // form itself delivers to — but the form delivers there because the
+    // server is configured to, not because this string travels in the request.
+    // See api/contact.js.
+    email: 'evelyneyi@outlook.com',
     // Read at page load, not baked in: the site can sit undeployed for months,
     // and a footer that still says last year on January 1st is the kind of
     // wrong nobody reports. Uses the visitor's clock, which is the usual and
     // correct trade for a copyright line.
     footerLeft: `© ${new Date().getFullYear()} Evelyn Gao`,
-    footerRight: '',
   },
 }
 

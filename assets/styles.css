@@ -1483,141 +1483,43 @@ section {
   }
 }
 
-/* Contact */
+/*
+  Contact (#72). The page is the form and nothing else: the full-bleed photo,
+  the Topic dropdown, the separate list of social addresses, the Location row
+  and the second heading are all gone, and with them the dark panel the old
+  section painted over the page.
+*/
 #contact {
   position: relative;
-  background: #14120f; /* fallback while the photo decodes, not a permanent overlay */
-  color: var(--paper);
-  overflow: hidden;
-}
-.contact-photo-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  display: block;
-}
-.contact-photo-bg-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-#contact .sec-inner {
-  position: relative;
-  z-index: 2;
-  padding-top: 2.5rem;
-  padding-bottom: 0.75rem;
-}
-#contact .footer-bar {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* Solid floating panels over the (untouched) photo — staggered, not flush */
-.contact-panels {
-  display: grid;
-  grid-template-columns: 0.85fr 1.4fr;
-  gap: 1.35rem;
-  margin-bottom: 0.65rem;
-  align-items: start;
-}
-.contact-panel {
   background: var(--paper);
-  border-radius: 0;
-  padding: clamp(1.35rem, 2.3vw, 1.9rem);
-  box-shadow: 0 28px 50px -14px rgba(0, 0, 0, 0.5);
-}
-.contact-panel--info {
-  /* the "small on the left sits a little lower" stagger */
-  margin-top: clamp(1.5rem, 3.75vw, 2.6rem);
-}
-.contact-panel-headline {
-  font-family: var(--serif);
-  font-weight: 300;
-  font-size: clamp(26px, 3.15vw, 37px);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
   color: var(--ink);
-  margin-bottom: clamp(1.3rem, 2.6vw, 1.75rem);
 }
 
-/* Small panel: email / linkedin / github / location */
-.contact-info-list {
-  list-style: none;
+.contact-inner {
+  /* Left-aligned on the same line as every other page's content: the inset on
+     .page-root is what positions this, so centring would fight it. */
+  max-width: 640px;
   margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 1.25rem;
-}
-.contact-info-link {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  text-decoration: none;
-  color: inherit;
-  padding: 0.15rem 1.25rem 0.15rem 0;
-  transition: transform 0.25s ease;
-}
-a.contact-info-link:hover,
-a.contact-info-link:focus-visible {
-  transform: translateX(4px);
-}
-a.contact-info-link:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-}
-.contact-info-arrow {
-  position: absolute;
-  top: 0.15rem;
-  right: 0;
-  color: var(--accent);
-  opacity: 0;
-  transform: translateX(-4px);
-  transition:
-    opacity 0.25s ease,
-    transform 0.25s ease;
-}
-a.contact-info-link:hover .contact-info-arrow,
-a.contact-info-link:focus-visible .contact-info-arrow {
-  opacity: 1;
-  transform: translateX(0);
-}
-.contact-info-label {
-  font-family: var(--sans);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  color: var(--ink-muted);
-}
-.contact-info-value {
-  font-family: var(--serif);
-  font-size: clamp(17px, 1.6vw, 21px);
-  font-weight: 300;
-  color: var(--ink);
-  transition: color 0.25s ease;
-  word-break: break-word;
-}
-a.contact-info-link:hover .contact-info-value,
-a.contact-info-link:focus-visible .contact-info-value {
-  color: var(--accent);
-}
-.contact-info-link--static {
-  cursor: default;
-}
-.contact-info-link--static .contact-info-value {
-  opacity: 0.7;
+  padding-top: 4rem;
+  padding-bottom: 3.5rem;
 }
 
-/* Big panel: "how can I help" form */
-.contact-panel--form {
-  display: flex;
-  flex-direction: column;
+.contact-title {
+  font-family: var(--serif);
+  font-size: 48px;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 2.5rem;
 }
-/* Honeypot. Positioned off-screen rather than display:none — a bot parsing
-   the DOM skips what is explicitly hidden, but happily fills what is merely
-   somewhere else. aria-hidden plus tabindex="-1" on the input keeps it away
-   from screen readers and the tab order, so no person can reach it. */
+
+.contact-form {
+  display: block;
+}
+
+/* Off-screen, not display:none — a bot fills what it can find in the DOM, and
+   a field that is not rendered at all is a field it never sees. Kept out of
+   the tab order and the accessibility tree by the markup. */
 .contact-botcheck {
   position: absolute;
   left: -9999px;
@@ -1626,130 +1528,179 @@ a.contact-info-link:focus-visible .contact-info-value {
   overflow: hidden;
 }
 
-.contact-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  margin-bottom: 1.2rem;
+/* 28px between fields, which is the gap itself rather than a margin on one
+   side, so the first field sits flush under the heading. */
+.contact-field + .contact-field {
+  margin-top: 28px;
 }
-.contact-field span {
+
+.contact-field label {
+  display: block;
   font-family: var(--sans);
-  font-size: 13px;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
-  color: var(--ink-muted);
+  font-size: 15px;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
 }
-.contact-field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
+
+/* No box and no card fill: one line under the field, and that is the whole
+   decoration. */
 .contact-field input,
-.contact-field select,
 .contact-field textarea {
+  display: block;
+  width: 100%;
   font-family: var(--sans);
-  font-size: 16px;
+  font-size: 17px;
+  line-height: 1.5;
   color: var(--ink);
-  background: var(--paper2);
-  border: 1px solid var(--line);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rule, #ddd5c7);
   border-radius: 0;
-  padding: 0.65rem 0.8rem;
-  outline: none;
+  padding: 0 0 0.5rem;
   transition:
     border-color 0.2s ease,
-    background-color 0.2s ease;
+    color 0.2s ease;
 }
-.contact-field input::placeholder,
-.contact-field textarea::placeholder {
-  color: var(--ink-muted);
+
+.contact-field input {
+  height: 48px;
 }
+
+.contact-field textarea {
+  min-height: 140px;
+  /* Vertical only: a horizontal drag would let the field outgrow the column
+     and push the page sideways. */
+  resize: vertical;
+}
+
 .contact-field input:focus,
-.contact-field select:focus,
 .contact-field textarea:focus {
-  border-color: var(--accent);
-  background: var(--paper);
-  box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.35);
+  outline: none;
+  border-bottom-color: var(--accent-link, #795a28);
+  border-bottom-width: 2px;
+  /* The extra pixel comes out of the padding, so nothing below shifts. */
+  padding-bottom: calc(0.5rem - 1px);
 }
+
 .contact-field input:disabled,
-.contact-field select:disabled,
 .contact-field textarea:disabled {
   opacity: 0.6;
-  cursor: not-allowed;
 }
-.contact-field select {
-  appearance: none;
-  background-image:
-    linear-gradient(45deg, transparent 50%, rgba(25, 23, 19, 0.55) 50%),
-    linear-gradient(135deg, rgba(25, 23, 19, 0.55) 50%, transparent 50%);
-  background-position:
-    calc(100% - 18px) center,
-    calc(100% - 13px) center;
-  background-size:
-    5px 5px,
-    5px 5px;
-  background-repeat: no-repeat;
-}
-.contact-field textarea {
-  resize: vertical;
-  min-height: 96px;
-}
+
 .contact-form-footer {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  flex-wrap: wrap;
-  margin-top: 0.25rem;
+  margin-top: 32px;
 }
+
+/* Words and an arrow, not a block of colour. The height is the hit area: 44px
+   is the smallest comfortable target, and the button has no padding that would
+   read as a frame. */
 .contact-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: inherit;
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #14120f;
-  background: var(--accent);
-  border: none;
-  border-radius: 999px;
-  padding: 0.85rem 1.75rem;
-  cursor: pointer;
+  color: var(--accent-link, #795a28);
   transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
-.contact-submit:hover:not(:disabled) {
-  background: #d4b688;
-  transform: translateY(-1px);
+
+.contact-submit:hover:not(:disabled),
+.contact-submit:focus-visible {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.4em;
 }
+
 .contact-submit:focus-visible {
   outline: 2px solid var(--ink);
-  outline-offset: 3px;
+  outline-offset: 4px;
 }
+
 .contact-submit:disabled {
   opacity: 0.6;
   cursor: default;
 }
+
+.contact-submit-arrow {
+  transition: transform 0.2s ease;
+}
+
+.contact-submit:hover:not(:disabled) .contact-submit-arrow {
+  transform: translateX(3px);
+}
+
+/* Always in the DOM so the live region is already being watched when a message
+   arrives; it simply has nothing in it most of the time. */
 .contact-form-status {
   font-family: var(--sans);
-  font-size: 14px;
-  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 1rem 0 0;
+  min-height: 1.5em;
 }
+
 .contact-form-status--ok {
   color: #3f7d4a;
 }
+
 .contact-form-status--error {
   color: #b3483f;
 }
 
-@media (max-width: 720px) {
-  .contact-panels {
-    grid-template-columns: 1fr;
-  }
-  .contact-panel--info {
-    margin-top: 0;
-  }
-  .contact-field-row {
-    grid-template-columns: 1fr;
+/* The address itself, small, under the form — the one thing besides the form
+   left on the page. */
+.contact-direct {
+  margin-top: 3rem;
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+.contact-direct-link {
+  color: var(--ink-muted);
+  text-decoration: underline;
+  text-decoration-color: var(--rule, #ddd5c7);
+  text-underline-offset: 0.3em;
+  transition: color 0.2s ease;
+}
+
+.contact-direct-link:hover,
+.contact-direct-link:focus-visible {
+  color: var(--accent-link, #795a28);
+}
+
+#contact .footer-bar {
+  margin-top: 2.5rem;
+  color: var(--ink-muted);
+  text-shadow: none;
+}
+
+@media (max-width: 899px) {
+  .contact-title {
+    font-size: 36px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-submit,
+  .contact-submit-arrow,
+  .contact-field input,
+  .contact-field textarea {
+    transition: none;
+  }
+  .contact-submit:hover:not(:disabled) .contact-submit-arrow {
+    transform: none;
+  }
+}
+
 .footer-bar {
   display: flex;
   justify-content: space-between;

@@ -55,7 +55,39 @@ npm install
 npm run dev      # localhost:5173
 
 npm run build && npm run verify   # route and interaction checks, see scripts/verify-site.mjs
+npm run test:contact              # api/contact.js against a stubbed mail service
 ```
 
 `npm run verify` drives the Chrome already on the machine; it skips with a notice if there
 isn't one. CI runs lint, format and build only.
+
+`npm run test:contact` stubs the mail service and sends nothing, which is the only way it
+runs — the recipient is a real inbox.
+
+## The contact form
+
+`/contact` posts to `api/contact.js`, a serverless function on the host, which forwards to
+Web3Forms. The browser never sees the credential and never names the recipient: the
+function reads the key from the environment, and the mail goes to whichever mailbox that
+key belongs to. `From` is Web3Forms' own verified sender and `Reply-To` is the visitor's
+address once it has been validated server-side.
+
+One environment variable, set on the host (Vercel → Settings → Environment Variables):
+
+|                        |                                                      |
+| ---------------------- | ---------------------------------------------------- |
+| `WEB3FORMS_ACCESS_KEY` | The access key for the mailbox the form delivers to. |
+
+Without it the endpoint answers every submission with a 503 and the form says so. It never
+reports success that the mail service did not confirm, and it never falls back to a
+`mailto:` link — a form that claims to have sent something it did not is worse than one
+that is plainly unavailable.
+
+The rate limiting and duplicate suppression in that file are in-process, so they reset on a
+cold start and are per instance. They take the edge off a loop and stop a double click
+arriving twice; they are not a defence against a distributed flood. The honeypot and the
+server-side validation are what actually keep the mailbox usable. A shared store is the
+next step if that ever stops being enough.
+
+`vercel.json` rewrites everything to the SPA shell _except_ `/api/*` — without that
+exclusion the function is never reached and the form posts into the HTML page.

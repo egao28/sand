@@ -1,232 +1,207 @@
-import { useState } from 'react'
-import contactAvif from '../assets/contact.avif'
-import contactWebp from '../assets/contact.webp'
-import contactJpg from '../assets/contact.jpg'
-
-// Public client-side submit key for Web3Forms — safe to expose in source,
-// the service is designed around this (like a Formspree form ID).
-const WEB3FORMS_ACCESS_KEY = '582a6f18-f79d-4578-bf3e-a29378790498'
+import { useRef, useState } from 'react'
 
 const EMPTY_FORM = { name: '', email: '', message: '' }
 
-// What a contact row shows for a link: its href with the parts nobody wants to
-// read stripped off. Derived rather than typed a second time — the LinkedIn row
-// used to display linkedin.com/in/xinyi-evelyn-gao next to an href of
-// https://www.linkedin.com/in/xinyi-evelyn-gao/, the same destination spelled
-// two ways with nothing holding them together.
-// Only as general as its one caller needs: a query string or fragment passes
-// straight through, so `mailto:a@b.com?subject=Hi` would display the prefill.
-// Harden it before reusing this anywhere the hrefs are not hand-written here.
-function displayTarget(href) {
-  return href
-    .replace(/^mailto:/i, '')
-    .replace(/^https?:\/\//i, '')
-    .replace(/^www\./i, '')
-    .replace(/\/+$/, '')
-}
+/* The form posts to this site's own endpoint, never to a mail service
+ * directly. That is what keeps the service's credential on the server (#72):
+ * the browser used to carry a submit key in its bundle, and anything in the
+ * bundle is public. It also means the recipient is fixed on the server, where
+ * a visitor cannot reach it.
+ *
+ * The limits here are the server's, repeated so the field can say "too long"
+ * before a round trip. api/contact.js enforces them for real — these are a
+ * courtesy, not a check. */
+const LIMITS = { name: 100, email: 200, message: 4000 }
+
+/** Good enough to catch a typo before the round trip; the server does this
+ * again with the same shape. Deliberately not an RFC-complete pattern — those
+ * reject real addresses, and the real test of an address is whether mail to it
+ * arrives. */
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function ContactSection({ content }) {
-  const [form, setForm] = useState({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
+  const [form, setForm] = useState(EMPTY_FORM)
   // Honeypot. Held outside `form` so it can never be spread into the payload.
   const [botcheck, setBotcheck] = useState('')
-  const [isSending, setIsSending] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [hasError, setHasError] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
+  const [error, setError] = useState('')
+  // Guards a double submit from a double click or a fast Enter-Enter, which
+  // state alone cannot: two events in the same tick both see `status` as it
+  // was at the start of the tick.
+  const inFlight = useRef(false)
 
   function handleChange(e) {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
+    if (status === 'error') setStatus('idle')
   }
 
   async function handleSubmit(e) {
     e.preventDefault()
+    if (inFlight.current) return
 
     // Nobody who can see the form can fill this field, so anything in it came
     // from a script walking the DOM. Drop it on the floor and report success:
-    // a bot told it was caught just retries with the field left blank.
+    // a bot told it was caught just retries with the field left blank. The
+    // server applies the same rule to the same field.
     if (botcheck) {
-      // Clear it too. The field is off-screen rather than display:none, which
-      // is what makes a bot fill it — and also what can make a password
-      // manager fill it, since autocomplete="off" is only advisory. Left
-      // sticky, one stray autofill would silently swallow every message a real
-      // visitor sends for the rest of the page load while still saying "Sent".
-      // Resetting caps the worst case at a single dropped message either way.
       setBotcheck('')
-      setHasError(false)
-      setIsSubmitted(true)
-      setForm({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
+      setStatus('sent')
+      setForm(EMPTY_FORM)
       return
     }
 
-    setIsSending(true)
-    setIsSubmitted(false)
-    setHasError(false)
+    const trimmed = {
+      name: form.name.trim(),
+      email: form.email.trim(),
+      message: form.message.trim(),
+    }
+    if (!trimmed.name || !trimmed.email || !trimmed.message) {
+      setStatus('error')
+      setError('Please fill in your name, your email and a message.')
+      return
+    }
+    if (!EMAIL_SHAPE.test(trimmed.email)) {
+      setStatus('error')
+      setError('That email address does not look right — please check it.')
+      return
+    }
+
+    inFlight.current = true
+    setStatus('sending')
+    setError('')
     try {
-      const res = await fetch('https://api.web3forms.com/submit', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `Portfolio contact — ${form.topic}`,
-          ...form,
-        }),
+        body: JSON.stringify(trimmed),
       })
-      const data = await res.json()
-      if (!res.ok || !data.success) throw new Error(data.message || 'Submission failed')
-      setIsSubmitted(true)
-      setForm({ ...EMPTY_FORM, topic: content.formTopics[0] ?? '' })
+
+      // A non-JSON body means something upstream answered instead of the
+      // function — a platform error page, say. Treat it as a failure rather
+      // than letting `.json()` throw something unreadable.
+      const data = await res.json().catch(() => null)
+
+      // The success message is the server's to give. There is no path here
+      // where the form says "sent" without a 2xx and an explicit `ok`.
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error || 'Your message could not be sent.')
+      }
+
+      setStatus('sent')
+      setForm(EMPTY_FORM)
     } catch (err) {
-      console.error('Contact form submission failed:', err)
-      setHasError(true)
+      // The inputs are deliberately left as they are: a failure must not cost
+      // someone the message they just wrote.
+      setStatus('error')
+      setError(err.message || 'Your message could not be sent.')
     } finally {
-      setIsSending(false)
+      inFlight.current = false
     }
   }
 
-  return (
-    <section id="contact">
-      <picture className="contact-photo-bg">
-        <source srcSet={contactAvif} type="image/avif" />
-        <source srcSet={contactWebp} type="image/webp" />
-        <img src={contactJpg} alt="" className="contact-photo-bg-img" decoding="async" />
-      </picture>
+  const sending = status === 'sending'
 
-      <div className="sec-inner">
-        <div className="contact-panels">
-          <div className="contact-panel contact-panel--info reveal">
-            <h2 className="contact-panel-headline">{content.panelHeadline}</h2>
-            <ul className="contact-info-list">
-              {content.items
-                // A row needs something to show: its own text, or an href to
-                // derive it from.
-                .filter((it) => it.value || it.href)
-                .map((item) => {
-                  const text = item.value || displayTarget(item.href)
-                  const isExternal = item.href?.startsWith('http')
-                  const inner = (
-                    <>
-                      <span className="contact-info-label">{item.label}</span>
-                      <span className="contact-info-value">{text}</span>
-                      {item.href && (
-                        <span className="contact-info-arrow" aria-hidden="true">
-                          ↗
-                        </span>
-                      )}
-                    </>
-                  )
-                  return (
-                    <li key={item.key}>
-                      {item.href ? (
-                        <a
-                          className="contact-info-link"
-                          href={item.href}
-                          {...(isExternal
-                            ? {
-                                target: '_blank',
-                                rel: 'noopener noreferrer',
-                                // The only visual cue is the ↗, and that is
-                                // aria-hidden. Same wording the project pages
-                                // use on their external demo links.
-                                'aria-label': `${item.label}: ${text} (opens in a new tab)`,
-                              }
-                            : {})}
-                        >
-                          {inner}
-                        </a>
-                      ) : (
-                        <div className="contact-info-link contact-info-link--static">{inner}</div>
-                      )}
-                    </li>
-                  )
-                })}
-            </ul>
+  return (
+    <section id="contact" aria-labelledby="contact-title">
+      <div className="sec-inner contact-inner">
+        <h1 id="contact-title" className="contact-title">
+          {content.title}
+        </h1>
+
+        <form className="contact-form" onSubmit={handleSubmit} noValidate>
+          {/* Off-screen rather than display:none, which is what makes a bot
+              fill it. aria-hidden and tabIndex -1 keep it away from anyone
+              reading the page with assistive technology or a keyboard. */}
+          <div className="contact-botcheck" aria-hidden="true">
+            <label htmlFor="contact-botcheck">Leave this field empty</label>
+            <input
+              id="contact-botcheck"
+              type="text"
+              name="botcheck"
+              tabIndex={-1}
+              autoComplete="off"
+              value={botcheck}
+              onChange={(e) => setBotcheck(e.target.value)}
+            />
           </div>
 
-          <form className="contact-panel contact-panel--form reveal" onSubmit={handleSubmit}>
-            <h3 className="contact-panel-headline">{content.formHeadline}</h3>
+          {/* Real <label>s, every one tied to its field. A placeholder is not a
+              label: it is gone the moment someone starts typing. */}
+          <div className="contact-field">
+            <label htmlFor="contact-name">Name</label>
+            <input
+              id="contact-name"
+              type="text"
+              name="name"
+              required
+              maxLength={LIMITS.name}
+              autoComplete="name"
+              value={form.name}
+              onChange={handleChange}
+              disabled={sending}
+            />
+          </div>
 
-            <div className="contact-botcheck" aria-hidden="true">
-              <label htmlFor="contact-botcheck">Leave this field empty</label>
-              <input
-                id="contact-botcheck"
-                type="text"
-                name="botcheck"
-                tabIndex={-1}
-                autoComplete="off"
-                value={botcheck}
-                onChange={(e) => setBotcheck(e.target.value)}
-              />
-            </div>
+          <div className="contact-field">
+            <label htmlFor="contact-email">Email</label>
+            <input
+              id="contact-email"
+              type="email"
+              name="email"
+              required
+              maxLength={LIMITS.email}
+              autoComplete="email"
+              value={form.email}
+              onChange={handleChange}
+              disabled={sending}
+            />
+          </div>
 
-            <label className="contact-field">
-              <span>Topic</span>
-              <select name="topic" value={form.topic} onChange={handleChange} disabled={isSending}>
-                {content.formTopics.map((topic) => (
-                  <option key={topic} value={topic}>
-                    {topic}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <div className="contact-field">
+            <label htmlFor="contact-message">Message</label>
+            <textarea
+              id="contact-message"
+              name="message"
+              required
+              maxLength={LIMITS.message}
+              rows={5}
+              value={form.message}
+              onChange={handleChange}
+              disabled={sending}
+            />
+          </div>
 
-            <div className="contact-field-row">
-              <label className="contact-field">
-                <span>Name</span>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={form.name}
-                  onChange={handleChange}
-                  disabled={isSending}
-                />
-              </label>
-              <label className="contact-field">
-                <span>Email</span>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={form.email}
-                  onChange={handleChange}
-                  disabled={isSending}
-                />
-              </label>
-            </div>
+          <div className="contact-form-footer">
+            <button type="submit" className="contact-submit" disabled={sending}>
+              {sending ? 'Sending…' : 'Send message'}
+              <span className="contact-submit-arrow" aria-hidden="true">
+                →
+              </span>
+            </button>
+          </div>
 
-            <label className="contact-field">
-              <span>Message</span>
-              <textarea
-                name="message"
-                rows={4}
-                required
-                value={form.message}
-                onChange={handleChange}
-                disabled={isSending}
-              />
-            </label>
+          {/* One live region, present from the first render rather than mounted
+              with the message, so a screen reader is already watching it when
+              the text arrives. */}
+          <p className="contact-form-status" role="status" aria-live="polite">
+            {status === 'sent' && (
+              <span className="contact-form-status--ok">
+                Thank you — your message has been sent.
+              </span>
+            )}
+            {status === 'error' && <span className="contact-form-status--error">{error}</span>}
+          </p>
+        </form>
 
-            <div className="contact-form-footer">
-              <button type="submit" className="contact-submit" disabled={isSending}>
-                {isSending ? 'Sending…' : 'Send message'}
-              </button>
-              {isSubmitted && (
-                <p className="contact-form-status contact-form-status--ok">
-                  Sent — thank you, I&apos;ll get back to you soon.
-                </p>
-              )}
-              {hasError && (
-                <p className="contact-form-status contact-form-status--error">
-                  Something went wrong — try emailing directly instead.
-                </p>
-              )}
-            </div>
-          </form>
-        </div>
+        <p className="contact-direct">
+          <a className="contact-direct-link" href={`mailto:${content.email}`}>
+            {content.email}
+          </a>
+        </p>
 
-        <div className={`footer-bar${content.footerRight ? '' : ' footer-bar--single'}`}>
+        <div className="footer-bar footer-bar--single">
           <span>{content.footerLeft}</span>
-          {content.footerRight ? <span>{content.footerRight}</span> : null}
         </div>
       </div>
     </section>
