@@ -14,7 +14,7 @@ export default function BloomMcpDetailPage() {
 
   return (
     <main
-      className="page page--secondary project-detail-page project-detail-page--tone-a"
+      className="page page--secondary project-detail-page tech-note-page"
       aria-label="bloom-mcp"
     >
       <div className="project-detail-back-wrap sec-inner">
