@@ -38,6 +38,11 @@
   --ok: #3f7d4a;
   --bad: #b3483f;
 
+  /* The logo's ink. Pure black in light, which is the colour the artwork is
+     already drawn in, so the light rendering is unchanged down to the
+     antialiasing; see the mask in site-nav.css. */
+  --logo-ink: #000000;
+
   /* The content font: every editorial heading on the site. Swapped from
      Cormorant Garamond to Alegreya in #68. */
   --serif: 'Alegreya', Georgia, serif;
@@ -50,23 +55,46 @@
     monospace;
 }
 
-/* The warm smoke-brown dark theme. Only colour changes here — not one rule
-   below alters a size, a position or a structure. */
+/* Theme A: the smoke-grey-brown dark scheme. Six values are given and every
+   token below is one of them or derived from one:
+
+     background                       #4B4542   --paper
+     body text, plain icons, logo     #F2EEE9   --ink, --logo-ink
+     secondary text                   #D2CAC4   --ink-soft, --ink-muted
+     low-saturation accent link       #D7C7AC   --accent, --accent-link
+     selected background              #625950   --rail-current-bg (site-nav.css)
+     dividers and input underlines    #82766C   --rule, --line
+
+   `--ink-soft` and `--ink-muted` are two names for one role here — the light
+   theme separates them, the brief gives dark one value, so both take it.
+   `--line` and `--rule` likewise: the light theme draws its hairlines in
+   translucent ink and its dividers in a solid tone, and in dark both are the
+   one divider colour, so the rules under the experience list and the
+   underlines in the contact form match.
+
+   Flat colour throughout. No gradient, no texture, no warm gold wash over the
+   page, and no filter on any image: a photograph with its colours inverted is
+   not a dark theme.
+
+   Only colour changes here — not one rule below alters a size, a position or a
+   structure, and the light theme above is untouched. */
 html[data-theme='dark'] {
-  --paper: #514638;
-  --paper2: #5b4f40;
-  --ink: #f5efe4;
-  --ink-rgb: 245, 239, 228;
-  --ink-soft: #e8dfd0;
-  --ink-muted: #d8ccba;
-  --accent: #d5b77d;
-  --accent-rgb: 213, 183, 125;
-  --accent-soft: rgba(213, 183, 125, 0.18);
-  --accent-link: #d5b77d;
-  --line: rgba(245, 239, 228, 0.16);
-  --rule: #7a6b57;
-  --paper-rgb: 81, 70, 56;
-  /* Lifted off the defaults, which are too dark to read on smoke brown. */
+  --paper: #4b4542;
+  --paper-rgb: 75, 69, 66;
+  /* Not the page background: `--paper2` backs the two placeholder images, and
+     is one step off --paper so they remain visible against it. */
+  --paper2: #554e4a;
+  --ink: #f2eee9;
+  --ink-rgb: 242, 238, 233;
+  --ink-soft: #d2cac4;
+  --ink-muted: #d2cac4;
+  --accent: #d7c7ac;
+  --accent-rgb: 215, 199, 172;
+  --accent-soft: rgba(215, 199, 172, 0.18);
+  --accent-link: #d7c7ac;
+  --line: #82766c;
+  --rule: #82766c;
+  /* Lifted off the defaults, which are too dark to read on the dark page. */
   --ok: #8fcf9b;
   --bad: #f0a099;
 }
