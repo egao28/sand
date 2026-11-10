@@ -55,12 +55,15 @@
   --rail-ink-current: #5b4327;
 }
 
-/* Dark: the cream ink from the pack's dark set, on the warm selected tint. The
-   icons paint with `currentColor`, so this one value carries each drawing. */
+/* Dark: the cream ink from the pack's dark set, on the selected tint. The icons
+   paint with `currentColor`, so this one value carries each drawing — which is
+   why the dark SVGs in the handoff are not shipped separately. They are the
+   same geometry as the light ones and differ only in this colour. */
 html[data-theme='dark'] {
-  --rail-current-bg: #6b5a43;
-  --rail-ink: #f5efe4;
-  --rail-ink-current: #f5efe4;
+  --rail-current-bg: #625950;
+  --rail-ink: #f2eee9;
+  --rail-ink-current: #f2eee9;
+  --logo-ink: #f2eee9;
 }
 
 /* How far down an anchor target sits from the top of the viewport, so a link
@@ -100,10 +103,39 @@ html[data-theme='dark'] {
   text-decoration: none;
 }
 
+/* The logo, painted rather than drawn.
+ *
+ * logo.png is a transparent bitmap whose ink is pure greyscale — 94% of it is
+ * fully transparent and every opaque pixel has zero chroma — so its alpha
+ * channel *is* the artwork. Used as a mask it can take any colour without the
+ * outline changing: the shape, the soft antialiased edges and the proportions
+ * are the file's own.
+ *
+ * That is what makes a cream logo possible in dark without inverting an image.
+ * Nothing here is a filter on a picture with a background in it, the outline is
+ * not redrawn, and this is still the original asset — only its colour comes
+ * from the theme.
+ *
+ * The light rendering is unchanged: `--logo-ink` is pure black there, which is
+ * the colour the ink is already drawn in, so compositing black through the
+ * file's own alpha gives back the same pixels the <img> did.
+ *
+ * It is a <span>, not an <img>, because an image cannot be recoloured this
+ * way. Nothing is lost by that — the logo is decorative here and always was
+ * (`alt=""`); the link around it carries the accessible name. */
 .site-logo-img {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  background-color: var(--logo-ink);
+  -webkit-mask-image: url('/logo.png');
+  mask-image: url('/logo.png');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
   /* Trims the whitespace frame baked into logo.png — carried over from the
      header this replaced. */
   clip-path: inset(5.5%);

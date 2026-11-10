@@ -19,6 +19,7 @@
  */
 import { existsSync } from 'node:fs'
 import { spawn } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import puppeteer from 'puppeteer-core'
 
 const PORT = Number(process.env.VERIFY_PORT ?? 4178)
@@ -413,6 +414,170 @@ await page.evaluate(() => {
   localStorage.removeItem('evelyn-site-theme')
 })
 
+console.log('\n# theme A is the stated six values, and only colour changes')
+const EXPECTED_DARK = {
+  background: 'rgb(75, 69, 66)', // #4B4542
+  ink: 'rgb(242, 238, 233)', // #F2EEE9
+  secondary: 'rgb(210, 202, 196)', // #D2CAC4
+  link: 'rgb(215, 199, 172)', // #D7C7AC
+  selected: 'rgb(98, 89, 80)', // #625950
+  divider: 'rgb(130, 118, 108)', // #82766C
+}
+
+await visit('/about')
+const themed2 = await page.evaluate(async (expected) => {
+  const read = () => {
+    const cs = getComputedStyle(document.documentElement)
+    const v = (n) => cs.getPropertyValue(n).trim()
+    const toRgb = (hex) => {
+      const d = document.createElement('div')
+      d.style.color = hex
+      document.body.appendChild(d)
+      const out = getComputedStyle(d).color
+      d.remove()
+      return out
+    }
+    return {
+      background: toRgb(v('--paper')),
+      ink: toRgb(v('--ink')),
+      soft: toRgb(v('--ink-soft')),
+      muted: toRgb(v('--ink-muted')),
+      link: toRgb(v('--accent-link')),
+      selected: toRgb(v('--rail-current-bg')),
+      rule: toRgb(v('--rule')),
+      line: toRgb(v('--line')),
+      logo: toRgb(v('--logo-ink')),
+      bodyBg: getComputedStyle(document.body).backgroundColor,
+      bodyBgImage: getComputedStyle(document.body).backgroundImage,
+    }
+  }
+  const light = read()
+  document.querySelector('.site-rail-theme').click()
+  await new Promise((r) => setTimeout(r, 400))
+  const dark = read()
+  // Anything with a filter on it would be an inverted image.
+  const filtered = [...document.querySelectorAll('img, picture, video, .site-logo-img')].filter(
+    (el) => {
+      const f = getComputedStyle(el).filter
+      return f && f !== 'none'
+    }
+  ).length
+  const sun = !!document.querySelector('.site-rail-theme .nav-icon--theme circle')
+  document.querySelector('.site-rail-theme').click()
+  await new Promise((r) => setTimeout(r, 400))
+  const moonBack = !document.querySelector('.site-rail-theme .nav-icon--theme circle')
+  localStorage.removeItem('evelyn-site-theme')
+  return { light, dark, filtered, sun, moonBack, expected }
+})
+
+check(
+  themed2.dark.background === EXPECTED_DARK.background,
+  `background is #4B4542 (${themed2.dark.background})`
+)
+check(themed2.dark.ink === EXPECTED_DARK.ink, `body text is #F2EEE9 (${themed2.dark.ink})`)
+check(
+  themed2.dark.soft === EXPECTED_DARK.secondary && themed2.dark.muted === EXPECTED_DARK.secondary,
+  `secondary text is #D2CAC4 (${themed2.dark.soft} / ${themed2.dark.muted})`
+)
+check(themed2.dark.link === EXPECTED_DARK.link, `accent links are #D7C7AC (${themed2.dark.link})`)
+check(
+  themed2.dark.selected === EXPECTED_DARK.selected,
+  `the selected background is #625950 (${themed2.dark.selected})`
+)
+check(
+  themed2.dark.rule === EXPECTED_DARK.divider && themed2.dark.line === EXPECTED_DARK.divider,
+  `dividers and input underlines are #82766C (${themed2.dark.rule} / ${themed2.dark.line})`
+)
+check(
+  themed2.dark.bodyBg === EXPECTED_DARK.background && themed2.dark.bodyBgImage === 'none',
+  `the page is that flat colour, with no gradient or texture over it (${themed2.dark.bodyBgImage})`
+)
+check(themed2.filtered === 0, `no image carries a filter (${themed2.filtered})`)
+check(themed2.sun, 'dark shows the sun')
+check(themed2.moonBack, 'and light shows the moon again')
+
+/* The light theme is not part of this change and must come back untouched. */
+check(
+  themed2.light.background === 'rgb(255, 253, 248)' && themed2.light.ink === 'rgb(48, 45, 41)',
+  `light is still cream and dark brown (${themed2.light.background}, ${themed2.light.ink})`
+)
+check(
+  themed2.light.logo === 'rgb(0, 0, 0)' && themed2.dark.logo === EXPECTED_DARK.ink,
+  `the logo is black in light and #F2EEE9 in dark (${themed2.light.logo} -> ${themed2.dark.logo})`
+)
+
+/* Every instance of the logo, on every surface that carries one. */
+for (const [path, w, h] of [
+  ['/', 1440, 900],
+  ['/', 390, 844],
+  ['/about', 1440, 900],
+  ['/about', 390, 844],
+  ['/projects', 390, 844],
+]) {
+  await visit(path, w, h)
+  const logos = await page.evaluate(() => {
+    document.documentElement.dataset.theme = 'dark'
+    const shown = [...document.querySelectorAll('.site-logo-img')].filter(
+      (el) => el.getBoundingClientRect().width > 0
+    )
+    return shown.map((el) => {
+      const cs = getComputedStyle(el)
+      return {
+        colour: cs.backgroundColor,
+        masked: cs.maskImage !== 'none' || cs.webkitMaskImage !== 'none',
+      }
+    })
+  })
+  check(
+    logos.length > 0 && logos.every((l) => l.colour === EXPECTED_DARK.ink && l.masked),
+    `${path} @${w}: ${logos.length} logo(s), cream and masked (${JSON.stringify(logos)})`
+  )
+}
+
+console.log('\n# the resume download is the new file, everywhere it is offered')
+await visit('/about', 1440, 900)
+const resumeHrefs = await page.evaluate(() => {
+  const all = [...document.querySelectorAll('a[download]')]
+  return {
+    count: all.length,
+    hrefs: [...new Set(all.map((a) => a.getAttribute('href')))],
+    names: [...new Set(all.map((a) => a.getAttribute('download')))],
+  }
+})
+check(
+  resumeHrefs.hrefs.length === 1,
+  `every download entry points at one file (${resumeHrefs.count} links, ${resumeHrefs.hrefs.join(', ')})`
+)
+check(
+  resumeHrefs.names.length === 1 && resumeHrefs.names[0] === 'Evelyn_Gao_Resume.pdf',
+  `and all save as Evelyn_Gao_Resume.pdf (${resumeHrefs.names.join(', ')})`
+)
+check(
+  /-[A-Za-z0-9_-]{8,}\.pdf$/.test(resumeHrefs.hrefs[0]),
+  `the published name carries a content hash, so no cache can serve the old one (${resumeHrefs.hrefs[0]})`
+)
+
+const EXPECTED_PDF_SHA = '2f5bf9768255ce997f7e13465c6561c95aa04a0b2d74482805a8dd7570f22b7b'
+/* The nav's own href, and the file `/resume` ends up on. The second one has to
+ * be read by driving the browser: `/resume` is a client-side route that hands
+ * over to the PDF from JavaScript, so fetching it directly returns the app
+ * shell rather than following anything. */
+await page.goto(BASE + RESUME_PATH, { waitUntil: 'networkidle0' })
+const legacyLanded = page.url().replace(BASE, '')
+
+for (const [label, from] of [
+  ['the nav download', resumeHrefs.hrefs[0]],
+  [`${RESUME_PATH} (via ${legacyLanded})`, legacyLanded],
+]) {
+  const res = await fetch(BASE + from)
+  const bytes = Buffer.from(await res.arrayBuffer())
+  const sha = createHash('sha256').update(bytes).digest('hex')
+  check(
+    sha === EXPECTED_PDF_SHA,
+    `${label} delivers the handoff PDF (${bytes.length} bytes, sha256 ${sha.slice(0, 16)}…)`
+  )
+}
+
 console.log('\n# the contact form, against a stubbed endpoint')
 /* The endpoint is intercepted here, so running this sends no mail to anyone.
  * What is being checked is the form's behaviour, which the API tests cannot
@@ -567,13 +732,17 @@ console.log('\n# the dark theme is the specified palette, and is flat')
   await dark.goto(BASE + '/about', { waitUntil: 'networkidle0' })
   await dark.evaluate(() => localStorage.setItem('evelyn-site-theme', 'dark'))
 
+  /* Theme A's six values, carried on every route. */
   const TOKENS = [
-    ['--paper', 'rgb(81, 70, 56)'],
-    ['--ink', 'rgb(245, 239, 228)'],
-    ['--ink-muted', 'rgb(216, 204, 186)'],
-    ['--accent-link', 'rgb(213, 183, 125)'],
-    ['--rule', 'rgb(122, 107, 87)'],
-    ['--rail-current-bg', 'rgb(107, 90, 67)'],
+    ['--paper', 'rgb(75, 69, 66)'], // #4B4542
+    ['--ink', 'rgb(242, 238, 233)'], // #F2EEE9
+    ['--ink-soft', 'rgb(210, 202, 196)'], // #D2CAC4
+    ['--ink-muted', 'rgb(210, 202, 196)'], // #D2CAC4
+    ['--accent-link', 'rgb(215, 199, 172)'], // #D7C7AC
+    ['--rail-current-bg', 'rgb(98, 89, 80)'], // #625950
+    ['--rule', 'rgb(130, 118, 108)'], // #82766C
+    ['--line', 'rgb(130, 118, 108)'], // #82766C
+    ['--logo-ink', 'rgb(242, 238, 233)'], // #F2EEE9
   ]
 
   for (const [path] of [
@@ -582,6 +751,12 @@ console.log('\n# the dark theme is the specified palette, and is flat')
     ['/projects'],
     ['/contact'],
     ['/experience/bloom-mcp'],
+    ['/experience/sony'],
+    ['/experience/tsinghua'],
+    ['/projects/proxima'],
+    ['/projects/almabot'],
+    ['/projects/carelink'],
+    ['/projects/campus-vegetation'],
   ]) {
     await dark.goto(BASE + path, { waitUntil: 'networkidle0' })
     await dark.evaluate(() => document.fonts.ready)
@@ -615,7 +790,7 @@ console.log('\n# the dark theme is the specified palette, and is flat')
       return { bg: getComputedStyle(document.body).backgroundColor, values, gradients, filtered }
     }, TOKENS)
 
-    check(r.bg === 'rgb(81, 70, 56)', `${path} paints the dark page background (${r.bg})`)
+    check(r.bg === 'rgb(75, 69, 66)', `${path} paints the dark page background (${r.bg})`)
     check(r.filtered === 0, `${path} leaves images un-filtered (${r.filtered} filtered)`)
     // The homepage's hanging line is a fading 1px rule, not a background — it
     // is part of the opening the brief keeps, so it is the one allowance.

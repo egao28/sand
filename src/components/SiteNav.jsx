@@ -34,14 +34,10 @@ export function SiteLogo({ className = '', size = 48 }) {
       aria-label="Evelyn Gao — back to the opening"
       onClick={handleClick}
     >
-      <img
-        className="site-logo-img"
-        src="/logo.png"
-        alt=""
-        width={size}
-        height={size}
-        decoding="async"
-      />
+      {/* The artwork is painted through a mask so the theme can colour it; see
+          `.site-logo-img` in site-nav.css. Decorative either way — the link
+          above carries the name. */}
+      <span className="site-logo-img" style={{ width: size, height: size }} aria-hidden="true" />
     </Link>
   )
 }
