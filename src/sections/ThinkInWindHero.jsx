@@ -1,5 +1,24 @@
 import { useEffect, useMemo, useState } from 'react'
 
+/*
+ * Per-letter variation for the gust that carries the letters off in #66.
+ * A fixed table rather than Math.random: the opening has to look the same on
+ * every visit, and a letter that starts in a different place each reload reads
+ * as a glitch rather than as wind. One value per letter, in the same order as
+ * `letters` below.
+ */
+const GUST_JITTER = [
+  0.31, 0.78, 0.12, 0.64, 0.95, 0.4, 0.07, 0.86, 0.53, 0.21, 0.69, 0.38, 0.92, 0.15,
+]
+
+// All fourteen are clear of the viewport by 65% of the transition, which is
+// where #66 puts the end of the letters' part of it. Each letter starts a
+// little later than the one to its left, so the gust reads as one front moving
+// across the phrase instead of fourteen letters leaving at once.
+const GUST_START_STEP = 0.013
+const GUST_FIRST_START = 0.02
+const GUST_ALL_GONE = 0.65
+
 export default function ThinkInWindHero() {
   const [windBoost, setWindBoost] = useState(0)
 
@@ -178,31 +197,45 @@ export default function ThinkInWindHero() {
   )
 
   return (
-    <section className="home-hero" role="img" aria-label="think in the wind">
+    <div className="home-hero" role="img" aria-label="think in the wind">
       <div className="home-hanging" aria-hidden="true" style={{ '--wind-boost': windBoost }}>
-        {letters.map((letter, idx) => (
-          <div
-            className="hang-letter"
-            key={`${letter.ch}-${idx}`}
-            style={{
-              left: `${letter.leftPct}%`,
-              top: letter.top,
-              '--hangH': letter.h,
-              '--letter-size': letter.size,
-              '--delay': letter.d,
-            }}
-          >
-            <div className="hang-letter__swing">
-              <div className="hang-line" aria-hidden="true" />
-              <div
-                className={`hang-text ${letter.cls === 'mono' ? 'hang-text--mono' : 'hang-text--serif'}`}
-              >
-                {letter.ch}
+        {letters.map((letter, idx) => {
+          const jitter = GUST_JITTER[idx] ?? 0.5
+          const start = GUST_FIRST_START + idx * GUST_START_STEP
+
+          return (
+            <div
+              className="hang-letter"
+              key={`${letter.ch}-${idx}`}
+              style={{
+                left: `${letter.leftPct}%`,
+                top: letter.top,
+                '--hangH': letter.h,
+                '--letter-size': letter.size,
+                '--delay': letter.d,
+                // Gust geometry, read by the transform in global.css. `--gust-x`
+                // clears the right edge from wherever the letter hangs, so a
+                // letter on the left travels further than one already near the
+                // edge and they leave on the same wind rather than fanning out.
+                '--gust-x': (104 - letter.leftPct + jitter * 12).toFixed(2),
+                '--gust-y': (-(26 + jitter * 18)).toFixed(2),
+                '--gust-rotate': (16 + jitter * 26).toFixed(2),
+                '--gust-start': start.toFixed(4),
+                '--gust-span': (GUST_ALL_GONE - start).toFixed(4),
+              }}
+            >
+              <div className="hang-letter__swing">
+                <div className="hang-line" aria-hidden="true" />
+                <div
+                  className={`hang-text ${letter.cls === 'mono' ? 'hang-text--mono' : 'hang-text--serif'}`}
+                >
+                  {letter.ch}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
-    </section>
+    </div>
   )
 }

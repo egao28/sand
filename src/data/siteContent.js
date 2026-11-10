@@ -26,12 +26,25 @@ const CARELINK_DEMO = {
 }
 
 export const siteContent = {
+  // The five entries in the nav, in order. The logo is not one of them: it is
+  // what returns to the opening, so there is no Home entry (#67).
+  //
+  // `match` is the set of path prefixes that light an entry up. About owns the
+  // experience write-ups and Projects owns the project write-ups, so a detail
+  // page keeps its section lit. GitHub leaves the site, so it carries `href`
+  // and no `match` and is never current.
+  //
+  // Every target already exists in this repo: /resume is the existing page,
+  // /contact is the existing route (a redirect to the homepage anchor before
+  // #66, the contact section's own page after it), and the GitHub URL is the
+  // one in `contact.items` and `about.links`.
   nav: {
     items: [
-      { label: 'about', to: '/about' },
-      { label: 'projects', to: '/projects' },
-      { label: 'resume', to: '/resume' },
-      { label: 'contact', to: '/#contact', isHomeAnchor: true, anchorId: 'home-contact' },
+      { id: 'about', label: 'About', to: '/about', match: ['/about', '/experience'] },
+      { id: 'projects', label: 'Projects', to: '/projects', match: ['/projects'] },
+      { id: 'resume', label: 'Resume', to: '/resume', match: ['/resume'] },
+      { id: 'contact', label: 'Contact', to: '/contact', match: ['/contact'] },
+      { id: 'github', label: 'GitHub', href: 'https://github.com/egao28', external: true },
     ],
   },
   hero: {

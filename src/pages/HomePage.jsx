@@ -1,45 +1,41 @@
-import { useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import ThinkInWindHero from '../sections/ThinkInWindHero.jsx'
-import ContactSection from '../sections/ContactSection.jsx'
+import HomeOpening from '../sections/HomeOpening.jsx'
+import AboutSection from '../sections/AboutSection.jsx'
+import { SiteTopBar } from '../components/SiteNav.jsx'
 import { siteContent } from '../data/siteContent.js'
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll.js'
 
-export default function HomePage() {
-  const location = useLocation()
+/**
+ * `/` — the opening, then the real About.
+ *
+ * The About here is the same `AboutSection` that `/about` renders, with the
+ * same data: there is no second copy of either. The difference between the two
+ * routes is only whether the opening is played, which is why scrolling into
+ * About on this page does not rewrite the URL — that would make the browser's
+ * back button undo a scroll.
+ */
+export default function HomePage({ handedOver }) {
+  // AboutSection's blocks carry `.reveal`, which starts at opacity 0 until this
+  // hook sees them. The opening's own fade is on `.home-about` above them, so
+  // the two do not fight: by the time the content is worth looking at both have
+  // resolved.
   useRevealOnScroll()
 
-  useEffect(() => {
-    if (location.hash === '#contact') {
-      const target = document.getElementById('home-contact')
-      if (target) {
-        window.setTimeout(() => {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }, 40)
-      }
-    }
-  }, [location.hash])
-
   return (
-    <main className="home-page" aria-label="Home">
-      <ThinkInWindHero />
+    <main className="home-page">
+      <HomeOpening dormant={handedOver} />
 
-      <section className="home-entry reveal" aria-label="Explore pages">
-        <div className="home-entry-list">
-          <Link className="home-entry-item" to="/about">
-            <span className="home-entry-label">About</span>
-          </Link>
-          <Link className="home-entry-item" to="/projects">
-            <span className="home-entry-label">Projects</span>
-          </Link>
-          <Link className="home-entry-item" to="/resume">
-            <span className="home-entry-label">Resume</span>
-          </Link>
-        </div>
-      </section>
-
-      <div id="home-contact">
-        <ContactSection content={siteContent.contact} />
+      {/* The About block is pulled up over the opening and starts at opacity 0,
+          so for the first part of the transition it is a full-viewport
+          invisible sheet sitting on top of the letters. `inert` until the
+          handover keeps it from swallowing a click on the scroll hint or a
+          hover on a letter, and keeps its links out of the tab order while
+          they cannot be seen. */}
+      <div
+        className={`home-about${handedOver ? ' home-about--live' : ''}`}
+        inert={!handedOver || undefined}
+      >
+        <SiteTopBar items={siteContent.nav.items} />
+        <AboutSection content={siteContent.about} resume={siteContent.resume} />
       </div>
     </main>
   )

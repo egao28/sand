@@ -14,10 +14,6 @@
   --mono:
     'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     monospace;
-
-  /* Nav + UI text scale (keep in sync with .nav-link-btn in global.css) */
-  --text-nav-link: 18px;
-  --text-nav-brand: 17px;
 }
 
 *,
@@ -125,71 +121,11 @@ body.cursor-dark-surface.cursor-link #cursor-dot {
   }
 }
 
-/* Nav */
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 200;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.6rem 3.5rem;
-  background: rgba(255, 253, 248, 0);
-  transition:
-    background 0.4s,
-    backdrop-filter 0.4s;
-}
-nav.scrolled {
-  background: rgba(255, 253, 248, 0.86);
-  backdrop-filter: blur(12px);
-}
-.nav-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-}
-.nav-logo-img {
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  object-fit: contain;
-  object-position: center;
-  flex-shrink: 0;
-  display: block;
-  /* 裁掉 PNG 里常见的边缘留白/灰框；仍明显时请换无框导出的 logo.png */
-  clip-path: inset(5.5%);
-}
-.nav-logo-text {
-  font-family: var(--mono);
-  font-size: var(--text-nav-brand);
-  letter-spacing: 0.09em;
-  color: var(--ink);
-  text-transform: lowercase;
-}
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 2.5rem;
-}
-nav ul li a {
-  font-family: var(--sans);
-  font-size: var(--text-nav-link);
-  letter-spacing: 0.06em;
-  color: var(--ink-soft);
-  text-decoration: none;
-  text-transform: lowercase;
-  position: relative;
-  transition: color 0.2s;
-}
-nav ul li a:hover {
-  color: var(--ink);
-}
+/* The old fixed header — the `evelyn gao` wordmark on the left and the
+   horizontal link list on the right — is gone with #66. It is not restyled or
+   collapsed: it is deleted, along with the band of page background it used to
+   paint and the 96px of reserve every route kept clear beneath it. The open
+   icon rail that replaces it lives in global.css under `.site-rail`. */
 
 /* Hero */
 #hero-section {
@@ -1740,12 +1676,6 @@ a.contact-info-link:focus-visible .contact-info-value {
 
 /* Responsive */
 @media (max-width: 900px) {
-  nav {
-    padding: 1.2rem 1.5rem;
-  }
-  nav ul {
-    gap: 1.25rem;
-  }
   #hero-section {
     grid-template-columns: 1fr;
   }
