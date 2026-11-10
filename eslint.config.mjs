@@ -39,5 +39,23 @@ export default [
       globals: globals.node,
     },
   },
+  {
+    // Serverless functions (#72). They run on the host's Node runtime, not in
+    // the browser, so they get Node's globals and the project's CommonJS
+    // module system rather than the browser defaults above.
+    files: ['api/**/*.js'],
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: globals.node,
+    },
+  },
+  {
+    // Node scripts that are run by hand or by npm, not bundled.
+    files: ['scripts/**/*.mjs'],
+    languageOptions: {
+      sourceType: 'module',
+      globals: globals.node,
+    },
+  },
   prettierConfig,
 ]

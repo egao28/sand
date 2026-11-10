@@ -50,7 +50,7 @@ const ROUTES = [
   ['/experience/bloom-mcp', '.project-detail-title'],
   ['/experience/sony', '.project-detail-title'],
   ['/experience/tsinghua', '.project-detail-title'],
-  ['/contact', '#contact'],
+  ['/contact', '.contact-form'],
 ]
 
 /* `/resume` is deliberately not in ROUTES: since #70 it is a redirect to the
@@ -298,6 +298,153 @@ await page.evaluate(() => {
   document.querySelector('.site-rail-theme').click()
   localStorage.removeItem('evelyn-site-theme')
 })
+
+console.log('\n# the contact form, against a stubbed endpoint')
+/* The endpoint is intercepted here, so running this sends no mail to anyone.
+ * What is being checked is the form's behaviour, which the API tests cannot
+ * see: that it refuses to submit what is incomplete, that it shows a sending
+ * state, that a failure keeps what was typed, and — the one that matters —
+ * that it never says "sent" unless the server said so. */
+{
+  const form = await browser.newPage()
+  await form.setViewport({ width: 1440, height: 900 })
+  await form.setRequestInterception(true)
+
+  let reply = { status: 200, body: { ok: true } }
+  let posted = null
+  form.on('request', (req) => {
+    if (req.url().endsWith('/api/contact')) {
+      posted = JSON.parse(req.postData() || '{}')
+      if (reply.abort) return req.abort('failed')
+      return req.respond({
+        status: reply.status,
+        contentType: 'application/json',
+        body: JSON.stringify(reply.body),
+      })
+    }
+    req.continue()
+  })
+
+  const open = async () => {
+    await form.goto(BASE + '/contact', { waitUntil: 'networkidle0' })
+    await form.evaluate(() => document.fonts.ready)
+  }
+  const fill = async (fields) => {
+    for (const [id, value] of Object.entries(fields)) {
+      await form.$eval(`#contact-${id}`, (el) => {
+        el.value = ''
+      })
+      if (value) await form.type(`#contact-${id}`, value)
+    }
+  }
+  const submit = async () => {
+    await form.click('.contact-submit')
+    await new Promise((r) => setTimeout(r, 400))
+  }
+  const state = () =>
+    form.evaluate(() => ({
+      ok: document.querySelector('.contact-form-status--ok')?.textContent ?? null,
+      error: document.querySelector('.contact-form-status--error')?.textContent ?? null,
+      name: document.querySelector('#contact-name').value,
+      message: document.querySelector('#contact-message').value,
+      button: document.querySelector('.contact-submit').textContent.trim(),
+    }))
+
+  await open()
+  const shape = await form.evaluate(() => {
+    const labelFor = (id) => document.querySelector(`label[for="contact-${id}"]`)?.textContent
+    const hidden = document.querySelector('.contact-botcheck')
+    const box = hidden.getBoundingClientRect()
+    return {
+      fields: ['name', 'email', 'message'].map(labelFor),
+      removed: {
+        topic: !!document.querySelector('select'),
+        photo: !!document.querySelector('.contact-photo-bg'),
+        socialList: !!document.querySelector('.contact-info-list'),
+      },
+      honeypotOnScreen: box.right > 0 && box.left < window.innerWidth,
+      honeypotName: hidden.querySelector('input')?.getAttribute('name'),
+      submitIsButton: document.querySelector('.contact-submit').tagName,
+      submitHeight: Math.round(
+        document.querySelector('.contact-submit').getBoundingClientRect().height
+      ),
+      direct: document.querySelector('.contact-direct-link')?.getAttribute('href'),
+      headings: [...document.querySelectorAll('h1, h2, h3')].map((h) => h.textContent),
+    }
+  })
+  check(
+    shape.fields.join(',') === 'Name,Email,Message',
+    `the form is Name, Email, Message (${shape.fields.join(', ')})`
+  )
+  check(
+    !shape.removed.topic && !shape.removed.photo && !shape.removed.socialList,
+    `the topic select, the photo and the address list are gone (${JSON.stringify(shape.removed)})`
+  )
+  check(
+    !shape.honeypotOnScreen && shape.honeypotName === 'botcheck',
+    'the honeypot is present and off-screen'
+  )
+  check(
+    shape.submitIsButton === 'BUTTON' && shape.submitHeight >= 44,
+    `the submit is a button at least 44px tall (${shape.submitIsButton}, ${shape.submitHeight}px)`
+  )
+  check(
+    shape.direct === 'mailto:evelyneyi@outlook.com',
+    `the address under the form is the real one (${shape.direct})`
+  )
+  check(shape.headings.length === 1, `one heading on the page (${shape.headings.join(' / ')})`)
+
+  await fill({ name: 'Ada', email: '', message: 'hello there' })
+  await submit()
+  let s1 = await state()
+  check(
+    !s1.ok && !!s1.error && posted === null,
+    `a missing field is refused without a request (${s1.error})`
+  )
+
+  await fill({ name: 'Ada', email: 'not-an-address', message: 'hello there' })
+  await submit()
+  s1 = await state()
+  check(
+    !s1.ok && !!s1.error && posted === null,
+    `a malformed address is refused without a request (${s1.error})`
+  )
+
+  reply = { status: 502, body: { ok: false, error: 'Your message could not be sent.' } }
+  await fill({ name: 'Ada', email: 'ada@example.com', message: 'a message worth keeping' })
+  await submit()
+  s1 = await state()
+  check(!!posted, 'a complete message does reach the endpoint')
+  check(
+    !s1.ok && !!s1.error,
+    `a service failure is reported as a failure, not a success (${s1.error})`
+  )
+  check(
+    s1.name === 'Ada' && s1.message === 'a message worth keeping',
+    'and the typed message is still there afterwards'
+  )
+
+  reply = { abort: true }
+  await submit()
+  s1 = await state()
+  check(!s1.ok && !!s1.error, 'a network failure is reported as a failure too')
+
+  reply = { status: 200, body: { ok: true } }
+  posted = null
+  await submit()
+  s1 = await state()
+  check(!!s1.ok && !s1.error, `a server success is the only thing that says sent (${s1.ok})`)
+  check(
+    s1.name === '' && s1.message === '',
+    'and the form is cleared only once the server has confirmed'
+  )
+  check(
+    posted && !('botcheck' in posted) && !('to' in posted),
+    `the payload is the three fields only (${Object.keys(posted ?? {}).join(', ')})`
+  )
+
+  await form.close()
+}
 
 console.log('\n# the opening transition runs on scroll and finishes flush')
 await visit('/')
