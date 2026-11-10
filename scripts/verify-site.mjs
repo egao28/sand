@@ -93,6 +93,7 @@ const RAIL = [
 const WIDTHS = [
   [1440, 900],
   [1024, 800],
+  [768, 1024],
   [390, 844],
 ]
 
@@ -444,6 +445,158 @@ console.log('\n# the contact form, against a stubbed endpoint')
   )
 
   await form.close()
+}
+
+console.log('\n# the dark theme is the specified palette, and is flat')
+{
+  const dark = await browser.newPage()
+  await dark.setViewport({ width: 1440, height: 900 })
+  await dark.goto(BASE + '/about', { waitUntil: 'networkidle0' })
+  await dark.evaluate(() => localStorage.setItem('evelyn-site-theme', 'dark'))
+
+  const TOKENS = [
+    ['--paper', 'rgb(81, 70, 56)'],
+    ['--ink', 'rgb(245, 239, 228)'],
+    ['--ink-muted', 'rgb(216, 204, 186)'],
+    ['--accent-link', 'rgb(213, 183, 125)'],
+    ['--rule', 'rgb(122, 107, 87)'],
+    ['--rail-current-bg', 'rgb(107, 90, 67)'],
+  ]
+
+  for (const [path] of [
+    ['/'],
+    ['/about'],
+    ['/projects'],
+    ['/contact'],
+    ['/experience/bloom-mcp'],
+  ]) {
+    await dark.goto(BASE + path, { waitUntil: 'networkidle0' })
+    await dark.evaluate(() => document.fonts.ready)
+    const r = await dark.evaluate((tokens) => {
+      // Read each token as a colour the way a rule would, so the check is on
+      // what paints rather than on the literal in the stylesheet.
+      const probe = document.createElement('span')
+      document.body.appendChild(probe)
+      const read = (name) => {
+        probe.style.color = `var(${name})`
+        return getComputedStyle(probe).color
+      }
+      const values = Object.fromEntries(tokens.map(([n]) => [n, read(n)]))
+      probe.remove()
+
+      // Anything painting a gradient, and anything putting a filter on an
+      // image. The Technical band is deliberately dark in both themes.
+      const gradients = [...document.querySelectorAll('*')].filter((el) => {
+        if (el.closest('.project-detail-tech')) return false
+        // The opening's hanging lines are 1px rules that fade along their
+        // length — part of the composition the brief keeps, not a background.
+        if (el.classList.contains('hang-line')) return false
+        if (!el.getClientRects().length) return false
+        const st = getComputedStyle(el)
+        return st.backgroundImage !== 'none' && !st.backgroundImage.startsWith('url')
+      }).length
+      const filtered = [...document.querySelectorAll('img, picture img')].filter(
+        (el) => getComputedStyle(el).filter !== 'none'
+      ).length
+
+      return { bg: getComputedStyle(document.body).backgroundColor, values, gradients, filtered }
+    }, TOKENS)
+
+    check(r.bg === 'rgb(81, 70, 56)', `${path} paints the dark page background (${r.bg})`)
+    check(r.filtered === 0, `${path} leaves images un-filtered (${r.filtered} filtered)`)
+    // The homepage's hanging line is a fading 1px rule, not a background — it
+    // is part of the opening the brief keeps, so it is the one allowance.
+    check(r.gradients === 0, `${path} paints no background gradient (${r.gradients})`)
+    const wrong = TOKENS.filter(([n, want]) => r.values[n] !== want)
+    check(
+      wrong.length === 0,
+      `${path} token values${wrong.length ? ': ' + wrong.map(([n, w]) => `${n} is ${r.values[n]}, wanted ${w}`).join('; ') : ' all match'}`
+    )
+  }
+
+  console.log('\n# the theme button switches, and does nothing else')
+  await dark.goto(BASE + '/', { waitUntil: 'networkidle0' })
+  await dark.evaluate(() => localStorage.removeItem('evelyn-site-theme'))
+  await dark.reload({ waitUntil: 'networkidle0' })
+  // Scroll the opening out of the way so the rail is live, then switch.
+  await dark.evaluate(() => window.scrollTo(0, window.innerHeight * 0.8))
+  await new Promise((r) => setTimeout(r, 400))
+  const before = await dark.evaluate(() => ({
+    url: location.href,
+    scroll: Math.round(window.scrollY),
+    progress: Number(
+      getComputedStyle(document.documentElement).getPropertyValue('--opening-progress')
+    ),
+    theme: document.documentElement.dataset.theme ?? 'light',
+  }))
+  await dark.click('.site-rail-theme')
+  await new Promise((r) => setTimeout(r, 400))
+  const after = await dark.evaluate(() => ({
+    url: location.href,
+    scroll: Math.round(window.scrollY),
+    progress: Number(
+      getComputedStyle(document.documentElement).getPropertyValue('--opening-progress')
+    ),
+    theme: document.documentElement.dataset.theme,
+  }))
+  check(
+    before.theme === 'light' && after.theme === 'dark',
+    `the button switches the theme (${before.theme} -> ${after.theme})`
+  )
+  check(after.url === before.url, `and does not navigate (${after.url === before.url})`)
+  check(
+    after.scroll === before.scroll && after.progress === before.progress,
+    `and does not replay the opening (scroll ${before.scroll}->${after.scroll}, progress ${before.progress}->${after.progress})`
+  )
+
+  // Hover must not switch anything: the moon and the sun are the two themes'
+  // symbols, not a hover pair.
+  await dark.goto(BASE + '/about', { waitUntil: 'networkidle0' })
+  const themeBefore = await dark.evaluate(() => document.documentElement.dataset.theme)
+  await dark.hover('.site-rail-theme')
+  await new Promise((r) => setTimeout(r, 500))
+  const themeAfterHover = await dark.evaluate(() => document.documentElement.dataset.theme)
+  check(
+    themeBefore === themeAfterHover,
+    `hovering the theme button changes nothing (${themeBefore} -> ${themeAfterHover})`
+  )
+
+  await dark.evaluate(() => localStorage.removeItem('evelyn-site-theme'))
+  await dark.close()
+}
+
+console.log('\n# reduced motion: the theme does not fade')
+{
+  const rm = await browser.newPage()
+  await rm.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
+  await rm.setViewport({ width: 1440, height: 900 })
+  await rm.goto(BASE + '/about', { waitUntil: 'networkidle0' })
+  /* What matters is whether a colour change would animate, which needs both a
+   * colour in transition-property and a duration. `all` at 0s is the browser
+   * default and animates nothing. */
+  const fades = await rm.evaluate(() => {
+    const out = []
+    for (const el of document.querySelectorAll(
+      'body, .page, .site-rail-link, .site-rail-theme, .nav-icon, .worklist-entry, .contact-field input'
+    )) {
+      const st = getComputedStyle(el)
+      const props = st.transitionProperty.split(',').map((x) => x.trim())
+      const durs = st.transitionDuration.split(',').map((x) => parseFloat(x) || 0)
+      props.forEach((prop, i) => {
+        const dur = durs[i % durs.length] ?? 0
+        const colourish = prop === 'all' || prop.includes('color') || prop.includes('background')
+        if (colourish && dur > 0) {
+          out.push(`${el.className || el.tagName}: ${prop} ${dur}s`)
+        }
+      })
+    }
+    return out
+  })
+  check(
+    fades.length === 0,
+    `nothing animates colour under reduced motion${fades.length ? ': ' + fades.join('; ') : ''}`
+  )
+  await rm.close()
 }
 
 console.log('\n# the opening transition runs on scroll and finishes flush')

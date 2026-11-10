@@ -40,6 +40,16 @@
   --rail-ink-current: #5b4327;
 }
 
+/* Dark: the cream ink from the pack's dark set, on the warm selected tint
+   (#73). The icons paint with `currentColor` for both fill and stroke, so this
+   one value carries the whole drawing — Contact included, which is filled
+   artwork and would otherwise keep a black fill under a recoloured outline. */
+html[data-theme='dark'] {
+  --rail-current-bg: #6b5a43;
+  --rail-ink: #f5efe4;
+  --rail-ink-current: #f5efe4;
+}
+
 /* ============================================================ rail ======= */
 
 .site-rail {

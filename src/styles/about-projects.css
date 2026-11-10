@@ -214,7 +214,7 @@
 }
 
 .worklist-entry + .worklist-entry {
-  border-top: 1px solid var(--rule, #ddd5c7);
+  border-top: 1px solid var(--rule);
 }
 
 .worklist-entry:first-child {
@@ -264,7 +264,7 @@
   font-size: 13px;
   line-height: 1.5; /* buttons default to `normal`; keeps them level with the links */
   letter-spacing: 0.07em;
-  color: var(--accent-link, #795a28);
+  color: var(--accent-link);
   text-decoration: none;
   /* No frame, no fill, no padding that would read as a hit area. */
   border: 0;
