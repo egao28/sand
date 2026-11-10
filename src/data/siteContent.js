@@ -26,10 +26,10 @@ const CARELINK_DEMO = {
 }
 
 export const siteContent = {
-  // The six entries in the nav, in order. The logo is not one of them: it is
-  // what returns to the opening, so there is no Home entry. The theme button
-  // is not one either — it is a button, not a destination, and SiteNav renders
-  // it after this list (#70).
+  // The six entries in the nav, in the order the rail and the compact bar
+  // both render them. The logo is not one of them: it is what returns to the
+  // opening, so there is no Home entry. The theme button is not one either —
+  // it is a button, not a destination, and SiteNav renders it after this list.
   //
   // Three kinds of entry, and the kind is what decides the rest:
   //
@@ -46,8 +46,10 @@ export const siteContent = {
   //           current: GitHub and LinkedIn are not pages of this site and must
   //           not pose as the one you are on.
   //
-  // `group` is only the rail's spacing: 'pages' then 'external', with a gap
-  // between them.
+  // `group` is the spacing, and now also the grouping: the three pages of the
+  // site first, then the three entries that hand you something — a file, or
+  // somewhere else. Resume moved out of the first group with that change; it
+  // belongs with the other two actions, not between Projects and Contact.
   nav: {
     items: [
       {
@@ -58,30 +60,30 @@ export const siteContent = {
         group: 'pages',
       },
       { id: 'projects', label: 'Projects', to: '/projects', match: ['/projects'], group: 'pages' },
+      { id: 'contact', label: 'Contact', to: '/contact', match: ['/contact'], group: 'pages' },
       {
         id: 'resume',
         label: 'Resume',
         // The real PDF in the repo, hashed through the bundler like any other
-        // asset, so this is same-origin and `download` is honoured. #70 drops
-        // the Resume page: the entry is the download now.
+        // asset, so this is same-origin and `download` is honoured. There is
+        // no Resume page: the entry is the download.
         href: resumePdf,
         download: 'Evelyn_Gao_Resume.pdf',
-        group: 'pages',
+        group: 'tools',
       },
-      { id: 'contact', label: 'Contact', to: '/contact', match: ['/contact'], group: 'pages' },
       {
         id: 'github',
         label: 'GitHub',
         href: 'https://github.com/egao28',
         external: true,
-        group: 'external',
+        group: 'tools',
       },
       {
         id: 'linkedin',
         label: 'LinkedIn',
         href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/',
         external: true,
-        group: 'external',
+        group: 'tools',
       },
     ],
   },
@@ -171,9 +173,9 @@ export const siteContent = {
     // and a page that already has a nav does not need a second one scattered
     // across the end of its body.
     //
-    // Under 900px the rail is not rendered, so GitHub survives as a text link
-    // at the end of the body and nowhere else. Resume and Contact are in the
-    // compact top bar; GitHub is not, because it leaves the site.
+    // Under 768px the rail is not rendered and the compact bar carries all
+    // seven controls itself, GitHub and LinkedIn included, so there is no text
+    // link at the end of the body either.
   },
   experience: {
     label: 'experience',

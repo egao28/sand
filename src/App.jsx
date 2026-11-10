@@ -31,17 +31,37 @@ import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion.js'
  * forward, where the browser is already restoring where you were. Forcing the
  * scroll there is what would make `/` replay its opening every time you came
  * back to it (#66).
+ *
+ * A link that carries a fragment is the exception: it is asking for one entry
+ * on the page, not the top of it. react-router does not scroll to fragments
+ * itself, and the browser cannot either — the target does not exist until
+ * React has rendered the new route — so the element is looked up after the
+ * commit and scrolled to here. `scroll-margin-top` on the target is what keeps
+ * it clear of the sticky bar; this only has to get it on screen.
  */
 function ScrollToTop() {
-  const { pathname } = useLocation()
+  const { pathname, hash } = useLocation()
   const navigationType = useNavigationType()
 
   useEffect(() => {
     if (navigationType === 'POP') return
+
+    if (hash) {
+      // `decodeURIComponent`: the fragment arrives percent-encoded, and
+      // getElementById wants the id as it is written in the markup.
+      const target = document.getElementById(decodeURIComponent(hash.slice(1)))
+      if (target) {
+        target.scrollIntoView({ behavior: 'instant', block: 'start' })
+        return
+      }
+      // A fragment that matches nothing falls through to the top of the page
+      // rather than leaving the visitor wherever they happened to be.
+    }
+
     // `instant`: `html { scroll-behavior: smooth }` would otherwise animate a
     // page change, so the new page would start part-way down and glide up.
     window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [pathname, navigationType])
+  }, [pathname, hash, navigationType])
 
   return null
 }

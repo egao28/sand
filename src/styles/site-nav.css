@@ -1,15 +1,12 @@
 /*
-  The site navigation that replaced the fixed header in #66, with the seven-icon
-  set from #70.
+  The site navigation: an open rail on the left from 768px up, and a compact
+  bar of icons at the top below it.
 
-  Two mutually exclusive pieces: `.site-rail`, fixed on the left from 900px up,
-  and `.site-topbar`, in normal document flow below it. Exactly one of them is
-  rendered at any width, so there is never a second interactive navigation on
-  the page.
-
-  There is no sidebar to speak of — no frame, fill, shadow, divider or rule.
-  The logo and the icons sit directly on the page. Icon motion lives in
-  nav-icons.css; this file is position, hit area, label and current-page state.
+  Exactly one of the two is rendered at any width, so there is never a second
+  interactive navigation on the page. Neither has a frame, fill, shadow,
+  divider or rule — the logo and the icons sit directly on the page, and the
+  grouping is done with space. Icon motion lives in nav-icons.css; this file is
+  position, hit area, label and current-page state.
 
   Every selector here is new markup: none of it appears in assets/styles.css or
   about-projects.css.
@@ -19,19 +16,37 @@
   --rail-top: 40px;
   --rail-left: 40px;
   --rail-hit: 48px;
+  /* Between entries inside a group. */
   --rail-gap: 12px;
-  /* The content inset (#68). Wide enough that the rail never sits over the
-     text, and the same on every route so the left edge does not move as you
-     navigate. */
+  /* Between the three pages and the three that hand you something. */
+  --rail-group-gap: 24px;
+  /* Between the last entry and the theme button. */
+  --rail-theme-gap: 16px;
+  /* Between the logo and the first entry. */
+  --rail-nav-top: 28px;
+
+  /* The height of the six entries and the gaps between them, derived from the
+     four numbers above rather than written out: 6 hit areas, 4 within-group
+     gaps and the one group gap. The opening reads it to carry the theme button
+     up under the logo while the entries are hidden, so a change to any of the
+     spacing tokens above has to move that with it — which is exactly what
+     deriving it does. */
+  --rail-nav-height: calc(6 * var(--rail-hit) + 4 * var(--rail-gap) + var(--rail-group-gap));
+
+  /* The content inset. Wide enough that the rail never sits over the text, and
+     the same on every route so the left edge does not move as you navigate. */
   --content-inset: clamp(180px, 22vw, 340px);
   --content-edge: 48px;
-  /* How far the theme button sits below the external pair (#70). */
-  --rail-theme-gap: 24px;
 
-  /* The navigation's three colours, and the only ones it has. The purple
-     current-page tint and the blue-violet glow that used to sit under these
-     entries are gone with #70; nothing in the rail paints a shadow, a halo or
-     a second surface. #73 gives these dark values.
+  /* The compact bar. 28px icons in 44px tap targets, which leaves 8px of
+     padding inside each one, so adjacent icons sit 16px apart without any gap
+     between the items themselves. */
+  --bar-hit: 44px;
+  --bar-group-gap: 8px;
+  --bar-edge: 12px;
+
+  /* The navigation's three colours, and the only ones it has. There is no
+     current-page tint beyond a fill, no glow and no second surface.
 
      The site's own cursor is deliberately untouched by all of this — it is set
      in assets/styles.css and is not the navigation's business. */
@@ -40,14 +55,27 @@
   --rail-ink-current: #5b4327;
 }
 
-/* Dark: the cream ink from the pack's dark set, on the warm selected tint
-   (#73). The icons paint with `currentColor` for both fill and stroke, so this
-   one value carries the whole drawing — Contact included, which is filled
-   artwork and would otherwise keep a black fill under a recoloured outline. */
+/* Dark: the cream ink from the pack's dark set, on the warm selected tint. The
+   icons paint with `currentColor`, so this one value carries each drawing. */
 html[data-theme='dark'] {
   --rail-current-bg: #6b5a43;
   --rail-ink: #f5efe4;
   --rail-ink-current: #f5efe4;
+}
+
+/* How far down an anchor target sits from the top of the viewport, so a link
+   into a list does not land with its heading under the sticky bar. Zero on
+   desktop, where the bar is not rendered and nothing overlaps. */
+:root {
+  --sticky-nav-height: 0px;
+}
+
+/* Every element that can be a fragment target keeps the bar's height clear
+   above it. `scroll-margin-top` only applies when something is actually
+   scrolled into view, so this costs nothing on the elements that never are,
+   and putting it on `[id]` means a new anchor cannot be added without it. */
+[id] {
+  scroll-margin-top: calc(var(--sticky-nav-height) + 16px);
 }
 
 /* ============================================================ rail ======= */
@@ -82,14 +110,9 @@ html[data-theme='dark'] {
 }
 
 .site-rail-nav {
-  margin-top: 28px;
+  margin-top: var(--rail-nav-top);
   opacity: 1;
-}
-
-/* On the opening the rail arrives with the content, over the last 40% of the
-   transition. Everywhere else it is simply there. */
-.has-opening .site-rail-nav {
-  opacity: clamp(0, calc((var(--opening-progress, 0) - 0.6) / 0.4), 1);
+  transition: opacity 320ms ease;
 }
 
 .site-rail-list {
@@ -108,11 +131,18 @@ html[data-theme='dark'] {
   display: flex;
 }
 
-/* The entries that leave the site sit apart from the four pages. The gap is on
-   the first of them rather than on every one, so GitHub and LinkedIn stay a
-   normal 12px apart from each other. */
-.site-rail-item--group-pages + .site-rail-item--group-external {
-  margin-top: 20px;
+/* The three that hand you something — a file, or somewhere else — sit apart
+   from the three pages of the site. The gap is on the first of them rather
+   than on every one, so Resume, GitHub and LinkedIn stay a normal 12px apart
+   from each other.
+
+   Space, and only space. The hairline that used to sit here is gone: a rule
+   between two groups of icons is one more thing drawn on a page that is
+   otherwise ink on paper. */
+.site-rail-item--group-pages + .site-rail-item--group-tools {
+  /* The list already lays 12px between every pair, so this adds the
+     difference rather than a second full gap on top of it. */
+  margin-top: calc(var(--rail-group-gap) - var(--rail-gap));
 }
 
 .site-rail-link {
@@ -132,17 +162,19 @@ html[data-theme='dark'] {
   transition: background 0.2s ease;
 }
 
-/* The page you are on. Fill only — no border, no shadow — and no permanent
-   label either: the icon plus the tint is the whole of it.
+/* No `--rail-surface` any more: Contact was the one icon that painted a shape
+   in "the colour behind it", and the V6 drawing is stroked throughout with a
+   mask doing the hiding, so nothing inside an icon needs to know what the hit
+   area is filled with.
 
    The tint is painted on the link, which is the fixed 48x48 hit area, and
    never on the icon inside it. That is what keeps it square to the rail while
    the drawing turns, unfolds or slides: the pinwheel rotating cannot take the
-   background round with it. */
-/* No `--rail-surface` any more: Contact was the one icon that painted a shape
-   in "the colour behind it", and the V6 drawing is stroked throughout with a
-   mask doing the hiding, so nothing inside an icon needs to know what the hit
-   area is filled with. */
+   background round with it.
+
+   Only the three pages can carry it. A download and two external links are not
+   pages of this site, so none of them can be the one you are on and none
+   leaves a highlight behind after it is used. */
 .site-rail-link--current {
   background: var(--rail-current-bg);
   color: var(--rail-ink-current);
@@ -182,7 +214,11 @@ html[data-theme='dark'] {
 
 /* The theme button. Same 48x48 as a nav entry, and it takes `.site-rail-link`
    for that, but it is a <button>: the UA background, border and font have to be
-   cleared or it arrives as a grey box with the wrong type in it. */
+   cleared or it arrives as a grey box with the wrong type in it.
+
+   It follows the navigation rather than being pinned anywhere: 16px under the
+   last entry, in normal flow, so there is no gap down the middle of the rail
+   and nothing sits at the bottom of the screen on its own. */
 .site-rail-theme {
   margin-top: var(--rail-theme-gap);
   background: transparent;
@@ -192,6 +228,30 @@ html[data-theme='dark'] {
   /* `inherit`, not `none`: it then follows body, which the site switches back
      to `auto` under (hover: none). */
   cursor: inherit;
+  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------- the opening's rail --- */
+
+/* While the opening owns the screen the six entries are not painted and not
+   reachable, and the theme button is carried up to sit directly under the
+   logo. So the opening shows the logo and the theme control and nothing else:
+   no column of invisible buttons holding a gap open down the left edge.
+
+   The entries keep their space in the layout — the button is moved by a
+   transform rather than by the box collapsing — which is what lets the two
+   animate. On handover the nav fades in at its full height, all six at once,
+   and the button slides down into place over the same 320ms. Nothing is
+   revealed icon by icon, because nothing here is driven by scroll position. */
+.site-rail[data-dormant='true'] .site-rail-nav {
+  opacity: 0;
+  /* `inert` on the element already takes it out of the tab order; this keeps
+     the invisible column from catching a click meant for a letter behind it. */
+  pointer-events: none;
+}
+
+.site-rail[data-dormant='true'] .site-rail-theme {
+  transform: translateY(calc(-1 * (var(--rail-nav-height) + var(--rail-nav-top))));
 }
 
 .nav-icon {
@@ -202,110 +262,208 @@ html[data-theme='dark'] {
 
 /* ========================================================== topbar ======= */
 
+/* Two rows: the logo, then the seven controls. Plain page background, no frame,
+   no shadow and no divider — it is part of the page, not a bar laid over it —
+   and in normal document flow, so the content below is never hidden under it. */
 .site-topbar {
   display: none;
   position: sticky;
   top: 0;
   z-index: 60;
-  /* Plain page background, no frame and no shadow — it is part of the page, not
-     a bar laid over it. */
   background: var(--paper);
-  padding: 14px 24px 10px;
+  /* The bar's own 12px inset. The rows inside it add none of their own, or the
+     two would stack into 24px. */
+  padding: 12px var(--bar-edge) 10px;
+}
+
+.site-topbar-logo-row {
+  display: flex;
+  align-items: center;
+}
+
+.site-topbar-logo {
+  width: var(--bar-hit);
+  height: var(--bar-hit);
+}
+
+/* The row of controls. On a 320px screen seven 44px targets and their gaps are
+   wider than the viewport, so the row scrolls sideways: the tap targets stay
+   44px, the icons stay 28px, and nothing is squeezed, stacked onto a second
+   line or swapped back to words. */
+.site-topbar-row {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.site-topbar-row::-webkit-scrollbar {
+  display: none;
 }
 
 .site-topbar-list {
   list-style: none;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0 20px;
   margin: 0;
   padding: 0;
+}
+
+.site-topbar-item {
+  display: flex;
+}
+
+/* The same split the rail makes, with 8px of air across it. Inside a group the
+   tap targets sit flush, which still leaves 16px between the drawings
+   themselves — 8px of padding on each side of a 28px icon in a 44px box. */
+.site-topbar-item--group-pages + .site-topbar-item--group-tools {
+  margin-left: var(--bar-group-gap);
 }
 
 .site-topbar-link {
   display: inline-flex;
   align-items: center;
-  /* Tap target, not a hover target: nothing on this width depends on hover. */
-  min-height: 44px;
-  font-family: var(--sans);
-  font-size: 13px;
-  letter-spacing: 0.04em;
-  color: var(--ink-soft);
+  justify-content: center;
+  /* Tap target, not a hover target: nothing at this width depends on hover, and
+     the first tap does the thing rather than revealing a name. */
+  width: var(--bar-hit);
+  height: var(--bar-hit);
+  flex: 0 0 var(--bar-hit);
+  border-radius: 12px;
+  color: var(--rail-ink);
   text-decoration: none;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease;
 }
 
+/* The page you are on, the same fill the rail uses. */
 .site-topbar-link--current {
-  color: var(--ink);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 0.3em;
+  background: var(--rail-current-bg);
+  color: var(--rail-ink-current);
 }
 
-/* Only the entries that leave the site are marked. A download and an in-site
-   page both stay where you are, so neither gets the arrow. */
-.site-topbar-arrow {
-  margin-left: 0.25em;
-  font-size: 0.85em;
+/* A tap has to look like it landed, and on a touch screen there is no hover to
+   do that. */
+.site-topbar-link:active,
+.site-topbar-theme:active {
+  background: var(--rail-current-bg);
 }
 
-/* The theme button at this width: the same 40px icon, no label beside it — the
-   bar is already a row of words and a seventh would wrap it. The name is in
-   the .sr-only span inside the button, so it still announces. */
+.site-topbar-link:focus-visible,
+.site-topbar-theme:focus-visible {
+  outline: 2px solid var(--rail-ink);
+  outline-offset: 2px;
+}
+
+/* The theme button at this width. Last in the row, after the 8px group gap, and
+   the same 44px target as the six beside it. Its name is in the .sr-only span
+   inside the button, so it still announces. */
 .site-topbar-theme {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  min-height: 44px;
-  margin-left: auto;
+  width: var(--bar-hit);
+  height: var(--bar-hit);
+  flex: 0 0 var(--bar-hit);
+  margin-left: var(--bar-group-gap);
+  border-radius: 12px;
   background: transparent;
   border: 0;
   padding: 0;
   color: var(--rail-ink);
   font: inherit;
   cursor: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease;
 }
 
-.site-topbar-theme:focus-visible {
+/* -------------------------------------------- the opening's own theme --- */
+
+/* Shown only where the rail is not: under 768px the rail is display:none and
+   the compact bar lives with the About content, so without this the opening
+   would carry no theme control at all. */
+.opening-theme {
+  display: none;
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 3;
+  align-items: center;
+  justify-content: center;
+  width: var(--bar-hit);
+  height: var(--bar-hit);
+  border-radius: 12px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--rail-ink);
+  font: inherit;
+  cursor: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.opening-theme:focus-visible {
   outline: 2px solid var(--rail-ink);
   outline-offset: 2px;
 }
 
-/* The bar is a row: logo, then the links, then the theme button pushed to the
-   far end by its own `margin-left: auto`. */
-.site-topbar {
-  align-items: center;
-  gap: 16px;
-}
-
-.site-topbar-nav {
-  min-width: 0;
-}
-
 /* ====================================================== breakpoints ====== */
 
-/* Exactly one logo is live at a time: the rail's above 900px, the opening's
+/* Exactly one logo is live at a time: the rail's from 768px up, the opening's
    own below it (where the rail is not rendered at all). */
 .opening-logo {
   display: none;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 767px) {
   /* display:none, not opacity or visibility: the rail must be unreachable by
      pointer and by Tab, not merely invisible. */
   .site-rail {
     display: none;
   }
   .site-topbar {
-    display: flex;
+    display: block;
   }
   .opening-logo {
     display: inline-flex;
   }
+  .opening-theme {
+    display: inline-flex;
+  }
+
+  /* Two rows of bar sit above the content, so an anchor has to stop short of
+     them or its heading lands underneath. Measured rather than guessed: logo
+     row + control row + the bar's own padding. */
+  :root {
+    --sticky-nav-height: calc(var(--bar-hit) * 2 + 26px);
+  }
+
+  .page-root {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .home-about {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .sec-inner {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* The page already supplies the side padding; the bar adding its own on top
+     would indent it past the content it sits above. The bar's 12px lives on
+     the rows inside it instead. */
+  .site-topbar {
+    margin-left: -24px;
+    margin-right: -24px;
+  }
 }
 
-@media (min-width: 900px) {
+@media (min-width: 768px) {
   .page-root:not(.page-root--home) {
     padding-left: var(--content-inset);
     padding-right: var(--content-edge);
@@ -324,23 +482,16 @@ html[data-theme='dark'] {
   }
 }
 
-@media (max-width: 899px) {
-  .page-root {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-  .home-about {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
-  .sec-inner {
-    padding-left: 0;
-    padding-right: 0;
-  }
-  /* The page already supplies the side padding; the bar adding its own would
-     indent it past the content it sits above. */
-  .site-topbar {
-    padding-left: 0;
-    padding-right: 0;
+/* ========================================================== motion ======= */
+
+@media (prefers-reduced-motion: reduce) {
+  /* The nav still arrives and the theme button still ends up where it belongs —
+     they simply do not animate on the way. */
+  .site-rail-nav,
+  .site-rail-theme,
+  .site-rail-link,
+  .site-topbar-link,
+  .site-topbar-theme {
+    transition: none;
   }
 }
