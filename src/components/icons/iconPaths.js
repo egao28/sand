@@ -1,134 +1,150 @@
 /*
-  Icon geometry for the seven nav entries (#70).
+  Icon geometry for the seven nav entries.
 
-  Every outline here is the artwork delivered in `website_refinement_v3/assets`,
-  carried over unchanged. What has been done to it is mechanical and is noted
-  per icon: nodes regrouped so a part can move on its own, and — for Resume —
-  both outlines resampled onto the same command list so `d` can interpolate
-  between them. No outline was redrawn.
+  Every outline here is the artwork delivered in
+  `website_final_handoff_v6/assets/{light,dark}/svg`, carried over verbatim.
+  The two colour sets are the same geometry — they differ only in ink, #302D29
+  against #F2EEE9 — so one set of paths is drawn with `currentColor` and the
+  theme supplies the colour. Nothing below is redrawn, re-fitted or cropped.
 
-  All seven share one `0 0 64 64` viewBox, as delivered: none is cropped to its
-  own ink, stretched to fill the box, or re-fitted per hover state. Every one is
-  aligned on the same fixed centre, so the drawing under the pointer never
-  shifts between the two states.
+  All seven share one `0 0 64 64` viewBox, stroke 2.4, round caps and round
+  joins, exactly as delivered. None is cropped to its own ink or stretched to
+  fill the box, and every one is aligned on the same fixed centre, so the
+  drawing under the pointer never shifts between the two states.
 
-  Stroke weight: the v3 set is drawn at 2.4, half again the 1.6 of the first
-  delivery. Contact is the exception and is handled below.
+  Three of the seven are new in V6 and replace earlier candidates outright:
+
+    About    the A3 waving figure — a still round head and an arm that lifts.
+             Not the A1 side-face head this file used to carry.
+    GitHub   Branch Unfold with solid endpoints — a short branch that grows,
+             carrying its filled node with it. Not the Travel dot that used to
+             ride the long curve, and no hollow ring anywhere in it.
+    Contact  the E1 looping envelope with the E2 letter, delivered as clean
+             layered strokes. It replaces the filled contour that had to be
+             split out of a PDF, and with it goes the lighter stroke width
+             that artwork needed.
+
+  Projects, Resume, LinkedIn and Theme are unchanged: the V6 files for those
+  four are byte-identical in geometry to what this file already carried.
 */
 
-/** The delivered weight for the six stroked icons. */
+/** The delivered weight, now shared by all seven — Contact included. */
 export const STROKE_WIDTH = 2.4
 
 // --- About -----------------------------------------------------------------
-// about_A1_start.svg, verbatim. The end file is this same path inside
-// `rotate(-7 27 52)`, so the hover is that rotation and nothing else.
-export const ABOUT_HEAD =
-  'M14 37 C20 32 23 27 23 19 C23 12 27 8 32 9 C38 9 41 15 40 22 C40 26 42 29 45 32 Q47 34 43 35 L41 35 L41 39 Q39 39 40 41 Q41 43 39 44 C40 50 35 52 30 51 Q26 51 25 55'
-export const ABOUT_PIVOT = { x: 27, y: 52, degrees: -7 }
+// about_start.svg / about_end.svg. A circle head and one arm path. The two
+// files share a head and differ only in the arm's second cubic, and both arms
+// are written with the same command list (`M` then two `C`), so the arm
+// interpolates directly from one to the other: the hand lifts, and the figure
+// is not redrawn.
+export const ABOUT_HEAD_CIRCLE = { cx: 30, cy: 19, radius: 7 }
+export const ABOUT_ARM_DOWN = 'M12 47 C17 35 26 36 33 41 C39 44 45 43 51 45'
+export const ABOUT_ARM_RAISED = 'M12 47 C17 35 26 36 33 41 C43 47 45 26 53 31'
 
 // --- Projects --------------------------------------------------------------
-// projects_pinwheel_start.svg: one blade, drawn three times at 120 deg. The end
-// file wraps all three in `rotate(24 32 32)`, so the hover turns the whole
-// pinwheel about its hub.
+// projects_start.svg: one blade, drawn three times at 120 deg. The end file
+// wraps all three in `rotate(24 32 32)`, so the hover turns the whole pinwheel
+// about its hub. Unchanged in V6.
 export const PINWHEEL_BLADE = 'M32 32 Q20 23 28 11 Q31 8 36 8 Q31 20 32 32'
 export const PINWHEEL_BLADE_ANGLES = [0, 120, 240]
 export const PINWHEEL_PIVOT = { x: 32, y: 32, degrees: 24 }
 
 // --- GitHub ----------------------------------------------------------------
-// github_travel_start.svg, verbatim: two strokes and three open nodes. The end
-// file adds one filled dot at (44, 25), which sits 76.9% of the way along the
-// right-hand curve — so the dot travels that curve and comes to rest exactly
-// where the end file puts it, rather than appearing out of nowhere.
-export const GITHUB_STROKES = 'M16 47 C23 36 24 27 20 17 M21 36 C33 35 44 28 49 19'
-export const GITHUB_NODES = [
-  { cx: 16, cy: 50 },
-  { cx: 19, cy: 14 },
-  { cx: 51, cy: 16 },
+// github_start.svg / github_end.svg, the Branch Unfold drawing.
+//
+// The stem runs from (21,51) to (31,12) through the fork at (27,33), and it
+// does not move. All three endpoints are filled dots of the same radius, all
+// three are present in both files, and none of them is a hollow ring.
+//
+// The hover is the branch alone. Its path keeps the same command list in both
+// files — `M27 33` then one `C` — so it interpolates, and it stays joined to
+// the stem at the fork because that `M` is the fork. Its dot is carried along
+// by a translate.
+//
+// `d` interpolation moves the curve's last point in a straight line from
+// (36,31) to (49,25); the same translate moves the dot along that same line.
+// Given one duration and one easing for both — see nav-icons.css — the dot sits
+// on the end of the branch at every frame of the motion, so no bare stub of
+// line is ever drawn ahead of its node and no line ever runs out through one.
+export const GITHUB_STEM = 'M21 51 C23 43 27 37 27 33 C31 26 33 19 31 12'
+export const GITHUB_FORK = { x: 27, y: 33 }
+export const GITHUB_NODE_RADIUS = 2.6
+/** The stem's own two endpoints. Fixed in both files. */
+export const GITHUB_STEM_NODES = [
+  { cx: 21, cy: 51 },
+  { cx: 31, cy: 12 },
 ]
-export const GITHUB_TRAVEL_PATH = 'M21 36 C33 35 44 28 49 19'
-export const GITHUB_TRAVEL = { radius: 1.4, restAt: 0, endAt: 76.9, x: 44, y: 25 }
+export const GITHUB_BRANCH_SHORT = 'M27 33 C30 33 33 32 36 31'
+export const GITHUB_BRANCH_LONG = 'M27 33 C35 33 43 29 49 25'
+/** Where the branch's node rests, and how far the unfold carries it. */
+export const GITHUB_BRANCH_NODE = { cx: 36, cy: 31, endX: 49, endY: 25 }
 
 // --- Resume ----------------------------------------------------------------
-// resume_unfold_start.svg and resume_unfold_end.svg. The two outlines are built
-// from different commands — four quadratics against a mix of lines and
-// quadratics — so neither CSS nor SMIL can interpolate them as delivered. Both
-// have been walked from the same corner in the same direction and resampled to
-// the same 44 points per subpath, which leaves two `d` values with an identical
-// command list and the same shapes at each end. The page genuinely unfolds; it
-// is not two drawings dissolving into each other.
+// resume_start.svg and resume_end.svg. The two outlines are built from
+// different commands — four quadratics against a mix of lines and quadratics —
+// so neither CSS nor SMIL can interpolate them as delivered. Both have been
+// walked from the same corner in the same direction and resampled to the same
+// 44 points per subpath, which leaves two `d` values with an identical command
+// list and the same shapes at each end. The page genuinely unfolds; it is not
+// two drawings dissolving into each other.
+//
+// Unchanged in V6: the delivered files are the same outlines these were
+// resampled from.
 export const RESUME_CLOSED =
   'M17.00,18.00L19.78,17.95L22.56,17.82L25.33,17.61L28.09,17.32L30.85,16.95L33.59,16.51L36.33,16.01L39.05,15.45L41.76,14.82L44.45,14.14L44.59,16.18L44.07,18.91L43.53,21.64L42.99,24.36L42.45,27.09L41.89,29.81L41.33,32.53L40.76,35.26L40.18,37.98L39.60,40.69L39.01,43.41L38.41,46.13L37.15,47.85L34.41,47.39L31.66,46.99L28.90,46.67L26.13,46.43L23.35,46.28L20.58,46.20L17.80,46.23L15.02,46.35L12.25,46.58L9.49,46.93L9.63,44.80L10.38,42.13L11.14,39.45L11.88,36.77L12.63,34.10L13.37,31.42L14.10,28.74L14.83,26.05L15.56,23.37L16.28,20.69ZM45.00,14.00L45.30,15.12L45.60,16.24L45.91,17.35L46.22,18.47L46.54,19.58L46.86,20.70L47.18,21.81L47.50,22.92L47.83,24.03L48.16,25.14L48.50,26.25L48.84,27.36L49.18,28.47L49.52,29.57L49.87,30.68L50.22,31.78L50.57,32.89L50.93,33.99L51.29,35.09L51.65,36.19L52.01,37.29L52.38,38.39L52.75,39.49L53.12,40.58L53.50,41.68L53.87,42.78L54.25,43.87L54.64,44.96L54.94,45.99L53.80,45.78L52.66,45.56L51.52,45.35L50.39,45.13L49.25,44.92L48.11,44.71L46.97,44.49L45.83,44.28L44.69,44.07L43.55,43.85L42.42,43.64L41.28,43.43L40.14,43.21L39.00,43.00'
 export const RESUME_OPEN =
   'M10.00,20.00L13.09,18.96L16.29,18.29L19.54,18.01L22.80,18.12L26.03,18.59L29.20,19.40L32.29,19.56L35.42,18.65L38.62,17.97L41.85,17.54L45.11,17.34L48.38,17.39L51.63,17.66L53.94,18.87L53.71,22.13L53.47,25.39L53.24,28.64L53.01,31.90L52.77,35.16L52.54,38.41L52.31,41.67L52.08,44.93L49.84,45.64L46.59,45.36L43.32,45.39L40.07,45.70L36.86,46.28L33.70,47.10L30.60,47.86L27.48,46.90L24.29,46.21L21.05,45.82L17.79,45.72L14.53,45.93L11.31,46.45L9.03,46.11L9.15,42.84L9.27,39.58L9.40,36.32L9.52,33.05L9.64,29.79L9.76,26.53L9.88,23.26ZM31.00,20.00L31.00,20.65L31.00,21.30L31.00,21.95L31.00,22.60L31.00,23.26L31.00,23.91L31.00,24.56L31.00,25.21L31.00,25.86L31.00,26.51L31.00,27.16L31.00,27.81L31.00,28.47L31.00,29.12L31.00,29.77L31.00,30.42L31.00,31.07L31.00,31.72L31.00,32.37L31.00,33.02L31.00,33.67L31.00,34.33L31.00,34.98L31.00,35.63L31.00,36.28L31.00,36.93L31.00,37.58L31.00,38.23L31.00,38.88L31.00,39.53L31.00,40.19L31.00,40.84L31.00,41.49L31.00,42.14L31.00,42.79L31.00,43.44L31.00,44.09L31.00,44.74L31.00,45.40L31.00,46.05L31.00,46.70L31.00,47.35L31.00,48.00'
 
 // --- Contact ---------------------------------------------------------------
-// contact_start.svg and contact_end.svg are two windows onto one PDF page: the
-// same filled hand-drawn artwork, cropped to the closed envelope on the right
-// and to the open one on the left. Split back into its own strokes, the two
-// drawings turn out to be the same envelope — the bodies share an x range to
-// the hundredth and sit on the same baseline once offset — drawn twice, with
-// the open one adding a letter and a flap.
+// contact_start.svg and contact_end.svg, verbatim. V6 delivers this icon as
+// layered strokes with the moving parts already named, which is why none of the
+// splitting, re-fitting and silhouette-tracing the previous artwork needed
+// survives here. It is stroked at the group's 2.4 like the other six; there is
+// no filled contour left to carry a lighter weight of its own.
 //
-// So the icon is built from the closed drawing's strokes plus the open
-// drawing's letter, carried into the same space by that offset. Nothing is
-// cross-faded: the flap turns about its own hinge and the letter slides up from
-// behind the front panel. At rest the result is contact_start.svg; at the end
-// the flap stands open and the letter sits where contact_end.svg puts it.
+// Four pieces, and only three of them move:
 //
-// Refit for v3: the delivered file places this drawing in a 56x56 box centred
-// in the 64 box, where the first delivery filled the 64 outright. Every
-// coordinate below has been carried across by that one mapping — x,y -> 4 +
-// 0.875x, 4 + 0.875y — which is a placement, not a redraw: the split into
-// flap, letter and front panel is the same split, and the shapes are the same
-// shapes. Keeping the paths in viewBox units rather than wrapping them in a
-// transform is what lets the origins in nav-icons.css stay readable, and what
-// keeps `transform-box: view-box` meaning the same thing here as in the other
-// six icons.
+//   ENVELOPE_BODY  the body and the loop at its lower left. Fixed.
+//   FRONT_FOLD     the V of the front panel. Fixed.
+//   CLOSED_RIM     the closed top edge. Visible at rest.
+//   REAR_FLAP      the two open wings. Visible at the end.
+//   LETTER         rises from behind the front fold.
 //
-// CONTACT_OCCLUDER is the only piece that is not a delivered stroke, and it is
-// not drawn either: it is the topmost edge of the envelope's own ink, read off
-// a render of these paths column by column, and it is a clip region rather than
-// something visible. It is what puts the letter behind the front panel and
-// behind the right-hand spike, instead of over them.
-export const CONTACT_BODY =
-  'M20.8272,31.4586C20.6075,31.4395,20.4452,31.2771,20.3974,31.0861L20.2828,31.0288C19.8913,30.8856,19.3756,31.0002,18.5256,31.3726C16.9022,32.0888,14.763,33.3781,13.4069,34.6196C12.0031,35.8992,11.2964,37.3795,11.0958,39.6332C10.8475,42.3359,10.5801,45.2104,11.4301,47.5883C12.1654,49.6893,13.5979,51.0358,15.2882,51.4273C17.1218,51.8571,18.984,52.0194,21.2569,51.8189C24.3988,51.5515,27.8559,49.9185,31.0646,49.1736C32.8123,48.7629,34.6458,48.2281,36.0019,47.7888C37.7018,47.2349,39.5927,46.2036,41.5504,45.2486C43.0879,44.4846,43.9761,43.6346,44.7114,42.5269C46.0961,40.4259,47.2612,37.8188,48.2258,35.2403C48.8465,33.5691,49.2094,32.0697,49.7346,30.4749C50.1357,29.2716,50.4509,27.9919,50.7374,26.6836C50.957,25.6618,51.2053,24.9264,51.148,24.3439C51.1289,24.1433,51.043,24.0574,50.8329,23.981C50.6037,23.9046,50.2408,23.9046,49.8588,24.0287C49.1139,24.277,48.4358,24.5826,47.7769,24.9264C47.9011,24.8118,47.9679,24.7068,48.0061,24.6686L48.1685,24.5349L48.2926,24.4203L48.4358,24.2675L48.7987,24.0192L49.238,23.7041C49.2858,23.685,49.4481,23.7136,49.5436,23.3603C49.5627,23.2839,49.5532,23.1884,49.5245,23.0929C49.6964,23.0356,49.8588,22.9974,50.0116,22.9687C49.7728,22.6536,49.5436,22.3193,49.2762,21.9755L49.4386,22.0233L49.5245,22.0519L49.7251,22.1379L49.8397,22.1856L49.9447,22.2238L50.1548,22.3193L50.2408,22.3671L50.2981,22.3957L50.4509,22.5008L50.6037,22.5963L50.661,22.6345L50.7756,22.7013L50.9093,22.7777L51.0716,22.8732L51.2817,22.9878C51.3104,23.026,51.3295,23.0547,51.3581,23.0833C51.3772,23.112,51.3963,23.1311,51.4154,23.1597C51.7974,23.3794,52.0935,23.7805,52.1317,24.2579C52.2176,25.1174,51.912,25.9196,51.7019,26.8937C51.4154,28.2211,51.0907,29.539,50.6801,30.7805C50.1644,32.3371,49.7919,33.8556,49.1521,35.5841C48.178,38.2103,46.9843,40.8747,45.5327,43.0712C44.7305,44.2936,43.6609,45.3154,41.9801,46.1367C40.0511,47.0822,38.1411,48.1326,36.3075,48.7343C34.9323,49.1831,33.0701,49.7179,31.2843,50.1381C28.2188,50.8544,24.7331,52.516,21.3428,52.8025C18.9745,53.0126,16.9881,52.8407,15.0686,52.3919C13.0154,51.9239,11.325,50.2718,10.4942,47.9225C9.5488,45.2677,9.8639,42.2595,10.1026,39.5473C10.3223,37.1121,11.1818,35.3167,12.7289,33.8938C14.2186,32.5281,16.4056,31.2294,18.1245,30.4654C19.0509,30.0643,19.8626,29.8255,20.6171,30.0929C20.8749,30.1884,21.0946,30.303,21.2664,30.4558C21.3619,30.5418,21.6007,30.6373,21.4861,31.067C21.4192,31.2962,21.2092,31.4204,21.085,31.449Z'
-export const CONTACT_TOP_EDGE =
-  'M21.4479,21.8705C20.4929,21.9564,19.4711,22.0997,18.5447,22.2334C17.9526,22.3193,17.456,22.4721,16.9022,22.644L16.1191,22.8732L15.6416,23.0165L15.5747,23.0547L15.4792,23.0929C15.4315,23.112,15.3264,23.1597,15.1259,23.0833C14.9731,23.0165,14.8585,22.835,14.8298,22.7204C14.7821,22.453,14.8489,22.453,14.8585,22.4148C14.9158,22.2716,15.0017,22.0997,15.1068,21.9087L16.1191,21.6222L16.4342,21.584C16.396,21.6413,16.3578,21.6986,16.3196,21.7654L16.6157,21.689C17.1696,21.5267,17.7234,21.3548,18.4015,21.2593C19.7289,21.0587,21.2473,20.8391,22.5939,20.8104C23.9309,20.7722,25.5161,20.7913,27.1205,21.1065L26.07,21.1065C25.965,21.1065,25.8599,21.1447,25.7835,21.202L25.2487,21.2115C25.01,21.2211,24.819,21.2784,24.6758,21.3166L24.4848,21.3548L24.3797,21.3643L24.2556,21.3834L24.1028,21.4025C23.9309,21.393,23.7399,21.4025,23.5298,21.4312C23.3006,21.4598,23.0714,21.4598,22.8422,21.5649C22.6512,21.584,22.4697,21.6126,22.2883,21.6604L22.0973,21.7081L21.9827,21.7463L21.8585,21.7941C21.7153,21.7559,21.5625,21.7845,21.4479,21.8705M17.5229,22.2716C17.4369,22.3098,17.3414,22.3193,17.2555,22.3098L17.1314,22.3098L16.9022,22.3289C16.6252,22.3098,16.4151,22.0806,16.4247,21.8036C16.4342,21.7177,16.4629,21.6413,16.5011,21.5649L16.9977,21.498L17.5324,21.3548L17.8762,21.2115C17.9049,21.1924,17.9431,21.1733,17.9813,21.1638C18.7262,20.9919,19.8053,20.7245,20.9895,20.4762C23.0045,20.056,24.8572,20.1037,26.3756,20.1037L30.6062,20.0464L35.9733,20.0178C38.3607,20.0369,40.7959,20.2374,42.9065,20.5239C44.7305,20.7722,46.1057,21.1924,47.1084,21.4407C48.474,21.775,49.9543,21.9946,50.7756,22.9496C50.957,23.1597,50.9379,23.4749,50.7278,23.6563C50.5177,23.8282,50.2026,23.8091,50.0307,23.599C49.9161,23.4653,49.7537,23.3507,49.5532,23.2457C49.5436,23.0833,49.4481,22.8828,49.3335,22.8159C49.2094,22.73,49.1425,22.7395,49.0948,22.73L48.9515,22.7491L48.8274,22.7873L48.7128,22.835L48.6459,22.8732C48.1207,22.7109,47.5,22.5581,46.8697,22.4053C45.8383,22.1474,44.5204,21.7463,42.7728,21.5076C40.7004,21.2211,38.3034,21.0301,35.9637,21.011L30.6253,21.0396L26.3756,21.0969C24.8477,21.0969,23.0809,21.0492,21.1901,21.4503L18.8312,21.9851C18.3155,22.0997,17.8858,22.1952,17.5229,22.2716M23.0236,21.0587C22.8231,21.0492,22.6607,20.8773,22.6703,20.6767C22.6798,20.4666,22.8517,20.3138,23.0618,20.3234L23.1287,20.3234L23.2242,20.352L23.3483,20.4571C23.4056,20.5239,23.4534,20.6767,23.4247,20.7913C23.3674,20.9919,23.2624,21.011,23.2337,21.0301C23.0618,21.116,23.0905,21.0683,23.0523,21.0683L22.9377,21.0874L21.763,21.2784L20.0059,21.5267L18.9076,21.6317L18.3346,21.7559L18.0672,21.8132L17.8667,21.8609L17.3987,21.9564L17.3224,21.9755L17.1314,22.0042L16.5679,22.1952L16.0618,22.3384L15.8517,22.3862L15.527,22.4912L15.3455,22.5581L15.1545,22.6154L14.9826,22.6822L14.8776,22.7204L14.7152,22.7968L14.5529,22.9783C14.4574,23.1024,14.3046,23.2839,14.0467,23.3603C13.8557,23.408,13.6456,23.2934,13.5979,23.1024C13.5406,22.9019,13.6552,22.6918,13.8557,22.644L13.9608,22.5294C14.0372,22.4339,14.1422,22.262,14.3619,22.1379L14.6006,22.0328L14.7248,21.9851L14.9062,21.9182L15.1068,21.8514L15.2691,21.7941L15.6702,21.6604L15.8994,21.6126L16.3101,21.498C16.5202,21.4216,16.7207,21.3261,16.9881,21.2784L17.1791,21.2402L17.2746,21.2211L17.6852,21.1447L17.9049,21.0874L18.1532,21.0301L18.8026,20.8964L19.939,20.7818L21.6198,20.5526L22.8517,20.352L22.9759,20.3329C22.9854,20.3329,22.8517,20.3807,22.8995,20.3616L22.8613,20.3807C22.8708,20.3711,22.7658,20.4666,22.7944,20.438C22.8135,20.4093,22.6894,20.6385,22.7085,20.5812C22.7276,20.5144,22.7276,20.8677,22.7085,20.7913C22.6894,20.7245,22.8135,20.9728,22.7849,20.9441C22.7562,20.9155,22.8804,21.0205,22.8613,21.0014C22.8231,20.9823,22.9568,21.0492,22.9377,21.0396C22.8804,21.0205,23.0236,21.0587,23.0141,21.0587Z'
-export const CONTACT_CORNER =
-  'M48.8083,22.0997C48.9802,22.2238,49.0184,22.453,48.9038,22.6249C48.7796,22.7873,48.5504,22.835,48.3881,22.7109L48.2353,22.539C48.1589,22.3766,48.2353,22.157,48.3308,22.071L48.5313,21.966L48.7987,21.9469C49.1139,21.9851,49.2189,22.2143,49.2571,22.262L49.3622,22.348L49.4959,22.4626L49.6964,22.6536L49.7919,22.7395L49.9161,22.8541L49.9543,22.8828C49.9543,22.8828,49.8683,22.8541,49.9065,22.8637C50.1071,22.9114,50.2312,23.112,50.1835,23.3125C50.1357,23.5131,49.9352,23.6372,49.7346,23.5895C49.4386,23.5226,49.3622,23.3603,49.2858,23.2839L49.1903,23.1979L48.9993,23.026L48.8751,22.9114L48.6937,22.7395L48.6077,22.644L48.6364,22.6631L48.7128,22.6822L48.7223,22.6822L48.7796,22.6536C48.7605,22.6727,48.8942,22.539,48.8656,22.5867C48.8369,22.6154,48.942,22.3766,48.9324,22.4435C48.9229,22.4912,48.9229,22.2525,48.9324,22.3002C48.942,22.3671,48.8369,22.1283,48.8656,22.157C48.8847,22.1856,48.7987,22.0901,48.8083,22.0997M48.751,22.3002C48.8369,22.4912,48.751,22.7109,48.56,22.7968C48.3785,22.8828,48.1589,22.7968,48.073,22.6058C48.0157,22.4817,48.0252,22.2047,48.1971,22.0806C48.3595,21.966,48.474,21.9851,48.56,22.0042C48.7605,22.0328,48.8178,22.1188,48.8656,22.1379C49.047,22.262,49.2667,22.3862,49.4672,22.5867L49.7919,22.9687L49.8874,23.1693L49.9638,23.5226C49.9829,23.8759,49.7537,24.1338,49.4959,24.2293C49.3049,24.3057,49.0948,24.2102,49.0184,24.0192C48.942,23.8282,49.0375,23.6086,49.2285,23.5322L49.2189,23.5608L49.1903,23.4176L49.1616,23.3603L48.9324,23.112L48.4645,22.7682L48.3881,22.7204L48.4358,22.73L48.4931,22.7395C48.474,22.7395,48.6364,22.6822,48.5886,22.7013C48.56,22.7204,48.7319,22.5867,48.6937,22.6249C48.6746,22.6536,48.7701,22.4817,48.7605,22.5199C48.7414,22.5772,48.7701,22.3384,48.7701,22.3766C48.7796,22.4148,48.751,22.2907,48.751,22.3002'
-export const CONTACT_FLAP =
-  'M14.1613,23.5799C13.913,23.7041,13.617,23.6086,13.4928,23.3698C13.3687,23.1215,13.4642,22.8255,13.7029,22.7013C13.999,22.5485,14.2377,22.5581,14.6388,22.5103L16.0522,22.4148C17.5897,22.3862,19.1846,22.4435,20.7699,22.9401C22.1641,23.3794,23.2433,24.4871,24.1792,25.3275C24.6758,25.7668,25.0578,26.2061,25.4397,26.5881L26.0032,27.1516L26.7958,28.097C27.8177,29.4531,28.1042,30.5513,28.6294,31.4872C28.9159,31.9933,29.2597,32.5663,29.5939,32.977L30.1574,33.6168C30.6731,34.2185,31.1601,35.0302,31.5994,35.67C31.8286,35.9947,32.0101,36.2144,32.2011,36.3099C32.4207,36.4245,33.1751,36.3194,33.7099,36.0043C34.3498,35.6223,34.8082,35.1162,35.4862,34.5241L36.5272,33.6741L37.845,32.6714L38.5231,32.0984L39.0865,31.5922L39.8314,30.9142L41.579,29.3767L42.4767,28.584L43.3458,27.8869C44.4917,27.0465,45.3417,26.6263,46.2012,26.0056C46.3826,25.8814,46.5641,25.7382,46.7455,25.5854L46.9174,25.4899L47.0798,25.3753L47.2421,25.2798L47.3663,25.2034L47.5955,25.0601C47.8342,24.9073,47.9488,24.7259,48.0061,24.6686L48.1685,24.5349L48.2926,24.4203L48.4358,24.2675L48.7987,24.0192L49.238,23.7041C49.2858,23.685,49.4481,23.7136,49.5436,23.3603C49.5627,23.303,49.5627,23.2266,49.5436,23.1502C49.7824,22.9687,50.0116,22.8064,50.2408,22.6631C50.3458,22.5867,50.4795,22.5676,50.6037,22.5963L50.661,22.6345L50.7756,22.7013L50.8806,22.7586C51.0621,23.0451,50.9952,23.3507,50.766,23.494C49.6678,24.1911,48.1494,25.8337,46.7837,26.8173C45.8478,27.4858,45.017,27.8869,43.9379,28.6891L43.1261,29.3385L42.238,30.112L40.4904,31.6495L39.755,32.3276L39.182,32.8337L38.4658,33.4449L37.1288,34.4668L36.1452,35.269C35.5053,35.8228,34.9992,36.3958,34.2065,36.8638C33.4712,37.2935,32.5258,37.5896,31.7522,37.1885C31.3034,36.9593,31.036,36.5868,30.7877,36.2239C30.3293,35.565,29.8422,34.7724,29.4029,34.2662L28.8204,33.5977C28.4193,33.1011,28.066,32.4995,27.7699,31.9742C27.1587,30.9047,26.9295,29.921,26.0032,28.6891L25.2774,27.8296L24.7426,27.2948C24.332,26.8842,23.9691,26.464,23.5202,26.0629C22.5652,25.2129,21.5434,24.2293,20.4738,23.8855C19.0318,23.4367,17.5706,23.3794,16.0713,23.408C15.1354,23.4271,14.2282,23.5513,14.1613,23.5799'
-export const CONTACT_LETTER =
-  'M23.7876,21.2306C23.6635,21.4789,23.3674,21.5744,23.1191,21.4503C22.8804,21.3261,22.7849,21.0301,22.909,20.7818C22.9472,20.7054,22.8613,20.2661,22.6894,19.76C22.3265,18.6904,22.0304,17.5157,21.6293,16.3124C21.4288,15.7108,21.2855,15.2142,21.085,14.8131L20.7508,14.2019L20.2351,13.3997L19.9963,12.8172C19.9581,12.6644,19.9868,12.3779,20.1778,12.206C20.4452,11.9768,20.6457,12.0532,20.789,12.0723L21.2282,12.1487C21.8394,12.2728,22.718,12.3015,23.759,12.3015L27.4548,12.2251C29.9664,12.1678,32.096,11.8909,33.9296,11.5757C35.7059,11.2606,37.2338,10.8977,38.6377,10.6876L42.5054,10.1146L44.3676,9.8663L45.1984,9.7994L45.7619,9.7994C46.268,9.8567,46.6882,10.1623,46.9365,10.5634C47.414,11.3274,47.2803,12.2633,47.0798,13.1705C46.8697,14.1064,46.5736,15.0901,46.4877,16.0928C46.268,18.4898,46.1821,20.1992,46.1248,21.8036L46.0197,24.2961C45.9815,24.8691,45.9433,25.4708,45.9338,25.9578L44.9406,26.4735C44.9215,25.8623,44.9692,25.0219,45.0265,24.2197L45.1316,21.775C45.1507,21.3166,45.1698,20.8391,45.1889,20.352L45.2462,20.1228L45.313,19.8268L45.3417,19.4639L45.3512,19.2729L45.3512,19.0628L45.3512,18.8814L45.3894,18.3179L45.3894,18.0792L45.3894,17.9168L45.3894,17.7545L45.3894,17.5635L45.3894,17.2961C45.4181,16.895,45.4563,16.4652,45.4945,16.0069C45.5995,14.8704,45.9147,13.839,46.1152,12.9604C46.2967,12.1201,46.3349,11.4707,46.0961,11.0791C46.0006,10.9168,45.8192,10.8022,45.6664,10.7831L45.2175,10.7926L44.4917,10.8499L42.6391,11.0982L39.3444,11.5853L39.268,11.5948L38.7809,11.6712C37.4344,11.8718,35.9064,12.2346,34.1015,12.5498C32.2297,12.8745,30.0523,13.161,27.4739,13.2183L23.7685,13.2947C22.7944,13.2947,21.954,13.2756,21.2569,13.161L21.6007,13.6862L21.9827,14.3834C22.2214,14.88,22.3742,15.4052,22.5748,16.0069C22.9854,17.2388,23.2815,18.423,23.6253,19.4353C23.8067,19.9509,24.1219,20.5812,23.7876,21.2306'
+// The top edge and the wings are the same edge of the same envelope in its two
+// positions, which is the one place the delivered files swap rather than move;
+// everything else is the same ink throughout. No two drawings are dissolved
+// into each other, and nothing is scaled up to pass for an opened envelope.
+export const CONTACT_ENVELOPE_BODY =
+  'M9 29 C5 33 5 44 7 47 C10 53 21 51 19 46 C17 41 11 46 12 50 C13 55 20 55 28 54 L48 54 Q56 54 57 48 Q59 34 55 29'
+export const CONTACT_FRONT_FOLD = 'M9 29 C19 33 28 41 32 41 C36 41 45 32 55 29'
+export const CONTACT_CLOSED_RIM = 'M9 29 C17 24 25 27 32 26 C41 26 51 23 55 29'
+export const CONTACT_REAR_FLAP = 'M9 29 Q12 25 16 25 M48 25 Q53 25 55 29'
+export const CONTACT_LETTER = 'M18 32 L18 19 Q18 15 23 15 L41 15 Q46 14 46 20 L46 32'
 
-/** The letter's own silhouette, read off a render of CONTACT_LETTER the same
- * way CONTACT_OCCLUDER is read off the envelope: the leftmost and rightmost ink
- * in each row, joined up. Painted in the page colour behind the letter's
- * outline so the opened flap passes behind the paper instead of through it. */
-export const CONTACT_LETTER_FILL =
-  'M44.1575,9.8472L40.1466,10.4202L36.7086,10.9932L33.6526,11.5662L20.1873,12.1392L19.9963,12.7121L20.1873,13.2851L20.5693,13.8581L20.8558,14.4311L21.2378,15.0041L21.4288,15.5771L21.6198,16.1501L21.8108,16.7231L21.9063,17.2961L22.0973,17.8691L22.2883,18.4421L22.4793,19.0151L22.6703,19.5881L22.8613,20.161L22.8613,20.734L22.9568,21.307L45.1125,21.88L45.1125,22.453L45.1125,23.026L45.017,23.599L45.017,24.172L45.017,24.745L44.9215,25.318L44.9215,25.891L44.9215,26.3685L44.9215,26.3685L45.8765,25.891L45.8765,25.318L45.8765,24.745L45.972,24.172L45.972,23.599L45.972,23.026L45.972,22.453L46.0675,21.88L46.0675,21.307L46.0675,20.734L46.0675,20.161L46.163,19.5881L46.163,19.0151L46.163,18.4421L46.2585,17.8691L46.2585,17.2961L46.354,16.7231L46.354,16.1501L46.4495,15.5771L46.545,15.0041L46.6405,14.4311L46.8315,13.8581L46.927,13.2851L47.0225,12.7121L47.118,12.1392L47.118,11.5662L47.0225,10.9932L46.736,10.4202L46.0675,9.8472Z'
+/** The delivered `paper-reveal` mask: everything above the envelope's own front
+ * fold. It is what keeps the letter behind the V rather than across it, both
+ * at rest and all the way up. */
+export const CONTACT_PAPER_REVEAL = 'M0 0 H64 V29 C49 29 37 41 32 41 C27 41 16 31 0 27 Z'
 
-/** Everything above the envelope's own top silhouette. */
-export const CONTACT_OCCLUDER =
-  'M-5.4064,-10.0166H67.1727V23.1215L49.9829,23.1215L46.163,22.071L41.579,21.2115L36.9951,20.925L32.4112,20.925L27.8272,20.925L23.2433,21.0205L18.6593,21.7845L-5.4064,21.7845Z'
-
-/** The flap hinges on the top of its own stroke (22.39 in the box, after the
- * refit above) and opens to -0.62, which foreshortens it to where
- * contact_end.svg draws its open flap. */
-export const CONTACT_FLAP_HINGE = 22.3862
-export const CONTACT_FLAP_OPEN_SCALE = -0.62
-
-/** How far down the letter sits at rest — far enough that the occluder hides
- * every part of it, which is what makes the closed state contact_start.svg. */
-export const CONTACT_LETTER_REST_Y = 14.3248
-
-/** Contact is a filled contour, and the delivered file brings it up to the
- * group's 2.4 by stroking that contour at 2.2 of its own units — not by laying
- * a 2.4 stroke over it, which would read far heavier than the other six. In
- * the 64 box those 2.2 units measure 2.2 x 56/90, and with the ~1.15 of filled
- * ink underneath the result lands on 2.4. Stroking it a second time is the
- * mistake this constant exists to prevent. */
-export const CONTACT_STROKE_WIDTH = 1.3689
+/* How far down the letter sits at rest.
+ *
+ * The delivered start file parks it at `translate(0 13)` and then sets
+ * `opacity: 0` on top of that, because 13 is nowhere near far enough to hide
+ * it: CONTACT_PAPER_REVEAL reaches its deepest at the point of the V, (32,41),
+ * and at an offset of 13 the letter's top edge sits at y=26.8 there — a wide
+ * band of paper standing up out of the envelope. The delivered file covers
+ * that with the opacity rather than with the mask.
+ *
+ * 28 is where the mask takes over at every column of the letter, the point of
+ * the V included. Past it the letter is genuinely behind the front fold at
+ * rest, so the hover is a slide and nothing else — no fade, and no sliver of
+ * paper showing through the notch of the V before the motion starts.
+ *
+ * Both delivered states are still reproduced exactly: no letter at rest, and
+ * the letter at `translate(0 0)` at the end. The one value that differs from
+ * the file is the one the mask makes invisible either way.
+ */
+export const CONTACT_LETTER_REST_Y = 28
 
 // --- LinkedIn --------------------------------------------------------------
 // linkedin_start.svg and linkedin_end.svg (the L1 drawing). The two files are
@@ -136,6 +152,7 @@ export const CONTACT_STROKE_WIDTH = 1.3689
 // them is the dot's cy, 19 against 13. So the hover is that one move and
 // nothing else: the letters are not redrawn, nudged or rescaled, and there is
 // no arrow, trail, second dot, frame or underline anywhere in either file.
+// Unchanged in V6.
 export const LINKEDIN_LETTERS =
   'M19 28 Q18.6 38 19 48 M30 48 L30 28 M30 34 C33 27 39 26 43 29 C47 32 45 41 46 48'
 export const LINKEDIN_DOT = { cx: 19, restY: 19, hoverY: 13, radius: 1.5 }
@@ -145,6 +162,7 @@ export const LINKEDIN_DOT = { cx: 19, restY: 19, hoverY: 13, radius: 1.5 }
 // are not two ends of one hover: they are the button's symbol in each theme —
 // moon while the page is light, sun while it is dark — so the switch between
 // them follows the theme, and hovering only turns the symbol a few degrees.
+// Unchanged in V6.
 export const THEME_MOON =
   'M43 12 C25 10 13 23 17 38 C21 53 43 56 52 39 C39 43 27 34 29 23 C30 18 34 14 43 12Z'
 export const THEME_SUN_CORE = { cx: 32, cy: 32, radius: 10 }

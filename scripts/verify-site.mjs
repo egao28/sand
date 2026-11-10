@@ -256,6 +256,118 @@ check(
 )
 check(!!rail.theme.name, `the theme button has an accessible name (${rail.theme.name})`)
 
+console.log('\n# the icons are the V6 set, and each one actually moves')
+await visit('/about')
+/* The pointer has to be parked off the rail first: puppeteer leaves it wherever
+ * the last hover put it, and an icon already under it would report its hover
+ * state as its rest state and pass this trivially. */
+await page.mouse.move(1200, 500)
+await new Promise((r) => setTimeout(r, 400))
+
+const canvases = await page.evaluate(() =>
+  [...document.querySelectorAll('.site-rail .nav-icon')].map((svg) => ({
+    viewBox: svg.getAttribute('viewBox'),
+    strokes: [
+      ...new Set(
+        [...svg.querySelectorAll('[stroke-width]')].map((el) => el.getAttribute('stroke-width'))
+      ),
+    ],
+  }))
+)
+check(
+  canvases.every((c) => c.viewBox === '0 0 64 64'),
+  `every icon is drawn on one 64x64 canvas (${[...new Set(canvases.map((c) => c.viewBox))].join(', ')})`
+)
+check(
+  canvases.every((c) => c.strokes.every((w) => w === '2.4')),
+  `every stroke in every icon is 2.4 (${[...new Set(canvases.flatMap((c) => c.strokes))].join(', ')})`
+)
+
+/* Every endpoint in the GitHub drawing is a filled dot. A hollow ring or a
+ * stroked circle here would be the old G2 artwork coming back. */
+const githubNodes = await page.evaluate(() =>
+  [...document.querySelectorAll('.nav-icon--github circle')].map((c) => ({
+    fill: getComputedStyle(c).fill,
+    stroke: getComputedStyle(c).stroke,
+    r: c.getAttribute('r'),
+  }))
+)
+check(
+  githubNodes.length === 3 &&
+    githubNodes.every((n) => n.fill !== 'none' && n.stroke === 'none' && n.r === '2.6'),
+  `GitHub has three solid endpoints and no hollow ring (${JSON.stringify(githubNodes.map((n) => n.r))})`
+)
+
+/* Two icons of the same kind can be in one document — the rail and the compact
+ * bar are both on the homepage — so a shared clipPath id would have one of them
+ * masking the other. */
+await visit('/')
+const clipIds = await page.evaluate(() =>
+  [...document.querySelectorAll('clipPath[id]')].map((c) => c.id)
+)
+check(
+  new Set(clipIds).size === clipIds.length,
+  `${clipIds.length} clipPath id(s) in the document, all distinct`
+)
+
+/* What proves the motion is real: a geometric reading of the part that moves,
+ * taken at rest and again after the hover has settled. Deliberately not an
+ * assertion about the numbers themselves — only that hovering changes the
+ * drawing and that leaving puts it back. */
+await visit('/about')
+await page.mouse.move(1200, 500)
+await new Promise((r) => setTimeout(r, 400))
+
+const MOVERS = {
+  about: '.nav-icon-about-arm',
+  projects: '.nav-icon-pinwheel',
+  resume: '.nav-icon-resume-page',
+  contact: '.nav-icon-contact-letter',
+  github: '.nav-icon-github-branch',
+  linkedin: '.nav-icon-linkedin-dot',
+}
+
+const shapeOf = (id, sel) =>
+  page.evaluate(
+    ([itemId, selector]) => {
+      const el = document.querySelector(`.site-rail-item--${itemId} ${selector}`)
+      const box = el.getBoundingClientRect()
+      return [box.x, box.y, box.width, box.height].map((n) => Math.round(n * 100) / 100).join(',')
+    },
+    [id, sel]
+  )
+
+for (const [id, sel] of Object.entries(MOVERS)) {
+  const rest = await shapeOf(id, sel)
+  await page.hover(`.site-rail-item--${id} .site-rail-link`)
+  await new Promise((r) => setTimeout(r, 600))
+  const hovered = await shapeOf(id, sel)
+  await page.mouse.move(1200, 500)
+  await new Promise((r) => setTimeout(r, 600))
+  const back = await shapeOf(id, sel)
+
+  check(rest !== hovered, `${id} changes on hover (${rest} -> ${hovered})`)
+  check(back === rest, `${id} returns to rest when the pointer leaves (${back})`)
+}
+
+/* Keyboard focus has to do the same thing the pointer does, or the motion is
+ * only there for people using a mouse. */
+const focusMoved = await page.evaluate(async () => {
+  const link = document.querySelector('.site-rail-item--github .site-rail-link')
+  const branch = document.querySelector('.site-rail-item--github .nav-icon-github-branch')
+  const read = () => Math.round(branch.getBoundingClientRect().width * 100) / 100
+  const before = read()
+  link.focus()
+  await new Promise((r) => setTimeout(r, 600))
+  const after = read()
+  link.blur()
+  return { before, after }
+})
+check(
+  focusMoved.before !== focusMoved.after,
+  `keyboard focus plays the motion too (${focusMoved.before} -> ${focusMoved.after})`
+)
+
 console.log('\n# /resume still resolves, and it resolves to the PDF')
 await page.setViewport({ width: 1440, height: 900 })
 await page.goto(BASE + RESUME_PATH, { waitUntil: 'networkidle0' })
