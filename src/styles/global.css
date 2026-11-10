@@ -72,9 +72,10 @@
   pointer-events: none;
 }
 
-/* Under 900px the rail is display:none, so the opening carries the logo itself.
-   On desktop the rail's logo already holds this exact position, so this one is
-   switched off there — site-nav.css owns which of the two is shown. */
+/* Under 768px the rail is display:none, so the opening carries the logo and the
+   theme button itself. On desktop the rail already holds both in these exact
+   positions, so these are switched off there — site-nav.css owns which of the
+   two pairs is shown. */
 .opening-logo {
   position: absolute;
   top: 24px;
@@ -340,11 +341,9 @@
     transform: none;
     will-change: auto;
   }
-  /* The rail is not revealed by scroll progress here — there is no progress to
-     read. It is simply present, like it is on every other route. */
-  .has-opening .site-rail-nav {
-    opacity: 1;
-  }
+  /* Nothing to say about the rail here any more: with reduced motion the
+     opening never takes over, so the rail is never dormant and is simply
+     present, like it is on every other route. */
 }
 
 @media (max-width: 760px) {

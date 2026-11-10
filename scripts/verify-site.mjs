@@ -84,8 +84,8 @@ const CURRENT = [
 const RAIL = [
   ['about', 'page'],
   ['projects', 'page'],
-  ['resume', 'download'],
   ['contact', 'page'],
+  ['resume', 'download'],
   ['github', 'external'],
   ['linkedin', 'external'],
 ]
@@ -95,6 +95,7 @@ const WIDTHS = [
   [1024, 800],
   [768, 1024],
   [390, 844],
+  [320, 640],
 ]
 
 const failures = []
@@ -251,8 +252,8 @@ check(
   `the theme control is a button with an icon (${rail.theme.tag})`
 )
 check(
-  rail.theme.gap === 24,
-  `the theme button sits 24px below the external pair (${rail.theme.gap}px)`
+  rail.theme.gap === 16,
+  `the theme button sits 16px below the last entry (${rail.theme.gap}px)`
 )
 check(!!rail.theme.name, `the theme button has an accessible name (${rail.theme.name})`)
 
@@ -286,7 +287,7 @@ check(
 /* Every endpoint in the GitHub drawing is a filled dot. A hollow ring or a
  * stroked circle here would be the old G2 artwork coming back. */
 const githubNodes = await page.evaluate(() =>
-  [...document.querySelectorAll('.nav-icon--github circle')].map((c) => ({
+  [...document.querySelectorAll('.site-rail .nav-icon--github circle')].map((c) => ({
     fill: getComputedStyle(c).fill,
     stroke: getComputedStyle(c).stroke,
     r: c.getAttribute('r'),
@@ -761,6 +762,236 @@ check(
 console.log('\n# /about never plays the opening')
 await visit('/about')
 check(!(await page.$('.opening-scene')), '/about has no opening scene')
+
+console.log('\n# the rail groups three pages, then three actions, then the theme')
+await visit('/about', 1440, 900)
+const grouping = await page.evaluate(() => {
+  const items = [...document.querySelectorAll('.site-rail-item')]
+  const gaps = []
+  for (let i = 1; i < items.length; i += 1) {
+    gaps.push(
+      Math.round(items[i].getBoundingClientRect().top - items[i - 1].getBoundingClientRect().bottom)
+    )
+  }
+  const theme = document.querySelector('.site-rail-theme').getBoundingClientRect()
+  return {
+    gaps,
+    groups: items.map((li) =>
+      [...li.classList]
+        .find((c) => c.startsWith('site-rail-item--group-'))
+        ?.replace('site-rail-item--group-', '')
+    ),
+    themeGap: Math.round(theme.top - items[items.length - 1].getBoundingClientRect().bottom),
+    // The theme button has to be part of the rail, not pinned to the bottom of
+    // the screen with a hole above it.
+    themeFromBottom: Math.round(window.innerHeight - theme.bottom),
+    radius: getComputedStyle(document.querySelector('.site-rail-link')).borderRadius,
+  }
+})
+check(
+  grouping.groups.join(',') === 'pages,pages,pages,tools,tools,tools',
+  `three pages then three actions (${grouping.groups.join(', ')})`
+)
+check(
+  grouping.gaps.join(',') === '12,12,24,12,12',
+  `gaps are 12/12 inside the groups and 24 between them (${grouping.gaps.join(', ')})`
+)
+check(grouping.themeGap === 16, `the theme button follows at 16px (${grouping.themeGap}px)`)
+check(
+  grouping.themeFromBottom > 200,
+  `and is not pinned to the bottom of the screen (${grouping.themeFromBottom}px above it)`
+)
+check(grouping.radius === '12px', `the selected background is 12px round (${grouping.radius})`)
+
+/* Nothing draws a line between the groups: the grouping is space. */
+const rules = await page.evaluate(
+  () =>
+    [...document.querySelectorAll('.site-rail, .site-rail *')].filter((el) => {
+      const s = getComputedStyle(el)
+      const painted = (v) => v && v !== 'none' && v !== '0px' && !/rgba\(0, 0, 0, 0\)/.test(v)
+      return (
+        painted(s.borderTopWidth !== '0px' ? s.borderTopColor : '') ||
+        painted(s.boxShadow) ||
+        (el.classList.contains('site-rail') && painted(s.backgroundColor))
+      )
+    }).length
+)
+check(rules === 0, `no frame, divider or shadow anywhere in the rail (${rules} found)`)
+
+console.log('\n# the compact bar is seven icons, not a row of words')
+await visit('/about', 390, 844)
+const bar = await page.evaluate(() => {
+  const links = [...document.querySelectorAll('.site-topbar-link')]
+  const theme = document.querySelector('.site-topbar-theme')
+  const controls = [...links, theme]
+  const box = (el) => el.getBoundingClientRect()
+  const items = [...document.querySelectorAll('.site-topbar-item')]
+  const gaps = []
+  for (let i = 1; i < items.length; i += 1) {
+    gaps.push(Math.round(box(items[i]).left - box(items[i - 1]).right))
+  }
+  return {
+    count: controls.length,
+    // Text the bar actually paints. The theme button carries its name in an
+    // .sr-only span, which announces but is clipped to nothing on screen, so
+    // what counts here is text outside those spans.
+    visibleText: controls
+      .map((el) =>
+        [...el.childNodes]
+          .filter((n) => !(n.nodeType === 1 && n.classList.contains('sr-only')))
+          .map((n) => n.textContent.trim())
+          .join('')
+      )
+      .filter(Boolean).length,
+    // An accessible name, however it is given: aria-label on the six links,
+    // the .sr-only span on the theme button.
+    names: controls
+      .map((el) => el.getAttribute('aria-label') || el.textContent.trim())
+      .filter(Boolean).length,
+    hits: controls.map((el) => [Math.round(box(el).width), Math.round(box(el).height)]),
+    icons: controls.map((el) => {
+      const svg = el.querySelector('svg.nav-icon')
+      return svg ? [svg.getAttribute('width'), svg.getAttribute('height')] : null
+    }),
+    gaps,
+    themeGap: Math.round(box(theme).left - box(links[links.length - 1]).right),
+    logo: !!document.querySelector('.site-topbar-logo-row .site-logo'),
+    logoAbove: Math.round(
+      box(document.querySelector('.site-topbar-row')).top -
+        box(document.querySelector('.site-topbar-logo-row')).bottom
+    ),
+    edge: getComputedStyle(document.querySelector('.site-topbar')).paddingLeft,
+    sticky: getComputedStyle(document.querySelector('.site-topbar')).position,
+    bg: getComputedStyle(document.querySelector('.site-topbar')).backgroundColor,
+    pageBg: getComputedStyle(document.body).backgroundColor,
+    shadow: getComputedStyle(document.querySelector('.site-topbar')).boxShadow,
+  }
+})
+check(bar.count === 7, `seven controls in the bar (${bar.count})`)
+check(bar.logo, 'the original logo is on its own row above them')
+check(bar.visibleText === 0, `none of them paints a word (${bar.visibleText} with text)`)
+check(bar.names === 7, `all seven keep an accessible name (${bar.names})`)
+check(
+  bar.hits.every(([w, h]) => w >= 44 && h >= 44),
+  `every tap target is at least 44x44 (${bar.hits.map((h) => h.join('x')).join(' ')})`
+)
+check(
+  bar.icons.every((i) => i && i[0] === '28' && i[1] === '28'),
+  `every icon is 28x28 (${JSON.stringify(bar.icons)})`
+)
+check(
+  bar.gaps.join(',') === '0,0,8,0,0' && bar.themeGap === 8,
+  `8px between the groups and before the theme (${bar.gaps.join(',')} then ${bar.themeGap})`
+)
+check(bar.edge === '12px', `12px down each side of the bar (${bar.edge})`)
+check(bar.sticky === 'sticky', `the bar is sticky (${bar.sticky})`)
+check(bar.bg === bar.pageBg, `its background is the page colour (${bar.bg})`)
+check(bar.shadow === 'none', `and it casts no shadow (${bar.shadow})`)
+
+/* In flow, not over the content: the first thing on the page has to start
+ * below the bar, not underneath it. */
+const flow = await page.evaluate(() => {
+  const barBox = document.querySelector('.site-topbar').getBoundingClientRect()
+  const first = document.querySelector('.profile-name').getBoundingClientRect()
+  return { barBottom: Math.round(barBox.bottom), contentTop: Math.round(first.top) }
+})
+check(
+  flow.contentTop >= flow.barBottom,
+  `the content starts below the bar (bar ends ${flow.barBottom}, content starts ${flow.contentTop})`
+)
+
+/* 320px: the row scrolls sideways rather than shrinking the targets. */
+await visit('/about', 320, 640)
+const narrow = await page.evaluate(() => {
+  const row = document.querySelector('.site-topbar-row')
+  const controls = [
+    ...document.querySelectorAll('.site-topbar-link'),
+    document.querySelector('.site-topbar-theme'),
+  ]
+  return {
+    scrollable: row.scrollWidth > row.clientWidth,
+    hits: controls.map((el) => Math.round(el.getBoundingClientRect().width)),
+    rows: new Set(controls.map((el) => Math.round(el.getBoundingClientRect().top))).size,
+  }
+})
+check(
+  narrow.hits.every((w) => w >= 44),
+  `at 320px the targets are still 44px wide (${narrow.hits.join(' ')})`
+)
+check(narrow.rows === 1, `and still on one line (${narrow.rows} line(s))`)
+check(narrow.scrollable, 'the row scrolls sideways instead')
+
+console.log('\n# the opening carries the logo and the theme control, and nothing else')
+await visit('/', 1440, 900)
+const opening = await page.evaluate(() => {
+  const nav = document.querySelector('.site-rail-nav')
+  const theme = document.querySelector('.site-rail-theme').getBoundingClientRect()
+  const logo = document.querySelector('.site-rail-logo').getBoundingClientRect()
+  return {
+    navOpacity: getComputedStyle(nav).opacity,
+    inert: nav.hasAttribute('inert'),
+    focusable: [...nav.querySelectorAll('a')].filter((a) => a.tabIndex >= 0 && a.offsetParent)
+      .length,
+    themeBelowLogo: Math.round(theme.top - logo.bottom),
+  }
+})
+check(opening.navOpacity === '0', `the six entries are not painted (opacity ${opening.navOpacity})`)
+check(opening.inert, 'and the nav is inert, so Tab cannot reach them')
+check(
+  opening.themeBelowLogo < 48,
+  `the theme button sits right under the logo, not below a gap (${opening.themeBelowLogo}px)`
+)
+
+/* Scroll past the handover: the nav arrives whole and the button comes down. */
+const handedOver = await page.evaluate(async () => {
+  window.scrollTo({ top: window.innerHeight * 0.8, behavior: 'instant' })
+  await new Promise((r) => setTimeout(r, 700))
+  const nav = document.querySelector('.site-rail-nav')
+  const theme = document.querySelector('.site-rail-theme').getBoundingClientRect()
+  const items = [...document.querySelectorAll('.site-rail-item')]
+  return {
+    opacity: getComputedStyle(nav).opacity,
+    inert: nav.hasAttribute('inert'),
+    // Every entry at the same opacity: the group arrives as one piece, not
+    // one icon at a time.
+    opacities: new Set(items.map((li) => getComputedStyle(li).opacity)).size,
+    themeGap: Math.round(theme.top - items[items.length - 1].getBoundingClientRect().bottom),
+  }
+})
+check(handedOver.opacity === '1', `after the handover the nav is painted (${handedOver.opacity})`)
+check(!handedOver.inert, 'and reachable again')
+check(handedOver.opacities === 1, 'every entry arrives at once, none staggered')
+check(
+  handedOver.themeGap === 16,
+  `the theme button lands 16px under the last entry (${handedOver.themeGap}px)`
+)
+
+/* A direct visit to a real page never waits for an opening. */
+for (const path of ['/about', '/projects', '/contact', '/experience/sony']) {
+  await visit(path, 1440, 900)
+  const live = await page.evaluate(() => {
+    const nav = document.querySelector('.site-rail-nav')
+    return { opacity: getComputedStyle(nav).opacity, inert: nav.hasAttribute('inert') }
+  })
+  check(live.opacity === '1' && !live.inert, `${path} has the nav immediately`)
+}
+
+/* Switching the theme must not navigate or send you back through the opening. */
+await visit('/projects', 1440, 900)
+const afterToggle = await page.evaluate(async () => {
+  const before = location.pathname + location.hash
+  const y = window.scrollY
+  document.querySelector('.site-rail-theme').click()
+  await new Promise((r) => setTimeout(r, 300))
+  const after = { path: location.pathname + location.hash, y: window.scrollY }
+  document.querySelector('.site-rail-theme').click()
+  localStorage.removeItem('evelyn-site-theme')
+  return { before, ...after, movedBy: Math.abs(after.y - y) }
+})
+check(
+  afterToggle.before === afterToggle.path && afterToggle.movedBy === 0,
+  `switching the theme changes neither the route nor the scroll (${afterToggle.path})`
+)
 
 console.log('\n# only one navigation is interactive at a time')
 for (const [w, h] of WIDTHS) {

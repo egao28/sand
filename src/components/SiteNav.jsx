@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import NavIcon, { DESKTOP_ICON_SIZE, ThemeIcon } from './icons/NavIcons.jsx'
+import NavIcon, { DESKTOP_ICON_SIZE, MOBILE_ICON_SIZE, ThemeIcon } from './icons/NavIcons.jsx'
 import { useTheme } from '../hooks/useTheme.js'
 
 /** True when `path` is the section `item` stands for. About owns the experience
@@ -105,25 +105,31 @@ function ThemeToggle({ className, labelClassName, iconSize }) {
 }
 
 /**
- * The fixed left rail: logo, then the six entries, then the theme button.
- * Desktop only — under 900px it is display:none, so it cannot be reached by
- * pointer or by Tab, and the compact top bar below is the one navigation on
- * the page.
+ * The fixed left rail: logo, then the six entries in two groups, then the theme
+ * button. Desktop only — under 768px it is display:none, so it cannot be
+ * reached by pointer or by Tab, and the compact top bar below is the one
+ * navigation on the page.
  *
  * Each entry is a 48x48 hit area around a 40x40 icon. The name only appears on
  * hover or focus, positioned out of flow, so the rail takes no more width than
  * the icons themselves and a label can never push the page around.
+ *
+ * `data-dormant` is the opening's state, on the container rather than on the
+ * nav alone: while it is set the stylesheet both hides the six entries and
+ * carries the theme button up under the logo, so the opening shows the logo
+ * and the theme control and nothing else — no column of invisible buttons
+ * holding its space open. The two move together, which is what makes the nav
+ * arrive as one piece rather than appearing icon by icon as you scroll.
  */
 export function SiteRail({ items, dormant }) {
   const location = useLocation()
 
   return (
-    <div className="site-rail">
+    <div className="site-rail" data-dormant={dormant ? 'true' : undefined}>
       <SiteLogo className="site-rail-logo" />
 
-      {/* While the opening still owns the screen the rail has not faded in yet,
-          so it is inert: an invisible nav must not be the first thing Tab
-          reaches. */}
+      {/* Hidden and inert until the opening hands over: an invisible nav must
+          not be the first thing Tab reaches. */}
       <nav className="site-rail-nav" aria-label="Main" inert={dormant || undefined}>
         <ul className="site-rail-list">
           {items.map((item) => {
@@ -165,49 +171,86 @@ export function SiteRail({ items, dormant }) {
 }
 
 /**
- * The compact top bar for under 900px. In normal document flow and sticky at
- * the top, so on the homepage it sits with the About content and never appears
- * over the opening. Text links only — nothing here depends on hover, and a tap
- * does the thing rather than first revealing a label.
+ * The compact top bar for under 768px. Two rows: the original logo, then the
+ * seven controls as icons — the same drawings the rail uses, at 28px inside a
+ * 44px tap target.
  *
- * Every entry the rail carries is here too, including GitHub, LinkedIn and the
- * theme button: the rail is not rendered at this width, so anything missing
- * from this bar would simply be unreachable (#70).
+ * Not a row of words. There is no permanent text here and nothing that depends
+ * on hover: one tap navigates, downloads or switches the theme, and no tap is
+ * ever spent revealing a label first. The names are still on the controls as
+ * `aria-label`, so what a screen reader announces is unchanged.
+ *
+ * In normal document flow and sticky at the top, so on the homepage it sits
+ * with the About content and never appears over the opening. It keeps its
+ * place in the flow, so nothing is hidden underneath it.
+ *
+ * Every entry the rail carries is here too, the theme button included: the
+ * rail is not rendered at this width, so anything missing from this bar would
+ * simply be unreachable.
  */
 export function SiteTopBar({ items }) {
   const location = useLocation()
 
   return (
     <div className="site-topbar">
-      <SiteLogo className="site-topbar-logo" size={40} />
+      <div className="site-topbar-logo-row">
+        <SiteLogo className="site-topbar-logo" size={40} />
+      </div>
 
-      <nav className="site-topbar-nav" aria-label="Main">
-        <ul className="site-topbar-list">
-          {items.map((item) => {
-            const current = isCurrent(item, location.pathname)
+      {/* The row scrolls sideways rather than shrinking on a 320px screen: the
+          tap targets stay 44px and the icons stay 28px, which is the whole
+          point of the bar. */}
+      <div className="site-topbar-row">
+        <nav className="site-topbar-nav" aria-label="Main">
+          <ul className="site-topbar-list">
+            {items.map((item) => {
+              const current = isCurrent(item, location.pathname)
 
-            return (
-              <li key={item.id}>
-                <NavLink
-                  item={item}
-                  className={`site-topbar-link${current ? ' site-topbar-link--current' : ''}`}
-                  aria-current={current ? 'page' : undefined}
-                  aria-label={accessibleName(item)}
+              return (
+                <li
+                  key={item.id}
+                  className={`site-topbar-item site-topbar-item--group-${item.group}`}
                 >
-                  {item.label}
-                  {item.external && (
-                    <span className="site-topbar-arrow" aria-hidden="true">
-                      ↗
-                    </span>
-                  )}
-                </NavLink>
-              </li>
-            )
-          })}
-        </ul>
-      </nav>
+                  <NavLink
+                    item={item}
+                    className={`nav-control site-topbar-link${
+                      current ? ' site-topbar-link--current' : ''
+                    }`}
+                    aria-current={current ? 'page' : undefined}
+                    aria-label={accessibleName(item) ?? item.label}
+                  >
+                    <NavIcon id={item.id} size={MOBILE_ICON_SIZE} />
+                  </NavLink>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
 
-      <ThemeToggle className="site-topbar-theme" labelClassName="sr-only" />
+        {/* Outside the <nav> for the same reason it is on the rail: a setting
+            is not a destination. */}
+        <ThemeToggle
+          className="site-topbar-theme"
+          labelClassName="sr-only"
+          iconSize={MOBILE_ICON_SIZE}
+        />
+      </div>
     </div>
+  )
+}
+
+/**
+ * The theme control the opening carries on narrow screens.
+ *
+ * The rail is not rendered under 768px and the compact bar lives with the
+ * About content, so without this the opening would have no theme control at
+ * all at those widths. On desktop the rail's own button already holds this
+ * position through the whole opening, so this one is switched off there —
+ * site-nav.css owns which of the two is shown, exactly as it does for the two
+ * logos.
+ */
+export function OpeningThemeToggle() {
+  return (
+    <ThemeToggle className="opening-theme" labelClassName="sr-only" iconSize={MOBILE_ICON_SIZE} />
   )
 }
