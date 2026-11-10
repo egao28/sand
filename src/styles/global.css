@@ -5,6 +5,8 @@
 @import './about-projects.css';
 /* The left rail and the compact top bar that replaced the fixed header. */
 @import './site-nav.css';
+/* Hover and focus motion for the rail's five icons. */
+@import './nav-icons.css';
 
 /* Smooth local hover “wind” (used in hang-sway keyframes) */
 @property --hover-boost {

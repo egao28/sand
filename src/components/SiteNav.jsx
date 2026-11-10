@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import NavIcon from './icons/NavIcons.jsx'
 
 /** True when `path` is the section `item` stands for. About owns the experience
  * write-ups and Projects owns the project write-ups, so a detail page keeps its
@@ -66,11 +67,11 @@ function NavLink({ item, children, className, ...rest }) {
  * it is display:none, so it cannot be reached by pointer or by Tab, and the
  * compact top bar below is the one navigation on the page.
  *
- * #67 replaces the labels here with the hand-drawn icons and their hover
- * animations; the structure, the hit areas and the current-page handling are
- * the same either way.
+ * Each entry is a 48x48 hit area around a 40x40 icon. The name only appears on
+ * hover or focus, positioned out of flow, so the rail takes no more width than
+ * the icons themselves.
  */
-export function SiteRail({ items, renderItem, dormant }) {
+export function SiteRail({ items, dormant }) {
   const location = useLocation()
 
   return (
@@ -92,7 +93,10 @@ export function SiteRail({ items, renderItem, dormant }) {
                   className={`site-rail-link${current ? ' site-rail-link--current' : ''}`}
                   aria-current={current ? 'page' : undefined}
                 >
-                  {renderItem ? renderItem(item, current) : null}
+                  <NavIcon id={item.id} />
+                  {/* The link's accessible name. Faded out rather than removed,
+                      so a screen reader still has something to announce when
+                      the icon is all that is painted. */}
                   <span className="site-rail-label">{item.label}</span>
                 </NavLink>
               </li>
