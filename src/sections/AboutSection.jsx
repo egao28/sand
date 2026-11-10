@@ -72,7 +72,18 @@ export default function AboutSection({ content, resume }) {
           <ul className="profile-roles">
             {content.roles.map((role) => (
               <li key={role.id} className="profile-role">
-                <h3 className="profile-role-org">{role.org}</h3>
+                <h3 className="profile-role-org">
+                  {/* A role with an `href` is the only entry point its detail
+                      page has, so the heading itself is the link — no extra
+                      button and no added words beside it. */}
+                  {role.href ? (
+                    <Link to={role.href} className="profile-role-org-link">
+                      {role.org}
+                    </Link>
+                  ) : (
+                    role.org
+                  )}
+                </h3>
                 <p className="profile-role-title">{`${role.role} · ${role.time}`}</p>
                 <p className="profile-role-note">{role.note}</p>
               </li>

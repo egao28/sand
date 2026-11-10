@@ -79,6 +79,13 @@ export const siteContent = {
     // `experience.items` — that array survives only to back /experience/:slug
     // and the `sub` string BloomMcpDetailPage renders, so the two differ on
     // purpose. `role` and `time` are joined with a middot when rendered.
+    //
+    // `href` turns the institution heading into a plain text link and is the
+    // only way into /experience/sony and /experience/tsinghua from anywhere on
+    // the site (#65): the /projects listing has no card for either, and #58
+    // dropped the links the old timeline carried. Salk and CHAI have no `href`
+    // on purpose — bloom-mcp is already linked from the /projects listing, and
+    // CHAI has no page at all.
     roles: [
       {
         id: 'chai',
@@ -97,6 +104,7 @@ export const siteContent = {
       {
         id: 'sony',
         org: 'Sony',
+        href: '/experience/sony',
         role: 'Computer Science Operations & Maintenance Intern',
         time: 'May–Sep 2025',
         note: 'Automated music-release preparation and feedback routing through reusable processing pipelines.',
@@ -104,6 +112,7 @@ export const siteContent = {
       {
         id: 'tsinghua',
         org: 'Tsinghua University · Vehicle Emission Research Group',
+        href: '/experience/tsinghua',
         role: 'Research Assistant',
         time: 'Jul 2024–Jan 2025',
         note: 'Built and evaluated forecasting models for environmental data, linking prediction with spatial analysis.',

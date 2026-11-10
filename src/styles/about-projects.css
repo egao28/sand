@@ -117,6 +117,23 @@
   line-height: 1.2;
 }
 
+/* Plain text link, not a button: same size and face as the heading it sits in,
+   with only an underline to mark it. The two roles that carry one are the only
+   route to /experience/sony and /experience/tsinghua. */
+.profile-role-org-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  transition: color 0.2s ease;
+}
+
+.profile-role-org-link:hover,
+.profile-role-org-link:focus-visible {
+  color: var(--accent);
+}
+
 .profile-role-title {
   font-family: var(--mono);
   font-size: 13px;
@@ -411,7 +428,8 @@
 @media (prefers-reduced-motion: reduce) {
   .worklist-card,
   .worklist-action,
-  .profile-link {
+  .profile-link,
+  .profile-role-org-link {
     transition: none;
   }
   .worklist-card:hover,
