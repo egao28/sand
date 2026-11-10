@@ -97,17 +97,25 @@
   margin-bottom: 1.6rem;
 }
 
+/* The list and its rules share one container, so a rule can never run past the
+   text it belongs to. Without the width it inherits `.profile-inner`'s 1040px
+   and the hairlines carry on across the gap and under the photo column, which
+   is the one thing they must not do. The left edge is untouched: it is still
+   the inner's, so the list lines up with the introduction above it. */
 .profile-roles {
   list-style: none;
   margin: 0;
   padding: 0;
+  max-width: 820px;
+  width: 100%;
   border-top: 1px solid var(--line);
 }
 
 /* Compact list, not a timeline: every line is readable without hovering, and
-   the item is not itself a hover target. */
+   the item is not itself a hover target. 32px above and below each entry, and
+   one hairline between them. */
 .profile-role {
-  padding: 1.5rem 0;
+  padding: 32px 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -143,11 +151,15 @@
   margin-top: 0.45rem;
 }
 
+/* Normally left-aligned: not justified, and never stretched to make a line
+   reach the rule above it. The width is the list's, so the text stops where
+   the hairlines stop. */
 .profile-role-note {
-  font-size: 17px;
-  line-height: 1.58;
+  font-size: 18px;
+  line-height: 1.65;
   color: var(--ink-soft);
-  max-width: 62ch;
+  max-width: none;
+  text-align: left;
   margin-top: 0.7rem;
 }
 
@@ -319,6 +331,17 @@
   animation-delay: var(--worklist-delay, 0s);
 }
 
+/* The entry a link jumped to does not play the entrance; ProjectsSection
+   leaves `--animated` off it. It starts 18px low, which is harmless when you
+   are reading down the page and wrong when the browser has just scrolled it to
+   a measured position — it would settle 18px up out from under you, taking the
+   top of the entry off the screen with it.
+ *
+ * Deliberately not `:target`, which looks like the obvious way to write this
+ * and does not work: the browser resolves the fragment once, before React has
+ * rendered anything with that id, and `pushState` never re-resolves it. The
+ * selector would simply never match. */
+
 /* ======================================================== motion ========= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -361,9 +384,11 @@
   .profile-prose {
     font-size: 17px;
   }
-  .profile-prose,
-  .profile-role-note {
+  .profile-prose {
     max-width: none;
+  }
+  .profile-role-note {
+    font-size: 17px;
   }
 }
 

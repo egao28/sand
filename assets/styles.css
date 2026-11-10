@@ -677,12 +677,13 @@ section {
 }
 
 /*
-  The two technical notes as one flat article (#71).
+  The short notes as one flat article (#71, extended to the two experience
+  write-ups).
 
-  Everything below is scoped to `.tech-note-page`, which only
-  /projects/almabot and /experience/bloom-mcp carry. The other detail pages
-  keep their tones: this is a different kind of page — a short note, read
-  straight down — not a redesign of the write-ups.
+  Everything below is scoped to `.tech-note-page`, which /projects/almabot,
+  /experience/bloom-mcp, /experience/sony and /experience/tsinghua carry. The
+  remaining detail pages keep their tones: this is a different kind of page — a
+  short note, read straight down — not a redesign of the write-ups.
 
   What goes: the per-section gradient blocks, the hero's own band, and the
   tinted panels those sections sat in. What is left is the page background,

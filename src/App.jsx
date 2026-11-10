@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import {
   BrowserRouter,
   Navigate,
@@ -42,9 +42,17 @@ import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion.js'
 function ScrollToTop() {
   const { pathname, hash } = useLocation()
   const navigationType = useNavigationType()
+  // The first render is reported as a POP, because landing on a URL and
+  // pressing Back look the same to the router. They are not the same here:
+  // there is nothing to restore on a first load, so a fragment in the address
+  // bar still has to be honoured.
+  const firstRender = useRef(true)
 
   useEffect(() => {
-    if (navigationType === 'POP') return
+    const isFirst = firstRender.current
+    firstRender.current = false
+
+    if (navigationType === 'POP' && !isFirst) return
 
     if (hash) {
       // `decodeURIComponent`: the fragment arrives percent-encoded, and

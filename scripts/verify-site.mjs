@@ -993,6 +993,192 @@ check(
   `switching the theme changes neither the route nor the scroll (${afterToggle.path})`
 )
 
+console.log('\n# Selected Experience: four links, and rules that stay in their column')
+await visit('/about', 1440, 900)
+const list = await page.evaluate(() => {
+  const ul = document.querySelector('.profile-roles')
+  const items = [...document.querySelectorAll('.profile-role')]
+  const note = document.querySelector('.profile-role-note')
+  const intro = document.querySelector('.profile-prose')
+  const photo = document.querySelector('.profile-portrait')
+  const gaps = []
+  for (let i = 1; i < items.length; i += 1) {
+    const prev = items[i - 1]
+    const cur = items[i]
+    gaps.push(
+      Math.round(
+        parseFloat(getComputedStyle(prev).paddingBottom) +
+          parseFloat(getComputedStyle(cur).paddingTop)
+      )
+    )
+  }
+  return {
+    width: Math.round(ul.getBoundingClientRect().width),
+    ruleRight: Math.round(ul.getBoundingClientRect().right),
+    photoLeft: photo ? Math.round(photo.getBoundingClientRect().left) : Infinity,
+    parentWidth: Math.round(ul.parentElement.getBoundingClientRect().width),
+    parentRight: Math.round(document.querySelector('.profile-inner').getBoundingClientRect().right),
+    listLeft: Math.round(ul.getBoundingClientRect().left),
+    introLeft: Math.round(intro.getBoundingClientRect().left),
+    gaps,
+    noteSize: getComputedStyle(note).fontSize,
+    noteLeading: getComputedStyle(note).lineHeight,
+    noteAlign: getComputedStyle(note).textAlign,
+    links: [...document.querySelectorAll('.profile-role-org-link')].map((a) => ({
+      href: a.getAttribute('href'),
+      deco: getComputedStyle(a).textDecorationLine,
+      color: getComputedStyle(a).color,
+      size: getComputedStyle(a).fontSize,
+    })),
+  }
+})
+check(list.width <= 820, `the list is at most 820px wide (${list.width}px)`)
+check(
+  list.listLeft === list.introLeft,
+  `its left edge lines up with the introduction (${list.listLeft} vs ${list.introLeft})`
+)
+check(
+  list.width <= list.parentWidth,
+  `and never wider than its container (${list.width} inside ${list.parentWidth})`
+)
+/* The rules used to run the full width of the content area, out past the text
+ * and across the empty right-hand side. 820px is where the brief stops them;
+ * what this asserts is that they stop well short of that edge. */
+check(
+  list.ruleRight < list.parentRight - 100,
+  `the rules stop well short of the right edge (rule ends ${list.ruleRight}, content ends ${list.parentRight})`
+)
+check(
+  list.gaps.every((g) => g === 64),
+  `32px above and below each entry (${list.gaps.join(', ')} between them)`
+)
+check(
+  list.noteSize === '18px' && list.noteLeading === '29.7px',
+  `the notes are 18px/1.65 (${list.noteSize}/${list.noteLeading})`
+)
+check(list.noteAlign === 'left', `left-aligned, not justified (${list.noteAlign})`)
+check(list.links.length === 4, `all four institutions are links (${list.links.length})`)
+check(
+  list.links.map((l) => l.href).join(' ') ===
+    '/projects#project-chai /experience/bloom-mcp /experience/sony /experience/tsinghua',
+  `and they point where they should (${list.links.map((l) => l.href).join(', ')})`
+)
+check(
+  new Set(list.links.map((l) => `${l.deco}|${l.color}|${l.size}`)).size === 1,
+  `all four are marked the same way (${list.links[0].deco}, ${list.links[0].size})`
+)
+
+/* Each link has to land on something. The CHAI one is the new anchor; the
+ * other three are pages that must not 404. */
+for (const [href, marker] of [
+  ['/projects#project-chai', '#project-chai'],
+  ['/experience/bloom-mcp', '.project-detail-title'],
+  ['/experience/sony', '.project-detail-title'],
+  ['/experience/tsinghua', '.project-detail-title'],
+]) {
+  await visit(href)
+  const landed = await page.evaluate((m) => {
+    const el = document.querySelector(m)
+    return {
+      found: !!el,
+      notFound: !!document.querySelector('.not-found-headline'),
+      // For the anchor: it has to be on screen, not scrolled past the top.
+      top: el ? Math.round(el.getBoundingClientRect().top) : null,
+    }
+  }, marker)
+  check(
+    landed.found && !landed.notFound,
+    `${href} resolves to ${marker}${landed.top !== null ? ` (${landed.top}px from the top)` : ''}`
+  )
+}
+
+/* The fragment has to actually scroll, and clear the sticky bar on narrow
+ * screens rather than landing underneath it. */
+for (const [w, h] of [
+  [1440, 900],
+  [390, 844],
+]) {
+  await visit('/projects#project-chai', w, h)
+  const anchored = await page.evaluate(() => {
+    const el = document.getElementById('project-chai')
+    const bar = document.querySelector('.site-topbar')
+    const barVisible = bar && getComputedStyle(bar).display !== 'none'
+    return {
+      top: Math.round(el.getBoundingClientRect().top),
+      barBottom: barVisible ? Math.round(bar.getBoundingClientRect().bottom) : 0,
+    }
+  })
+  check(
+    anchored.top >= anchored.barBottom && anchored.top <= anchored.barBottom + 40,
+    `${w}px: the CHAI anchor lands clear of the bar (${anchored.top}px, bar ends ${anchored.barBottom}px)`
+  )
+}
+
+console.log('\n# Sony and Tsinghua read as one short note')
+for (const path of ['/experience/sony', '/experience/tsinghua']) {
+  await visit(path, 1440, 900)
+  const note = await page.evaluate(() => {
+    const main = document.querySelector('main')
+    const col = document.querySelector('.sec-inner')
+    const paras = [...document.querySelectorAll('.project-detail-prose')]
+    const words = paras.map((p) => p.textContent.trim().split(/\s+/).length)
+    const tinted = [...main.querySelectorAll('*')].filter((el) => {
+      const s = getComputedStyle(el)
+      return (
+        /gradient/.test(s.backgroundImage) ||
+        (s.backgroundColor !== 'rgba(0, 0, 0, 0)' &&
+          s.backgroundColor !== getComputedStyle(document.body).backgroundColor)
+      )
+    }).length
+    return {
+      column: Math.round(col.getBoundingClientRect().width),
+      words: words.reduce((a, b) => a + b, 0),
+      paragraphs: paras.length,
+      headings: [...main.querySelectorAll('h2')].map((h) => h.textContent.trim()),
+      headingFont: getComputedStyle(main.querySelector('h2'))
+        .fontFamily.split(',')[0]
+        .replace(/['"]/g, ''),
+      back: main.querySelector('.project-detail-back')?.getAttribute('href'),
+      // Everything the trim was supposed to remove.
+      stats: main.querySelectorAll('.detail-stat-strip, .detail-stat-num').length,
+      cards: main.querySelectorAll('.detail-tool-card, .detail-tool-grid').length,
+      chips: main.querySelectorAll('.tech-chip-grid, .project-detail-tech').length,
+      diagrams: main.querySelectorAll('.detail-diagram, svg').length,
+      code: main.querySelectorAll('.detail-code, code').length,
+      tinted,
+    }
+  })
+  check(note.column === 720, `${path}: one 720px column (${note.column}px)`)
+  check(
+    note.words >= 150 && note.words <= 220,
+    `${path}: ${note.words} words of body copy (150-220)`
+  )
+  check(
+    note.paragraphs === 3 && note.headings.length === 2,
+    `${path}: a summary and two topics (${note.paragraphs} paragraphs, ${note.headings.join(' / ')})`
+  )
+  check(note.headingFont === 'Alegreya', `${path}: headings in Alegreya (${note.headingFont})`)
+  check(
+    note.stats === 0 &&
+      note.cards === 0 &&
+      note.chips === 0 &&
+      note.diagrams === 0 &&
+      note.code === 0,
+    `${path}: no stat strip, cards, chips, diagram or code block (${JSON.stringify({
+      stats: note.stats,
+      cards: note.cards,
+      chips: note.chips,
+      diagrams: note.diagrams,
+      code: note.code,
+    })})`
+  )
+  check(note.tinted === 0, `${path}: nothing tinted or gradient-filled (${note.tinted})`)
+  check(
+    note.back === `/about#experience-${path.split('/').pop()}`,
+    `${path}: back goes to its own entry on /about (${note.back})`
+  )
+}
+
 console.log('\n# only one navigation is interactive at a time')
 for (const [w, h] of WIDTHS) {
   await visit('/about', w, h)
