@@ -160,22 +160,6 @@
   margin-top: 0.7rem;
 }
 
-/* --- GitHub, on narrow screens only -------------------------------------- */
-
-.profile-outbound {
-  display: none;
-  margin-top: 2.5rem;
-}
-
-.profile-outbound-link {
-  font-family: var(--sans);
-  font-size: 15px;
-  color: var(--ink-soft);
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 0.3em;
-}
-
 /* ======================================================= /projects ======= */
 
 /* .sec-inner opens a 6.5rem band, which is too deep under the fixed nav for a
@@ -447,10 +431,6 @@
   .profile-prose,
   .profile-role-note {
     max-width: none;
-  }
-  /* The rail is gone at this width, so this is the only GitHub link there is. */
-  .profile-outbound {
-    display: block;
   }
 }
 

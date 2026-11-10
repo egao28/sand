@@ -1,14 +1,16 @@
 /*
-  Hover and focus motion for the five nav icons (#67).
+  Hover and focus motion for the seven nav icons (#70).
 
   All of it is CSS transitions on groups inside the inline SVGs, driven by the
-  state of the link. That is deliberate: a transition plays once on entry, holds
+  state of the link or button. That is deliberate: a transition plays once on entry, holds
   its end state while the pointer stays, and eases back on leave, with no loop
   to stop and no timer or listener to clean up. Entering and leaving quickly
   interrupts and reverses mid-flight on its own.
 
-  The motion is the whole of it: the icons are not swapped, cross-faded or
-  replaced by a second drawing.
+  The motion is the whole of it. The two delivered states are where the drawing
+  starts and where it ends up, not how it gets there: nothing here swaps one
+  file for another, cross-fades two bitmaps, or scales a closed envelope up to
+  pass for an open one. Each icon animates the part that actually moves.
 
   `transform-box: view-box` throughout, so every origin and translation below is
   in the icons' shared 64x64 units rather than in rendered pixels.
@@ -60,8 +62,9 @@
 .nav-icon-contact-flap {
   /* Hinged on the top of its own stroke, so it turns about the fold rather than
      about the middle of the icon. Through zero it is edge-on, which is what a
-     flap looks like half-way open. */
-  transform-origin: 32px 23.93px;
+     flap looks like half-way open. The number is CONTACT_FLAP_HINGE after the
+     v3 refit — see iconPaths.js; it is the artwork's own fold, not a guess. */
+  transform-origin: 32px 22.3862px;
   transition: transform 320ms cubic-bezier(0.33, 0, 0.2, 1);
 }
 
@@ -77,8 +80,12 @@
   fill: var(--rail-surface, var(--paper));
 }
 
+/* The letter itself. It is clipped by the envelope's own top silhouette, so at
+   rest it is genuinely behind the front panel rather than merely hidden: the
+   reveal is a mask, and the paper slides out from under the ink that was
+   covering it. CONTACT_LETTER_REST_Y, after the v3 refit. */
 .nav-icon-contact-letter {
-  transform: translateY(15px);
+  transform: translateY(14.3248px);
   transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -104,6 +111,38 @@
   opacity: 1;
 }
 
+/* --- LinkedIn: the dot over the i moves up, 260ms ----------------------- */
+
+/* The letters are not in this group and have no transition of their own, which
+   is the point: the whole hover is 6 units of travel on one dot. Nothing is
+   added alongside it — no arrow, no trail, no second dot, no frame and no
+   underline. */
+.nav-icon-linkedin-dot {
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-rail-link:hover .nav-icon-linkedin-dot,
+.site-rail-link:focus-visible .nav-icon-linkedin-dot {
+  transform: translateY(var(--dot-rise));
+}
+
+/* --- Theme: a slight turn on hover, and nothing else -------------------- */
+
+/* Hover does not change the theme and does not preview it. The moon and the sun
+   are the two themes' symbols, swapped when the theme actually changes; all
+   that happens under the pointer is four degrees. */
+.nav-icon-theme-turn {
+  transform-origin: 32px 32px;
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.site-rail-theme:hover .nav-icon-theme-turn,
+.site-rail-theme:focus-visible .nav-icon-theme-turn,
+.site-topbar-theme:hover .nav-icon-theme-turn,
+.site-topbar-theme:focus-visible .nav-icon-theme-turn {
+  transform: rotate(4deg);
+}
+
 /* ========================================================== motion ======= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -115,6 +154,8 @@
   .nav-icon-contact-flap,
   .nav-icon-contact-letter,
   .nav-icon-github-dot,
+  .nav-icon-linkedin-dot,
+  .nav-icon-theme-turn,
   .site-rail-label {
     transition: none;
   }
@@ -143,6 +184,13 @@
      motion, but nothing here should move when motion has been turned down. */
   .site-rail-link:hover .nav-icon-contact-letter,
   .site-rail-link:focus-visible .nav-icon-contact-letter {
-    transform: translateY(15px);
+    transform: translateY(14.3248px);
+  }
+
+  .site-rail-link:hover .nav-icon-linkedin-dot,
+  .site-rail-link:focus-visible .nav-icon-linkedin-dot,
+  .site-rail-theme:hover .nav-icon-theme-turn,
+  .site-rail-theme:focus-visible .nav-icon-theme-turn {
+    transform: none;
   }
 }

@@ -16,6 +16,28 @@
     <meta name="theme-color" content="#fffdf8" />
 
     <!--
+      The remembered light/dark choice, applied before the first paint (#70,
+      #73). It has to run here, synchronously in <head> and ahead of the
+      stylesheet, or the page paints cream and then switches — the flash of the
+      wrong theme that a saved preference is supposed to prevent.
+
+      Kept to one attribute and no fallback to `prefers-color-scheme`: a first
+      visit is light, and only a choice the visitor made here is remembered.
+      src/hooks/useTheme.js reads this attribute as its starting value, so the
+      two cannot disagree; the storage key is spelled out in both places and
+      has to stay in step.
+    -->
+    <script>
+      try {
+        if (localStorage.getItem('evelyn-site-theme') === 'dark') {
+          document.documentElement.dataset.theme = 'dark'
+        }
+      } catch (e) {
+        /* storage blocked — light, as a first visit would be */
+      }
+    </script>
+
+    <!--
       Deliberately no og:url and no canonical. This file is the shell every
       route is served from, so either one would hardcode the homepage onto
       /projects/proxima and friends — telling crawlers the whole site is a

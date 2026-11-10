@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Route and interaction checks for the built site (#65-#68).
+ * Route and interaction checks for the built site (#65-#68, #70).
  *
  * Deliberately not a mirror of the implementation: it asserts the things that
  * would be quietly wrong after a refactor and that the build and the linter
@@ -50,9 +50,13 @@ const ROUTES = [
   ['/experience/bloom-mcp', '.project-detail-title'],
   ['/experience/sony', '.project-detail-title'],
   ['/experience/tsinghua', '.project-detail-title'],
-  ['/resume', '.resume-photo-link'],
   ['/contact', '#contact'],
 ]
+
+/* `/resume` is deliberately not in ROUTES: since #70 it is a redirect to the
+ * PDF, so visiting it and then asking what rendered would be asking the PDF.
+ * It gets its own check further down. */
+const RESUME_PATH = '/resume'
 
 /** `projects.listingOnly` entries carry an `id`, never a `slug`, so none of
  * them may resolve a project URL. If one ever does, a listing card has quietly
@@ -67,11 +71,23 @@ const NOT_ROUTES = [
 const CURRENT = [
   ['/about', '/about'],
   ['/experience/sony', '/about'],
+  ['/experience/bloom-mcp', '/about'],
   ['/projects', '/projects'],
   ['/projects/proxima', '/projects'],
-  ['/resume', '/resume'],
+  ['/projects/almabot', '/projects'],
   ['/contact', '/contact'],
   ['/', null],
+]
+
+/** The rail, in order, and what each entry is. #70's three kinds: a page can be
+ * current, a download and an external link never can. */
+const RAIL = [
+  ['about', 'page'],
+  ['projects', 'page'],
+  ['resume', 'download'],
+  ['contact', 'page'],
+  ['github', 'external'],
+  ['linkedin', 'external'],
 ]
 
 const WIDTHS = [
@@ -151,20 +167,137 @@ for (const [path, expected] of CURRENT) {
   )
 }
 
-console.log('\n# external targets never pose as the current page')
+console.log('\n# the rail carries seven controls, in order')
 await visit('/about')
-const github = await page.evaluate(() => {
-  const el = document.querySelector('.site-rail-item--github a')
+const rail = await page.evaluate(() => {
+  const items = [...document.querySelectorAll('.site-rail-item')].map((li) => {
+    const a = li.querySelector('a')
+    const link = li.querySelector('.site-rail-link')
+    const icon = li.querySelector('svg.nav-icon')
+    const box = link.getBoundingClientRect()
+    return {
+      id: [...li.classList]
+        .find((c) => c.startsWith('site-rail-item--') && !c.includes('group'))
+        ?.replace('site-rail-item--', ''),
+      href: a.getAttribute('href'),
+      download: a.getAttribute('download'),
+      target: a.getAttribute('target'),
+      rel: a.getAttribute('rel'),
+      current: a.getAttribute('aria-current'),
+      hit: [Math.round(box.width), Math.round(box.height)],
+      icon: icon ? [icon.getAttribute('width'), icon.getAttribute('height')] : null,
+      label: li.querySelector('.site-rail-label')?.textContent,
+    }
+  })
+  const theme = document.querySelector('.site-rail-theme')
+  const themeBox = theme.getBoundingClientRect()
   return {
-    href: el.getAttribute('href'),
-    current: el.getAttribute('aria-current'),
-    target: el.getAttribute('target'),
+    items,
+    theme: {
+      tag: theme.tagName,
+      icon: theme.querySelector('svg.nav-icon') ? 'yes' : 'no',
+      hit: [Math.round(themeBox.width), Math.round(themeBox.height)],
+      // Distance from the bottom of the last entry to the top of the button.
+      gap: Math.round(
+        themeBox.top -
+          document.querySelector('.site-rail-item:last-child').getBoundingClientRect().bottom
+      ),
+      name: theme.textContent.trim(),
+    },
   }
 })
+
 check(
-  github.href.startsWith('https://') && !github.current && github.target === '_blank',
-  `GitHub is an external link with no aria-current (${JSON.stringify(github)})`
+  rail.items.map((i) => i.id).join(',') === RAIL.map(([id]) => id).join(','),
+  `rail order is ${rail.items.map((i) => i.id).join(', ')}`
 )
+check(
+  rail.items.every((i) => i.hit[0] === 48 && i.hit[1] === 48),
+  `every hit area is 48x48 (${rail.items.map((i) => i.hit.join('x')).join(' ')})`
+)
+check(
+  rail.items.every((i) => i.icon && i.icon[0] === '40' && i.icon[1] === '40'),
+  'every icon is a 40x40 inline SVG'
+)
+check(
+  rail.items.every((i) => i.label),
+  `every entry has a label (${rail.items.map((i) => i.label).join(', ')})`
+)
+
+for (const [id, kind] of RAIL) {
+  const item = rail.items.find((i) => i.id === id)
+  if (kind === 'external') {
+    check(
+      item.href.startsWith('https://') &&
+        item.target === '_blank' &&
+        /noopener/.test(item.rel) &&
+        !item.current,
+      `${id} is an external link, new tab, safe rel, never current (${item.href})`
+    )
+  } else if (kind === 'download') {
+    check(
+      item.download === 'Evelyn_Gao_Resume.pdf' &&
+        item.href.endsWith('.pdf') &&
+        !item.href.startsWith('http') &&
+        !item.current,
+      `${id} downloads a same-origin PDF as Evelyn_Gao_Resume.pdf (${JSON.stringify(item)})`
+    )
+  }
+}
+
+check(
+  rail.theme.tag === 'BUTTON' && rail.theme.icon === 'yes',
+  `the theme control is a button with an icon (${rail.theme.tag})`
+)
+check(
+  rail.theme.gap === 24,
+  `the theme button sits 24px below the external pair (${rail.theme.gap}px)`
+)
+check(!!rail.theme.name, `the theme button has an accessible name (${rail.theme.name})`)
+
+console.log('\n# /resume still resolves, and it resolves to the PDF')
+await page.setViewport({ width: 1440, height: 900 })
+await page.goto(BASE + RESUME_PATH, { waitUntil: 'networkidle0' })
+const landed = page.url()
+check(
+  landed.endsWith('.pdf') && landed.startsWith(BASE),
+  `${RESUME_PATH} lands on a same-origin PDF (${landed.replace(BASE, '')})`
+)
+const pdf = await fetch(landed)
+const pdfHead = Buffer.from(await pdf.arrayBuffer())
+  .subarray(0, 5)
+  .toString()
+check(
+  pdf.ok && pdfHead === '%PDF-',
+  `that PDF is a real PDF, not a placeholder (${pdf.status}, starts ${JSON.stringify(pdfHead)})`
+)
+
+console.log('\n# the theme choice survives a reload')
+await visit('/about')
+const themed = await page.evaluate(() => {
+  const before = document.documentElement.dataset.theme ?? 'light'
+  document.querySelector('.site-rail-theme').click()
+  return { before, after: document.documentElement.dataset.theme }
+})
+check(
+  themed.before !== 'dark' && themed.after === 'dark',
+  `clicking the moon switches to dark (${themed.before} -> ${themed.after})`
+)
+await page.reload({ waitUntil: 'networkidle0' })
+const persisted = await page.evaluate(() => ({
+  theme: document.documentElement.dataset.theme,
+  // Read before React mounts anything of its own: the inline script in
+  // index.html is what has to have set this, or the page flashes light first.
+  stored: localStorage.getItem('evelyn-site-theme'),
+}))
+check(
+  persisted.theme === 'dark' && persisted.stored === 'dark',
+  `and it is still dark after a reload (${JSON.stringify(persisted)})`
+)
+await page.evaluate(() => {
+  document.querySelector('.site-rail-theme').click()
+  localStorage.removeItem('evelyn-site-theme')
+})
 
 console.log('\n# the opening transition runs on scroll and finishes flush')
 await visit('/')

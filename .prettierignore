@@ -2,3 +2,9 @@ dist
 node_modules
 .vite
 package-lock.json
+
+# Design handoff packs dropped in the working tree. They are the designer's
+# files, not the site's source, and they are not committed — reformatting them
+# would only make them differ from what was delivered.
+website_implementation_handoff/
+website_refinement_v3/

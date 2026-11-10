@@ -63,21 +63,10 @@ export default function AboutSection({ content }) {
           </ul>
         </section>
 
-        {/* Under 900px the rail is not rendered and the compact top bar carries
-            only the four pages, so this is GitHub's only place on the site at
-            that width. Above it the rail has GitHub, and this is `display:
-            none` — which takes it out of the tab order and the accessibility
-            tree too, so there is never a second GitHub link to land on. */}
-        <p className="profile-outbound">
-          <a
-            className="profile-outbound-link"
-            href={content.github.href}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {content.github.label}
-          </a>
-        </p>
+        {/* The narrow-screen GitHub link that used to sit here is gone with
+            #70: the compact top bar carries GitHub and LinkedIn itself now, so
+            this was a second link to the same place on exactly the widths
+            where the bar is the navigation. */}
       </div>
     </section>
   )

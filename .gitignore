@@ -51,3 +51,12 @@ next-env.d.ts
 # commit the processed assets under src/assets/projects/ instead. Scoped to the
 # root so an intentional PNG elsewhere still gets tracked.
 /*.png
+
+# Design handoff packs dropped in the working tree while a round of changes is
+# being implemented (website_implementation_handoff/, website_refinement_v3/).
+# They are the designer's source material, not the site's: the SVGs that matter
+# are carried into src/components/icons/ as geometry, and committing the packs
+# would add megabytes of PNG previews the build never reads. Ignored rather
+# than merely untracked so `git add -A` cannot sweep them into a commit.
+/website_implementation_handoff/
+/website_refinement_v3/
