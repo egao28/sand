@@ -23,4 +23,10 @@ jobs:
         continue-on-error: true
       - run: npm run lint
       - run: npm run format:check
+      # The contact endpoint's own suite. Every service it talks to is stubbed,
+      # so this sends no mail and touches no deployed URL.
+      - run: npm run test:contact
       - run: npm run build
+      # After the build, so the scan sees the real bundle and not just the
+      # sources: a secret reaches the browser through what Vite inlines.
+      - run: npm run check:secrets

@@ -14,7 +14,8 @@
     "format:check": "prettier --check .",
     "prepare": "husky",
     "verify": "node scripts/verify-site.mjs",
-    "test:contact": "node scripts/test-contact-api.mjs"
+    "test:contact": "node scripts/test-contact-api.mjs",
+    "check:secrets": "node scripts/check-secrets.mjs"
   },
   "keywords": [],
   "author": "",
