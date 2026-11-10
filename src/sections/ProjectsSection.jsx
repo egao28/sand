@@ -148,8 +148,8 @@ export default function ProjectsSection({ content, cards }) {
 
   return (
     <section id="projects" aria-labelledby="worklist-title">
-      <div className="sec-inner worklist-inner">
-        <h1 id="worklist-title" className="worklist-title">
+      <div className="sec-inner page-shell worklist-inner">
+        <h1 id="worklist-title" className="worklist-title page-shell-title">
           {content.title}
         </h1>
 

@@ -95,6 +95,7 @@ const WIDTHS = [
   [1440, 900],
   [1024, 800],
   [768, 1024],
+  [430, 932],
   [390, 844],
   [320, 640],
 ]
@@ -1294,7 +1295,8 @@ for (const path of ['/experience/sony', '/experience/tsinghua']) {
   await visit(path, 1440, 900)
   const note = await page.evaluate(() => {
     const main = document.querySelector('main')
-    const col = document.querySelector('.sec-inner')
+    const container = document.querySelector('.sec-inner')
+    const col = document.querySelector('.project-detail-prose')
     const paras = [...document.querySelectorAll('.project-detail-prose')]
     const words = paras.map((p) => p.textContent.trim().split(/\s+/).length)
     const tinted = [...main.querySelectorAll('*')].filter((el) => {
@@ -1306,6 +1308,7 @@ for (const path of ['/experience/sony', '/experience/tsinghua']) {
       )
     }).length
     return {
+      container: Math.round(container.getBoundingClientRect().width),
       column: Math.round(col.getBoundingClientRect().width),
       words: words.reduce((a, b) => a + b, 0),
       paragraphs: paras.length,
@@ -1323,7 +1326,10 @@ for (const path of ['/experience/sony', '/experience/tsinghua']) {
       tinted,
     }
   })
-  check(note.column === 720, `${path}: one 720px column (${note.column}px)`)
+  check(
+    note.container <= 1000 && note.column === 800,
+    `${path}: an 800px reading column in the shared container (${note.column}px in ${note.container}px)`
+  )
   check(
     note.words >= 150 && note.words <= 220,
     `${path}: ${note.words} words of body copy (150-220)`
@@ -1362,6 +1368,286 @@ for (const [w, h] of WIDTHS) {
     bar: getComputedStyle(document.querySelector('.site-topbar')).display !== 'none',
   }))
   check(navs.rail !== navs.bar, `${w}px: rail=${navs.rail} bar=${navs.bar}`)
+}
+
+console.log('\n# one desktop container: /about, /projects and /contact')
+/* The three pages are a layout system or they are three pages that happen to
+ * look alike. What is asserted is the system: one left edge, one top, one gap
+ * under the title, one width limit — measured, at both of the widths the brief
+ * names, from what actually painted. */
+for (const [w, h] of [
+  [1280, 900],
+  [1440, 900],
+]) {
+  const read = async (path) => {
+    await visit(path, w, h)
+    return page.evaluate(() => {
+      const shell = document.querySelector('.page-shell')
+      const title = document.querySelector('.page-shell-title')
+      const sb = shell.getBoundingClientRect()
+      const tb = title.getBoundingClientRect()
+      const next = title.nextElementSibling ?? title.parentElement.nextElementSibling
+      return {
+        left: Math.round(tb.left),
+        shellLeft: Math.round(sb.left),
+        width: Math.round(sb.width),
+        // Top of the content area to the top of the title.
+        top: Math.round(tb.top - sb.top),
+        gap: Math.round(next.getBoundingClientRect().top - tb.bottom),
+        marginRight: getComputedStyle(shell).marginRight,
+      }
+    })
+  }
+
+  const about = await read('/about')
+  const projects = await read('/projects')
+  const contact = await read('/contact')
+  const all = { about, projects, contact }
+  const lefts = Object.values(all).map((v) => v.left)
+  const tops = Object.values(all).map((v) => v.top)
+  const widths = Object.values(all).map((v) => v.width)
+
+  check(
+    new Set(lefts).size === 1,
+    `${w}px: the three titles start on one left edge (${lefts.join(', ')})`
+  )
+  check(
+    Object.values(all).every((v) => v.left === v.shellLeft),
+    `${w}px: and that edge is the container's, with nothing offsetting it (${Object.entries(all)
+      .map(([k, v]) => `${k} ${v.left}/${v.shellLeft}`)
+      .join(', ')})`
+  )
+  check(
+    new Set(tops).size === 1 && tops[0] === 96,
+    `${w}px: all three titles start 96px down (${tops.join(', ')})`
+  )
+  check(
+    new Set(Object.values(all).map((v) => v.gap)).size === 1,
+    `${w}px: one gap under the title (${Object.values(all)
+      .map((v) => v.gap)
+      .join(', ')})`
+  )
+  check(
+    widths.every((x) => x <= 1000) && new Set(widths).size === 1,
+    `${w}px: one container width, 1000px at most (${widths.join(', ')})`
+  )
+  check(
+    Object.values(all).every((v) => v.marginRight !== 'auto'),
+    `${w}px: nothing is centred in the content area (${Object.values(all)
+      .map((v) => v.marginRight)
+      .join(', ')})`
+  )
+
+  /* The form keeps its own measure inside that container, and the space to its
+   * right is left empty rather than filled. */
+  await visit('/contact', w, h)
+  const form = await page.evaluate(() => {
+    const f = document.querySelector('.contact-form')
+    const shell = document.querySelector('.page-shell')
+    return {
+      width: Math.round(f.getBoundingClientRect().width),
+      left: Math.round(f.getBoundingClientRect().left),
+      shellLeft: Math.round(shell.getBoundingClientRect().left),
+    }
+  })
+  check(
+    form.width === 640 && form.left === form.shellLeft,
+    `${w}px: the contact form is 640px on the common left edge (${form.width}px at ${form.left})`
+  )
+}
+
+console.log('\n# every technical note is on that same edge, in an 800px column')
+for (const path of [
+  '/experience/bloom-mcp',
+  '/projects/almabot',
+  '/experience/sony',
+  '/experience/tsinghua',
+]) {
+  for (const [w, h] of [
+    [1280, 900],
+    [1440, 900],
+  ]) {
+    await visit(path, w, h)
+    const note = await page.evaluate(() => {
+      const left = (sel) => {
+        const el = document.querySelector(sel)
+        return el ? Math.round(el.getBoundingClientRect().left) : null
+      }
+      const widthOf = (sel) => {
+        const el = document.querySelector(sel)
+        return el ? Math.round(el.getBoundingClientRect().width) : null
+      }
+      return {
+        edges: {
+          back: left('.project-detail-back'),
+          title: left('.project-detail-title'),
+          meta: left('.experience-detail-subtitle'),
+          heading: left('.project-detail-section-title'),
+          prose: left('.project-detail-prose'),
+        },
+        container: widthOf('.sec-inner'),
+        title: widthOf('.project-detail-title'),
+        prose: widthOf('.project-detail-prose'),
+        centred: [...document.querySelectorAll('.sec-inner')].filter(
+          (el) => getComputedStyle(el).marginRight === 'auto'
+        ).length,
+        // A <br> inside the title would be a hand-made line break standing in
+        // for a measure.
+        titleBreaks: document.querySelectorAll('.project-detail-title br').length,
+      }
+    })
+    const edges = Object.values(note.edges).filter((x) => x !== null)
+    check(
+      new Set(edges).size === 1,
+      `${w}px ${path}: back link, title, meta, heading and body share one left edge (${Object.entries(
+        note.edges
+      )
+        .map(([k, v]) => `${k} ${v}`)
+        .join(', ')})`
+    )
+    check(
+      note.prose === 800 && note.title === 800,
+      `${w}px ${path}: an 800px column, title included (prose ${note.prose}, title ${note.title})`
+    )
+    check(
+      note.container <= 1000 && note.centred === 0,
+      `${w}px ${path}: in a container of ${note.container}px, none of it centred (${note.centred} centred)`
+    )
+    check(
+      note.titleBreaks === 0,
+      `${w}px ${path}: the title wraps on its own (${note.titleBreaks} hard breaks)`
+    )
+  }
+}
+
+/* The left edge of a note has to be the left edge of the three main pages, not
+ * merely consistent among the notes. */
+await visit('/about', 1440, 900)
+const aboutEdge = await page.evaluate(() =>
+  Math.round(document.querySelector('.page-shell-title').getBoundingClientRect().left)
+)
+for (const path of [
+  '/experience/bloom-mcp',
+  '/projects/almabot',
+  '/experience/sony',
+  '/experience/tsinghua',
+]) {
+  await visit(path, 1440, 900)
+  const noteEdge = await page.evaluate(() =>
+    Math.round(document.querySelector('.project-detail-title').getBoundingClientRect().left)
+  )
+  check(noteEdge === aboutEdge, `${path} starts where /about does (${noteEdge} vs ${aboutEdge})`)
+}
+
+console.log('\n# the contact form lines are drawn, and only there')
+for (const theme of ['light', 'dark']) {
+  await visit('/contact', 1440, 900)
+  const lines = await page.evaluate(async (mode) => {
+    document.documentElement.dataset.theme = mode
+    await new Promise((r) => setTimeout(r, 200))
+    const probe = document.createElement('span')
+    document.body.appendChild(probe)
+    const token = (name) => {
+      probe.style.color = `var(${name})`
+      return getComputedStyle(probe).color
+    }
+    const rule = token('--rule')
+    const accent = token('--accent-link')
+    probe.remove()
+
+    const svgs = [...document.querySelectorAll('.contact-field-rule')]
+    const read = (svg) => {
+      const path = svg.querySelector('path')
+      const cs = getComputedStyle(path)
+      return {
+        colour: cs.stroke,
+        width: cs.strokeWidth,
+        cap: cs.strokeLinecap,
+        effect: path.getAttribute('vector-effect'),
+        // How many separate subpaths the drawing is made of: one smooth line,
+        // not a double stroke and not a scribble.
+        moves: (path.getAttribute('d').match(/[Mm]/g) || []).length,
+        paths: svg.querySelectorAll('path').length,
+        pointer: getComputedStyle(svg).pointerEvents,
+        animation: cs.animationName,
+        // Rendered width follows the field it sits under.
+        width_px: Math.round(svg.getBoundingClientRect().width),
+        fieldWidth: Math.round(svg.parentElement.getBoundingClientRect().width),
+      }
+    }
+    const rest = svgs.map(read)
+
+    document.querySelector('#contact-email').focus()
+    await new Promise((r) => setTimeout(r, 400))
+    const focused = read(svgs[1])
+    document.querySelector('#contact-email').blur()
+    await new Promise((r) => setTimeout(r, 400))
+
+    return {
+      rule,
+      accent,
+      rest,
+      focused,
+      // Nothing outside the form grew a drawn line.
+      strays: document.querySelectorAll('.contact-field-rule').length,
+      onSubmit: document.querySelectorAll('.contact-submit svg, .contact-submit path').length,
+      ds: svgs.map((s) => s.querySelector('path').getAttribute('d')),
+      borders: [...document.querySelectorAll('.contact-field input, .contact-field textarea')].map(
+        (el) => getComputedStyle(el).borderBottomWidth
+      ),
+    }
+  }, theme)
+
+  check(lines.rest.length === 3, `${theme}: three fields carry a drawn line (${lines.rest.length})`)
+  check(
+    lines.rest.every((l) => l.paths === 1 && l.moves === 1),
+    `${theme}: each one is a single smooth path (${lines.rest.map((l) => `${l.paths}/${l.moves}`).join(' ')})`
+  )
+  check(
+    new Set(lines.ds).size === 3,
+    `${theme}: the three curves differ (${new Set(lines.ds).size} distinct)`
+  )
+  check(
+    lines.rest.every((l) => l.colour === lines.rule),
+    `${theme}: at rest they are the theme's divider colour (${lines.rest[0].colour} vs ${lines.rule})`
+  )
+  check(
+    lines.rest.every((l) => l.width === '1.25px' && l.cap === 'round'),
+    `${theme}: 1.25px, round caps (${lines.rest.map((l) => `${l.width} ${l.cap}`).join(' ')})`
+  )
+  check(
+    lines.rest.every((l) => l.effect === 'non-scaling-stroke' && l.width_px === l.fieldWidth),
+    `${theme}: each line spans its field without stretching the stroke (${lines.rest
+      .map((l) => `${l.width_px}/${l.fieldWidth}`)
+      .join(' ')})`
+  )
+  check(
+    lines.rest.every((l) => l.pointer === 'none'),
+    `${theme}: none of them takes a pointer event (${lines.rest.map((l) => l.pointer).join(' ')})`
+  )
+  check(
+    lines.rest.every((l) => l.animation === 'none'),
+    `${theme}: nothing animates (${lines.rest.map((l) => l.animation).join(' ')})`
+  )
+  check(
+    lines.focused.colour === lines.accent && parseFloat(lines.focused.width) > 1.25,
+    `${theme}: focus takes the accent and a heavier line (${lines.focused.colour} ${lines.focused.width})`
+  )
+  check(
+    lines.borders.every((b) => b === '0px'),
+    `${theme}: the inputs carry no border of their own (${lines.borders.join(' ')})`
+  )
+  check(
+    lines.onSubmit === 0,
+    `${theme}: the Send message button is untouched (${lines.onSubmit} drawings on it)`
+  )
+}
+
+/* The change must not have leaked onto any other page's dividers. */
+for (const path of ['/about', '/projects', '/experience/bloom-mcp', '/projects/almabot', '/']) {
+  await visit(path, 1440, 900)
+  const strays = await page.evaluate(() => document.querySelectorAll('.contact-field-rule').length)
+  check(strays === 0, `${path} has no drawn field line on it (${strays})`)
 }
 
 console.log('\n# nothing overflows sideways')

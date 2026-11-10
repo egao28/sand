@@ -14,10 +14,10 @@ import polaroidPhoto from '../assets/about/myself.png'
 export default function AboutSection({ content }) {
   return (
     <section id="about" aria-labelledby="profile-name">
-      <div className="sec-inner profile-inner">
+      <div className="sec-inner page-shell profile-inner">
         <div className="profile-intro reveal">
           <div className="profile-intro-text">
-            <h1 id="profile-name" className="profile-name">
+            <h1 id="profile-name" className="profile-name page-shell-title">
               {content.name}
             </h1>
 

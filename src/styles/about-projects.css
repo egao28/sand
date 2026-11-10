@@ -24,12 +24,12 @@
   the rail it clears is defined.
 */
 
+/* The width and the left edge are the shared container's (`.page-shell` in
+   page-shell.css), which this element also carries. What is left here is the
+   page's own bottom padding; the 96px above the title is the shell's, and is
+   what /projects and /contact now take as well. */
 .profile-inner {
-  max-width: 1040px;
-  /* Left-aligned in the content area rather than centred in it: the inset on
-     the left is what positions this page, and centring would fight it. */
-  margin: 0;
-  padding: 96px 0 6rem;
+  padding: 0 0 6rem;
 }
 
 .profile-intro {
@@ -43,6 +43,8 @@
    name is set at the same size as any other content page's title. Enlarging it
    would reintroduce the hero the #58 rewrite removed. Size and weight come from
    the Alegreya scale in typography.css. */
+/* The gap under it is `--shell-title-gap` on desktop, shared with the other
+   two page titles. The 1.6rem below is the mobile value, kept as it was. */
 .profile-name {
   font-family: var(--serif);
   letter-spacing: -0.01em;
@@ -176,12 +178,13 @@
   between the text actions underneath.
 */
 
-/* .sec-inner opens a 6.5rem band, which is too deep under the fixed nav for a
-   page that starts straight into the list. Tightened on this class rather than
-   on .sec-inner so the override cannot reach any other section on the site. */
+/* Width, left edge and the space above the title are the shared container's
+   (`.page-shell`), which this element also carries. The 960px and the 4rem that
+   used to be here were this page's own: with `.sec-inner`'s `margin: 0 auto`
+   still in force, 960px centred in the content area is what started the title
+   58px to the right of /about's at 1440px. Only the bottom padding is still
+   the page's. */
 .worklist-inner {
-  max-width: 960px;
-  padding-top: 4rem;
   padding-bottom: 3.5rem;
 }
 
@@ -194,6 +197,8 @@
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.01em;
+  /* Mobile only: on desktop the gap is `--shell-title-gap`, the same one under
+     the /about and /contact titles. */
   margin-bottom: 2.75rem;
 }
 
@@ -374,10 +379,18 @@
   }
 }
 
-@media (max-width: 899px) {
+/* The phone's space above the name. `/about` takes its own from
+   `.page--secondary #about .sec-inner` in assets/styles.css; `/` renders the
+   same section outside `.page--secondary` and has no such rule, so without
+   this the homepage's About would start flush against the opening. From 768px
+   up both routes take the shell's 96px instead. */
+@media (max-width: 767px) {
   .profile-inner {
     padding-top: 2.5rem;
   }
+}
+
+@media (max-width: 899px) {
   .profile-portrait {
     width: min(100%, 360px);
   }
