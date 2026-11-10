@@ -1824,6 +1824,20 @@ html[data-theme='dark'] .project-detail-title {
   opacity: 0.6;
 }
 
+/* Where the Turnstile challenge is rendered.
+
+   There is deliberately no box here: no height, no margin, no padding and no
+   `display` of our own. The widget is rendered with
+   `appearance: "interaction-only"`, so Cloudflare keeps its own iframe hidden
+   inline on every visit that is not asked to prove anything — and a rule of
+   ours that set a height, or fought that inline `display`, would leave a
+   65px hole in the form on every one of those visits. The margin hangs off
+   the iframe instead, so it exists only when the iframe does. */
+.contact-turnstile iframe {
+  margin-top: 28px;
+  max-width: 100%;
+}
+
 .contact-form-footer {
   margin-top: 32px;
 }

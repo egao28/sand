@@ -8,3 +8,6 @@ package-lock.json
 # would only make them differ from what was delivered.
 website_implementation_handoff/
 website_refinement_v3/
+
+# Carries names only; prettier has no parser for it.
+.env.example

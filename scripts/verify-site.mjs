@@ -135,7 +135,52 @@ async function waitForServer() {
 await waitForServer()
 
 const browser = await puppeteer.launch({ executablePath: chrome, headless: 'shell' })
-const page = await browser.newPage()
+
+/* Turnstile is stubbed in every page this run opens, never loaded. Defining
+ * `window.turnstile` before any script runs is enough: src/hooks/useTurnstile.js
+ * checks for it first and so never appends Cloudflare's api.js. That keeps this
+ * run off Cloudflare entirely — the same rule the file already follows for the
+ * mail service — and it keeps a third party's script out of the timings these
+ * checks measure.
+ *
+ * The stub records what it was asked for, which is how the contact-form block
+ * can tell that the widget is wired the invisible way and that a fresh token is
+ * minted per submit rather than reused. */
+const stubTurnstile = () => {
+  window.__turnstile = { render: 0, execute: 0, reset: 0, options: null, tokens: [] }
+  let callback = null
+  window.turnstile = {
+    render(element, options) {
+      window.__turnstile.render += 1
+      window.__turnstile.options = {
+        execution: options.execution,
+        appearance: options.appearance,
+        theme: options.theme,
+        sitekey: typeof options.sitekey === 'string' && options.sitekey.length > 0,
+      }
+      callback = options.callback
+      return 'stub-widget-id'
+    },
+    execute() {
+      window.__turnstile.execute += 1
+      const token = `stub-token-${window.__turnstile.execute}`
+      window.__turnstile.tokens.push(token)
+      setTimeout(() => callback && callback(token), 0)
+    },
+    reset() {
+      window.__turnstile.reset += 1
+    },
+    remove() {},
+  }
+}
+
+async function newPage() {
+  const fresh = await browser.newPage()
+  await fresh.evaluateOnNewDocument(stubTurnstile)
+  return fresh
+}
+
+const page = await newPage()
 
 async function visit(path, width = 1440, height = 900) {
   await page.setViewport({ width, height })
@@ -586,13 +631,18 @@ console.log('\n# the contact form, against a stubbed endpoint')
  * state, that a failure keeps what was typed, and — the one that matters —
  * that it never says "sent" unless the server said so. */
 {
-  const form = await browser.newPage()
+  const form = await newPage()
   await form.setViewport({ width: 1440, height: 900 })
   await form.setRequestInterception(true)
 
   let reply = { status: 200, body: { ok: true } }
   let posted = null
+  let cloudflareRequests = 0
   form.on('request', (req) => {
+    if (req.url().includes('challenges.cloudflare.com')) {
+      cloudflareRequests += 1
+      return req.abort('failed')
+    }
     if (req.url().endsWith('/api/contact')) {
       posted = JSON.parse(req.postData() || '{}')
       if (reply.abort) return req.abort('failed')
@@ -674,6 +724,54 @@ console.log('\n# the contact form, against a stubbed endpoint')
   )
   check(shape.headings.length === 1, `one heading on the page (${shape.headings.join(' / ')})`)
 
+  /* The challenge, and whether this build has a site key at all. A bundle
+   * built without VITE_TURNSTILE_SITE_KEY cannot render the widget, and the
+   * form is then correctly unavailable — so the submission checks below are
+   * skipped rather than failed, with a notice saying how to run them. */
+  const widget = await form.evaluate(() => window.__turnstile)
+  const challengeWired = widget.render > 0
+
+  if (!challengeWired) {
+    console.log(
+      '  --   no VITE_TURNSTILE_SITE_KEY in this build, so the form cannot submit.\n' +
+        "       Rebuild with Cloudflare's always-passes test key to run these:\n" +
+        '       VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA npm run build && npm run verify'
+    )
+  } else {
+    check(
+      widget.options.execution === 'execute' && widget.options.appearance === 'interaction-only',
+      `the challenge is invisible until it is needed (${widget.options.execution}, ${widget.options.appearance})`
+    )
+    check(
+      widget.options.theme === 'light' || widget.options.theme === 'dark',
+      `the challenge follows the site's theme, not the OS (${widget.options.theme})`
+    )
+    check(widget.execute === 0, 'and nothing runs until the form is submitted')
+  }
+
+  /* Whatever the widget did, it must not have changed the page. The container
+   * is in the form on every visit; it is only allowed to take up space when a
+   * challenge is actually being shown. */
+  const spacing = await form.evaluate(() => {
+    const container = document.querySelector('.contact-turnstile')
+    // Not `:last-of-type` — that is the last *div*, which is the footer.
+    const field = [...document.querySelectorAll('.contact-field')].at(-1)
+    const footer = document.querySelector('.contact-form-footer')
+    return {
+      present: !!container,
+      height: container ? Math.round(container.getBoundingClientRect().height) : null,
+      gap: Math.round(footer.getBoundingClientRect().top - field.getBoundingClientRect().bottom),
+    }
+  })
+  check(
+    spacing.present && spacing.height === 0,
+    `the challenge container reserves no space (${spacing.height}px)`
+  )
+  check(
+    spacing.gap === 32,
+    `the 32px gap between the last field and the submit is unchanged (${spacing.gap}px)`
+  )
+
   await fill({ name: 'Ada', email: '', message: 'hello there' })
   await submit()
   let s1 = await state()
@@ -690,37 +788,68 @@ console.log('\n# the contact form, against a stubbed endpoint')
     `a malformed address is refused without a request (${s1.error})`
   )
 
-  reply = { status: 502, body: { ok: false, error: 'Your message could not be sent.' } }
-  await fill({ name: 'Ada', email: 'ada@example.com', message: 'a message worth keeping' })
-  await submit()
-  s1 = await state()
-  check(!!posted, 'a complete message does reach the endpoint')
-  check(
-    !s1.ok && !!s1.error,
-    `a service failure is reported as a failure, not a success (${s1.error})`
-  )
-  check(
-    s1.name === 'Ada' && s1.message === 'a message worth keeping',
-    'and the typed message is still there afterwards'
-  )
+  if (challengeWired) {
+    reply = { status: 502, body: { ok: false, error: 'Your message could not be sent.' } }
+    await fill({ name: 'Ada', email: 'ada@example.com', message: 'a message worth keeping' })
+    await submit()
+    s1 = await state()
+    check(!!posted, 'a complete message does reach the endpoint')
+    check(
+      !s1.ok && !!s1.error,
+      `a service failure is reported as a failure, not a success (${s1.error})`
+    )
+    check(
+      s1.name === 'Ada' && s1.message === 'a message worth keeping',
+      'and the typed message is still there afterwards'
+    )
 
-  reply = { abort: true }
-  await submit()
-  s1 = await state()
-  check(!s1.ok && !!s1.error, 'a network failure is reported as a failure too')
+    reply = { abort: true }
+    await submit()
+    s1 = await state()
+    check(!s1.ok && !!s1.error, 'a network failure is reported as a failure too')
 
-  reply = { status: 200, body: { ok: true } }
-  posted = null
-  await submit()
-  s1 = await state()
-  check(!!s1.ok && !s1.error, `a server success is the only thing that says sent (${s1.ok})`)
+    reply = { status: 200, body: { ok: true } }
+    posted = null
+    await submit()
+    s1 = await state()
+    check(!!s1.ok && !s1.error, `a server success is the only thing that says sent (${s1.ok})`)
+    check(
+      s1.name === '' && s1.message === '',
+      'and the form is cleared only once the server has confirmed'
+    )
+
+    /* The payload, which is the whole of what a visitor can say to the mail
+     * service. Four fields: the three they typed and the challenge token. A
+     * recipient, a sender or a subject in here would be a visitor choosing
+     * where this site's mail goes. */
+    const keys = Object.keys(posted ?? {}).sort()
+    check(
+      keys.join(',') === 'cf-turnstile-response,email,message,name',
+      `the payload is the three fields and the token, nothing else (${keys.join(', ')})`
+    )
+
+    /* A fresh challenge per submit. Turnstile tokens are single-use and
+     * expire after 300 seconds, so a form that solved once at page load would
+     * be posting a stale token by the time anyone finished writing. */
+    const after = await form.evaluate(() => window.__turnstile)
+    /* Three, not five. Five submits were made, but the first two were refused
+     * by the form itself — an empty field and a malformed address — and a form
+     * that is not filled in correctly has no business spending a challenge, or
+     * a request. The three that reached the endpoint each ran one. */
+    check(
+      after.execute === 3 && after.reset === 3,
+      `every submit that reaches the endpoint runs a fresh challenge (${after.execute} executes, ${after.reset} resets)`
+    )
+    check(
+      new Set(after.tokens).size === after.tokens.length &&
+        posted['cf-turnstile-response'] === after.tokens.at(-1),
+      'and each submit carries its own fresh token'
+    )
+  }
+
   check(
-    s1.name === '' && s1.message === '',
-    'and the form is cleared only once the server has confirmed'
-  )
-  check(
-    posted && !('botcheck' in posted) && !('to' in posted),
-    `the payload is the three fields only (${Object.keys(posted ?? {}).join(', ')})`
+    cloudflareRequests === 0,
+    `this run never reached Cloudflare (${cloudflareRequests} request(s))`
   )
 
   await form.close()
@@ -728,7 +857,7 @@ console.log('\n# the contact form, against a stubbed endpoint')
 
 console.log('\n# the dark theme is the specified palette, and is flat')
 {
-  const dark = await browser.newPage()
+  const dark = await newPage()
   await dark.setViewport({ width: 1440, height: 900 })
   await dark.goto(BASE + '/about', { waitUntil: 'networkidle0' })
   await dark.evaluate(() => localStorage.setItem('evelyn-site-theme', 'dark'))
@@ -856,7 +985,7 @@ console.log('\n# the dark theme is the specified palette, and is flat')
 
 console.log('\n# reduced motion: the theme does not fade')
 {
-  const rm = await browser.newPage()
+  const rm = await newPage()
   await rm.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }])
   await rm.setViewport({ width: 1440, height: 900 })
   await rm.goto(BASE + '/about', { waitUntil: 'networkidle0' })
@@ -1544,7 +1673,13 @@ for (const theme of ['light', 'dark']) {
   await visit('/contact', 1440, 900)
   const lines = await page.evaluate(async (mode) => {
     document.documentElement.dataset.theme = mode
-    await new Promise((r) => setTimeout(r, 200))
+    /* Longer than the 0.2s colour transition on `.contact-field-rule`, not
+     * equal to it. Waiting exactly the duration is a coin flip — anything that
+     * delays the transition's start by a frame leaves this reading an
+     * interpolated colour a couple of steps short of the token, which looks
+     * exactly like a wrong colour and is not one. 400ms is what the focus
+     * checks below already wait. */
+    await new Promise((r) => setTimeout(r, 400))
     const probe = document.createElement('span')
     document.body.appendChild(probe)
     const token = (name) => {

@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import useTurnstile from '../hooks/useTurnstile'
 
 const EMPTY_FORM = { name: '', email: '', message: '' }
 
@@ -66,6 +67,11 @@ function FieldRule({ field }) {
 
 export default function ContactSection({ content }) {
   const [form, setForm] = useState(EMPTY_FORM)
+  // The invisible Turnstile challenge. It draws nothing unless Cloudflare
+  // decides this visitor should prove something, so the form below is laid out
+  // exactly as it was before it existed.
+  const turnstileRef = useRef(null)
+  const turnstile = useTurnstile(turnstileRef)
   // Honeypot. Held outside `form` so it can never be spread into the payload.
   const [botcheck, setBotcheck] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | sent | error
@@ -116,10 +122,39 @@ export default function ContactSection({ content }) {
     setStatus('sending')
     setError('')
     try {
+      // The challenge runs here, not at page load: a Turnstile token expires
+      // after 300 seconds and is good for one use, so the only token worth
+      // sending is one minted at the moment of submitting. A failure here is a
+      // failure to submit — there is no path that posts without a token and
+      // hopes the server is lenient, because the server is not.
+      let turnstileToken
+      try {
+        turnstileToken = await turnstile.getToken()
+      } catch (err) {
+        // Two different situations, and telling someone to try again in the
+        // second one would just waste their time. A challenge that failed or
+        // timed out is worth another go; a widget that never loaded — no site
+        // key in this build, Cloudflare blocked by an extension or a network —
+        // will not load on the second click either, so point at the address
+        // instead. The one thing neither does is submit anyway.
+        const neverLoaded =
+          !turnstile.configured ||
+          err?.message === 'turnstile-not-ready' ||
+          err?.message === 'turnstile-unconfigured'
+        throw new Error(
+          neverLoaded
+            ? 'The message form is not available right now — please email directly instead.'
+            : 'Could not confirm that you are a person — please try again.'
+        )
+      }
+
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(trimmed),
+        // Name, email, message and the challenge token. Nothing else: the
+        // recipient and the sender are the server's to decide, and there is no
+        // field here that could suggest otherwise.
+        body: JSON.stringify({ ...trimmed, 'cf-turnstile-response': turnstileToken }),
       })
 
       // A non-JSON body means something upstream answered instead of the
@@ -219,6 +254,12 @@ export default function ContactSection({ content }) {
             />
             <FieldRule field="message" />
           </div>
+
+          {/* Where the challenge would appear if one were needed. Empty and
+              zero-height on an ordinary visit — the CSS puts no box, no
+              padding and no reserved space around it, so nothing in the form
+              moves. */}
+          <div className="contact-turnstile" ref={turnstileRef} />
 
           <div className="contact-form-footer">
             <button type="submit" className="contact-submit" disabled={sending}>

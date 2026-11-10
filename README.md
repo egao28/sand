@@ -54,15 +54,29 @@ Add a URL to `public/sitemap.xml` whenever you add a route — it is hand-mainta
 npm install
 npm run dev      # localhost:5173
 
-npm run build && npm run verify   # route and interaction checks, see scripts/verify-site.mjs
-npm run test:contact              # api/contact.js against a stubbed mail service
+# route and interaction checks, see scripts/verify-site.mjs. The site key is
+# Cloudflare's documented always-passes test key: the form needs one at build
+# time, and this is the one that is safe to write down.
+VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA npm run build && npm run verify
+npm run test:contact              # api/contact.js against stubbed services
+npm run check:secrets             # credentials cannot reach the bundle or the repo
 ```
 
 `npm run verify` drives the Chrome already on the machine; it skips with a notice if there
-isn't one. CI runs lint, format and build only.
+isn't one. Turnstile is stubbed inside the page rather than loaded, so the run reaches
+Cloudflare not at all; build without a site key and it says so and skips the form's
+submission checks instead of failing them. CI runs lint, format, `test:contact`, build and
+`check:secrets`.
 
-`npm run test:contact` stubs the mail service and sends nothing, which is the only way it
-runs — the recipient is a real inbox.
+`npm run test:contact` stubs Cloudflare, Resend and the rate-limit store and sends nothing,
+which is the only way it runs — the recipient is a real inbox, and a suite that load-tested
+a deployed endpoint would be the thing that flooded it.
+
+`npm run check:secrets` is the half a unit test cannot see: that no client file names a
+server-only variable, that no `VITE_` name looks like a secret, that nothing key-shaped is
+committed, and — when the real values are in the environment, as they are on a deploy —
+that none of them appears in `dist/`. Run it after `npm run build`, because what reaches
+the browser is what Vite inlined, not what the sources say.
 
 ## Themes
 
@@ -83,28 +97,65 @@ band in both themes, and `logo.png` is a raster asset that is never filtered.
 
 ## The contact form
 
-`/contact` posts to `api/contact.js`, a serverless function on the host, which forwards to
-Web3Forms. The browser never sees the credential and never names the recipient: the
-function reads the key from the environment, and the mail goes to whichever mailbox that
-key belongs to. `From` is Web3Forms' own verified sender and `Reply-To` is the visitor's
-address once it has been validated server-side.
+`/contact` posts to `api/contact.js`, a serverless function on the host. The browser never
+sees a credential and never names the recipient: both ends of the envelope are read from
+the environment inside `lib/contact/mail.js`, where there is no parameter a request could
+reach. `From` is a sender on a domain verified in Resend, and `Reply-To` is the visitor's
+address once it has been validated server-side — mail is never sent _as_ them.
 
-One environment variable, set on the host (Vercel → Settings → Environment Variables):
+A submission has to get past all of this, in this order, before anything is delivered:
 
-|                        |                                                      |
-| ---------------------- | ---------------------------------------------------- |
-| `WEB3FORMS_ACCESS_KEY` | The access key for the mailbox the form delivers to. |
+| Step                 | What it refuses                                                     |
+| -------------------- | ------------------------------------------------------------------- |
+| method, origin, type | anything that is not a same-origin JSON `POST`                      |
+| size                 | over 16KB, checked against `Content-Length` and again while reading |
+| honeypot             | a filled trap field — answered `ok`, delivered to nobody            |
+| validation           | empty, over-long, malformed, or carrying control characters         |
+| configuration        | every submission, until all five variables below are set            |
+| rate limit           | over 5 per address per 10 minutes, or 60 an hour across everyone    |
+| Turnstile            | a missing, forged, replayed or expired challenge token              |
+| duplicate claim      | a message already claimed by an atomic `SET NX`                     |
 
-Without it the endpoint answers every submission with a 503 and the form says so. It never
-reports success that the mail service did not confirm, and it never falls back to a
-`mailto:` link — a form that claims to have sent something it did not is worse than one
-that is plainly unavailable.
+The rate limit and the duplicate guard live in Redis, reached over Upstash's REST API,
+because a serverless function has no memory between instances: the in-process `Map` this
+file used to use was a limit of five per ten minutes _per instance_, which on a platform
+that starts instances freely is not a limit. They are also the reason the endpoint fails
+closed — if the store or Cloudflare cannot be reached, the answer is 503 and no mail. A
+protection with a bypass that opens when it is unavailable is not a protection.
 
-The rate limiting and duplicate suppression in that file are in-process, so they reset on a
-cold start and are per instance. They take the edge off a loop and stop a double click
-arriving twice; they are not a defence against a distributed flood. The honeypot and the
-server-side validation are what actually keep the mailbox usable. A shared store is the
-next step if that ever stops being enough.
+The challenge itself is invisible. `src/hooks/useTurnstile.js` renders the widget with
+`execution: "execute"` and `appearance: "interaction-only"`, and executes it at submit
+time rather than page load — a Turnstile token is single-use and expires after 300
+seconds, so a token minted when the page loaded is routinely stale by the time anyone
+finishes writing. On an ordinary visit nothing is drawn and the form looks exactly as it
+did before any of this existed.
+
+Set these on the host (Vercel → Settings → Environment Variables) and in a local `.env`;
+`.env.example` is the annotated copy.
+
+| Variable                                              | What it is                                           |
+| ----------------------------------------------------- | ---------------------------------------------------- |
+| `RESEND_API_KEY`                                      | Resend API key. Secret.                              |
+| `CONTACT_TO_EMAIL`                                    | The mailbox the form delivers to.                    |
+| `CONTACT_FROM_EMAIL`                                  | Sender, on a domain verified in Resend.              |
+| `TURNSTILE_SECRET_KEY`                                | Secret half of the Turnstile pair. Secret.           |
+| `VITE_TURNSTILE_SITE_KEY`                             | Public half. Needed at **build** time, not run time. |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | The shared store. `KV_REST_API_*` works too.         |
+
+Optional: `CONTACT_ALLOWED_ORIGINS`, `TURNSTILE_CHECK_REMOTE_IP`, `CONTACT_RATE_PER_IP`,
+`CONTACT_RATE_WINDOW_MIN`, `CONTACT_RATE_GLOBAL`.
+
+Miss any of the required ones and the endpoint answers every submission with a 503, names
+the missing variables in the server log, and the form says it is unavailable. It never
+reports success that Resend did not confirm, and it never falls back to a `mailto:` link —
+a form that claims to have sent something it did not is worse than one that is plainly
+unavailable. `VITE_TURNSTILE_SITE_KEY` is the odd one out: it is inlined at build time, so
+changing it needs a redeploy, not just a restart.
+
+What none of this is: proof against a determined attacker. A distributed botnet with
+solved challenges can still fill the mailbox, and no public form can prevent that
+outright. What it does is make the mailbox cost something to reach, keep every credential
+on the server, and refuse rather than guess whenever a protection cannot be checked.
 
 `vercel.json` rewrites everything to the SPA shell _except_ `/api/*` — without that
 exclusion the function is never reached and the form posts into the HTML page.

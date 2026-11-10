@@ -40,10 +40,13 @@ export default [
     },
   },
   {
-    // Serverless functions (#72). They run on the host's Node runtime, not in
-    // the browser, so they get Node's globals and the project's CommonJS
-    // module system rather than the browser defaults above.
-    files: ['api/**/*.js'],
+    // Serverless functions (#72) and the modules they require. They run on the
+    // host's Node runtime, not in the browser, so they get Node's globals and
+    // the project's CommonJS module system rather than the browser defaults
+    // above. `lib/` is in here because that is where the contact endpoint's
+    // helpers live — Vercel turns files under api/ into endpoints, so shared
+    // modules belong outside it.
+    files: ['api/**/*.js', 'lib/**/*.js'],
     languageOptions: {
       sourceType: 'commonjs',
       globals: globals.node,
