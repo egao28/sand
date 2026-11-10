@@ -129,26 +129,32 @@ export const siteContent = {
     // and the `sub` string BloomMcpDetailPage renders, so the two differ on
     // purpose. `role` and `time` are joined with a middot when rendered.
     //
-    // `href` turns the institution heading into a plain text link and is the
-    // only way into /experience/sony and /experience/tsinghua from anywhere on
-    // the site (#65): the /projects listing has no card for either, and #58
-    // dropped the links the old timeline carried. Salk and CHAI have no `href`
-    // on purpose — bloom-mcp is already linked from the /projects listing, and
-    // CHAI has no page at all.
+    // `href` turns the institution heading into a plain text link. All four
+    // carry one now, and they all look the same: the first two led nowhere
+    // while the last two jumped to a long write-up, which read as though only
+    // half the list had anything behind it. CHAI points at its card's anchor
+    // on /projects, Salk at the bloom-mcp technical note, and Sony and
+    // Tsinghua keep the addresses they have always had.
     roles: [
       {
         id: 'chai',
         org: 'University of Chicago · Chicago Human+AI Lab',
+        // The CHAI card on /projects, which is the only place on the site that
+        // carries this work. There is no /projects/chai page and this must not
+        // become one: the card is listing-only, so the heading points at the
+        // card's own anchor.
+        href: '/projects#project-chai',
         role: 'Undergraduate Researcher',
         time: 'Sep 2026–Present',
-        note: 'Developing evaluations that expose failures in language-model evidence use and reasoning.',
+        note: 'I study how reference answers and feedback influence language-model reasoning. I develop failure-mode taxonomies and cross-condition evaluations to identify when models change problem constraints or rationalize conclusions rather than follow the evidence.',
       },
       {
         id: 'bloom-mcp',
         org: 'Salk Institute · Harnessing Plants Initiative',
+        href: '/experience/bloom-mcp',
         role: 'Research Software Engineering Intern',
         time: 'Jun–Aug 2026',
-        note: 'Built scientific analysis tools and validation infrastructure for AI-driven research workflows.',
+        note: 'I built scientific analysis tools that let AI agents carry out research workflows through natural-language requests. I also developed validation and reproducibility infrastructure so researchers could check outputs and trace how each analysis was performed.',
       },
       {
         id: 'sony',
@@ -156,7 +162,7 @@ export const siteContent = {
         href: '/experience/sony',
         role: 'Computer Science Operations & Maintenance Intern',
         time: 'May–Sep 2025',
-        note: 'Automated music-release preparation and feedback routing through reusable processing pipelines.',
+        note: 'I built Python pipelines to automate the preparation and delivery of weekly music releases. I also developed a rule-based feedback-triage tool that routed comments to the appropriate teams and made classification rules easier to maintain.',
       },
       {
         id: 'tsinghua',
@@ -164,7 +170,7 @@ export const siteContent = {
         href: '/experience/tsinghua',
         role: 'Research Assistant',
         time: 'Jul 2024–Jan 2025',
-        note: 'Built and evaluated forecasting models for environmental data, linking prediction with spatial analysis.',
+        note: 'I developed a pipeline for forecasting vehicle emissions over a 24-hour horizon, comparing Random Forest and ARIMA models. I combined temporal features with spatial analysis to examine when emissions rise and where they concentrate.',
       },
     ],
 

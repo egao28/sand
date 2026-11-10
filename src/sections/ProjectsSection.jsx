@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import DemoVideo from '../components/DemoVideo.jsx'
 
 /* The decorative polaroids that used to sit beside the featured summaries are
@@ -55,12 +55,16 @@ function WorklistAction({ action }) {
   )
 }
 
-function WorklistEntry({ project, index }) {
+function WorklistEntry({ project, index, targetId }) {
   const { card } = project
   // `items` entries are keyed by slug, `listingOnly` entries by id; both are
   // unique across the merged list, so either makes a stable DOM id.
   const key = project.slug ?? project.id
   const [demoOpen, setDemoOpen] = useState(false)
+  // The entry a fragment link asked for. It must not play the entrance: the
+  // keyframes start it 18px low, and settling up out from under a reader who
+  // has just been scrolled to it takes its top off the screen.
+  const isTarget = targetId === `project-${key}`
 
   const title = card.title ?? project.title
   const titleId = `worklist-${key}-title`
@@ -68,7 +72,11 @@ function WorklistEntry({ project, index }) {
 
   return (
     <article
-      className="worklist-entry worklist-entry--animated"
+      // A stable anchor for each entry. About's CHAI heading links to this
+      // one, because the work has a card here and no page of its own; adding
+      // the id changes nothing about how the listing is laid out or read.
+      id={`project-${key}`}
+      className={`worklist-entry${isTarget ? '' : ' worklist-entry--animated'}`}
       aria-labelledby={titleId}
       style={{ '--worklist-delay': `${Math.min(index * STAGGER_STEP, STAGGER_MAX)}s` }}
     >
@@ -132,6 +140,8 @@ function WorklistEntry({ project, index }) {
  * Heading order is h1 (page) → h2 (group) → h3 (project). Only /projects
  * renders this; the homepage never has. */
 export default function ProjectsSection({ content, cards }) {
+  const { hash } = useLocation()
+  const targetId = hash ? decodeURIComponent(hash.slice(1)) : null
   const tiers = content.tiers
     .map((tier) => ({ ...tier, cards: cards.filter((p) => p.card.tier === tier.id) }))
     .filter((tier) => tier.cards.length > 0)
@@ -161,6 +171,7 @@ export default function ProjectsSection({ content, cards }) {
                     // Indexed across the whole page, not per tier, so the
                     // stagger reads top-to-bottom instead of restarting.
                     index={cards.indexOf(project)}
+                    targetId={targetId}
                   />
                 ))}
               </div>

@@ -41,11 +41,14 @@ export default function AboutSection({ content }) {
 
           <ul className="profile-roles">
             {content.roles.map((role) => (
-              <li key={role.id} className="profile-role">
+              // The id is what `← About` on a write-up comes back to, so the
+              // entry you left is the one you land on.
+              <li key={role.id} id={`experience-${role.id}`} className="profile-role">
                 <h3 className="profile-role-org">
-                  {/* A role with an `href` is the only entry point its detail
-                      page has, so the heading itself is the link — no extra
-                      button and no added words beside it. */}
+                  {/* The heading itself is the link — no extra button and no
+                      added words beside it. All four carry one, and all four
+                      are marked the same way, so none of them reads as though
+                      there is nothing behind it. */}
                   {role.href ? (
                     <Link to={role.href} className="profile-role-org-link">
                       {role.org}
