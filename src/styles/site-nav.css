@@ -1,0 +1,261 @@
+/*
+  The site navigation that replaced the fixed header in #66, with the icon set
+  from #67.
+
+  Two mutually exclusive pieces: `.site-rail`, fixed on the left from 900px up,
+  and `.site-topbar`, in normal document flow below it. Exactly one of them is
+  rendered at any width, so there is never a second interactive navigation on
+  the page.
+
+  There is no sidebar to speak of — no frame, fill, shadow, divider or rule.
+  The logo and the five icons sit directly on the page. Icon motion lives in
+  nav-icons.css; this file is position, hit area, label and current-page state.
+
+  Every selector here is new markup: none of it appears in assets/styles.css or
+  about-projects.css.
+*/
+
+:root {
+  --rail-top: 40px;
+  --rail-left: 40px;
+  --rail-hit: 48px;
+  --rail-gap: 12px;
+  /* The content inset (#68). Wide enough that the rail never sits over the
+     text, and the same on every route so the left edge does not move as you
+     navigate. */
+  --content-inset: clamp(180px, 22vw, 340px);
+  --content-edge: 48px;
+  /* The one tinted surface in the navigation: the current page's hit area. */
+  --rail-current-bg: #e8dce2;
+  --rail-ink: #302d29;
+}
+
+/* ============================================================ rail ======= */
+
+.site-rail {
+  position: fixed;
+  top: var(--rail-top);
+  left: var(--rail-left);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: none;
+  border: 0;
+}
+
+.site-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rail-hit);
+  height: var(--rail-hit);
+  text-decoration: none;
+}
+
+.site-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Trims the whitespace frame baked into logo.png — carried over from the
+     header this replaced. */
+  clip-path: inset(5.5%);
+}
+
+.site-rail-nav {
+  margin-top: 28px;
+  opacity: 1;
+}
+
+/* On the opening the rail arrives with the content, over the last 40% of the
+   transition. Everywhere else it is simply there. */
+.has-opening .site-rail-nav {
+  opacity: clamp(0, calc((var(--opening-progress, 0) - 0.6) / 0.4), 1);
+}
+
+.site-rail-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rail-gap);
+  margin: 0;
+  padding: 0;
+}
+
+/* `display: flex` rather than the default list-item: an inline-level child
+   would leave a few pixels of baseline leading under each icon and quietly
+   turn the 12px gaps into 15px ones. */
+.site-rail-item {
+  display: flex;
+}
+
+/* GitHub leaves the site, so it sits a little apart from the four pages. */
+.site-rail-item--github {
+  margin-top: 20px;
+}
+
+.site-rail-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--rail-hit);
+  height: var(--rail-hit);
+  border-radius: 12px;
+  color: var(--rail-ink);
+  text-decoration: none;
+  /* The icons are hand-drawn ink on paper; nothing else is painted. */
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  transition: background 0.2s ease;
+}
+
+/* The page you are on. Fill only — no border, no shadow — and no permanent
+   label either: the icon plus the tint is the whole of it. */
+.site-rail-link--current {
+  background: var(--rail-current-bg);
+  /* Anything an icon paints in "the colour behind it" follows the tint. */
+  --rail-surface: var(--rail-current-bg);
+}
+
+.site-rail-link:focus-visible {
+  outline: 2px solid var(--rail-ink);
+  outline-offset: 2px;
+}
+
+/* The name, on hover or keyboard focus only. Absolutely positioned so it takes
+   no layout space and cannot push the page around, and `pointer-events: none`
+   so it can never sit between the pointer and the text underneath it. No
+   bubble, no tag — just the word. */
+.site-rail-label {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  white-space: nowrap;
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--rail-ink);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-4px, -50%);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.site-rail-link:hover .site-rail-label,
+.site-rail-link:focus-visible .site-rail-label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.nav-icon {
+  display: block;
+  overflow: visible;
+  color: var(--rail-ink);
+}
+
+/* ========================================================== topbar ======= */
+
+.site-topbar {
+  display: none;
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  /* Plain page background, no frame and no shadow — it is part of the page, not
+     a bar laid over it. */
+  background: var(--paper);
+  padding: 14px 24px 10px;
+}
+
+.site-topbar-list {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.site-topbar-link {
+  display: inline-flex;
+  align-items: center;
+  /* Tap target, not a hover target: nothing on this width depends on hover. */
+  min-height: 44px;
+  font-family: var(--sans);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.site-topbar-link--current {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.3em;
+}
+
+/* ====================================================== breakpoints ====== */
+
+/* Exactly one logo is live at a time: the rail's above 900px, the opening's
+   own below it (where the rail is not rendered at all). */
+.opening-logo {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  /* display:none, not opacity or visibility: the rail must be unreachable by
+     pointer and by Tab, not merely invisible. */
+  .site-rail {
+    display: none;
+  }
+  .site-topbar {
+    display: block;
+  }
+  .opening-logo {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 900px) {
+  .page-root:not(.page-root--home) {
+    padding-left: var(--content-inset);
+    padding-right: var(--content-edge);
+  }
+  /* The opening is full-bleed; the content below it is not. */
+  .home-about {
+    padding-left: var(--content-inset);
+    padding-right: var(--content-edge);
+  }
+  /* The inset above replaces `.sec-inner`'s own side padding rather than
+     stacking on top of it, which would push every page a further 56px in. Its
+     vertical padding is untouched. */
+  .sec-inner {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 899px) {
+  .page-root {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .home-about {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .sec-inner {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* The page already supplies the side padding; the bar adding its own would
+     indent it past the content it sits above. */
+  .site-topbar {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

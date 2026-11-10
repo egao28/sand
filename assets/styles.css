@@ -9,15 +9,16 @@
   --accent-soft: rgba(196, 165, 116, 0.2);
   --line: rgba(25, 23, 19, 0.1);
 
-  --serif: 'Cormorant Garamond', Georgia, serif;
+  /* The content font: every editorial heading on the site. Swapped from
+     Cormorant Garamond to Alegreya in #68. */
+  --serif: 'Alegreya', Georgia, serif;
+  /* The homepage's wind letters, and only those — the documented exception to
+     that swap, so the opening still reads in the faces it was drawn with. */
+  --serif-hero: 'Cormorant Garamond', Georgia, serif;
   --sans: 'Space Grotesk', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   --mono:
     'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     monospace;
-
-  /* Nav + UI text scale (keep in sync with .nav-link-btn in global.css) */
-  --text-nav-link: 18px;
-  --text-nav-brand: 17px;
 }
 
 *,
@@ -125,71 +126,11 @@ body.cursor-dark-surface.cursor-link #cursor-dot {
   }
 }
 
-/* Nav */
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 200;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.6rem 3.5rem;
-  background: rgba(255, 253, 248, 0);
-  transition:
-    background 0.4s,
-    backdrop-filter 0.4s;
-}
-nav.scrolled {
-  background: rgba(255, 253, 248, 0.86);
-  backdrop-filter: blur(12px);
-}
-.nav-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  text-decoration: none;
-}
-.nav-logo-img {
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  object-fit: contain;
-  object-position: center;
-  flex-shrink: 0;
-  display: block;
-  /* 裁掉 PNG 里常见的边缘留白/灰框；仍明显时请换无框导出的 logo.png */
-  clip-path: inset(5.5%);
-}
-.nav-logo-text {
-  font-family: var(--mono);
-  font-size: var(--text-nav-brand);
-  letter-spacing: 0.09em;
-  color: var(--ink);
-  text-transform: lowercase;
-}
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 2.5rem;
-}
-nav ul li a {
-  font-family: var(--sans);
-  font-size: var(--text-nav-link);
-  letter-spacing: 0.06em;
-  color: var(--ink-soft);
-  text-decoration: none;
-  text-transform: lowercase;
-  position: relative;
-  transition: color 0.2s;
-}
-nav ul li a:hover {
-  color: var(--ink);
-}
+/* The old fixed header — the `evelyn gao` wordmark on the left and the
+   horizontal link list on the right — is gone with #66. It is not restyled or
+   collapsed: it is deleted, along with the band of page background it used to
+   paint and the 96px of reserve every route kept clear beneath it. The open
+   icon rail that replaces it lives in global.css under `.site-rail`. */
 
 /* Hero */
 #hero-section {
@@ -363,7 +304,7 @@ nav ul li a:hover {
   display: inline-block;
 }
 
-/* Sections — no top/bottom divider lines (only .sec-label title extension lines) */
+/* Sections — no top/bottom divider lines */
 section {
   border: none;
 }
@@ -372,55 +313,20 @@ section {
   margin: 0 auto;
   padding: 6.5rem 3.5rem;
 }
-/* Section label + horizontal rule extending to the right (only allowed line style) */
-.sec-label {
-  font-family: var(--mono);
-  font-size: 15px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 3.2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.sec-label::after {
-  content: '';
-  flex: 1 1 auto;
-  min-width: 0;
-  height: 1px;
-  background: var(--line);
-}
-.sec-label span {
-  white-space: nowrap;
-}
-.sec-label--no-rule {
-  margin-bottom: 2rem;
-}
-.sec-label--no-rule::after {
-  display: none;
-}
-
 /* About */
 #about {
   background: var(--paper);
 }
-.page--secondary #about .sec-inner {
-  padding-bottom: 2rem;
-}
 
-/* Secondary routes (About, Projects, Resume, etc.): same canvas as Projects — var(--paper2) */
+/* Secondary routes carried their own slightly darker canvas, which left a
+   visible seam down the page once the fixed header went and the content
+   started beside a rail sitting on the body background. One warm cream runs
+   through the opening and every page now (#68). */
 .page--secondary {
-  background: var(--paper2);
+  background: var(--paper);
   min-height: 100vh;
 }
 .page--secondary #about {
-  background: transparent;
-}
-.page--secondary #skills {
-  background: transparent;
-}
-.page--secondary #experience {
   background: transparent;
 }
 .page--secondary #projects {
@@ -437,17 +343,6 @@ section {
 .about-headline em {
   font-style: italic;
 }
-.about-polaroid {
-  width: 100%;
-  max-width: 280px;
-  transform: rotate(-3deg);
-}
-.about-polaroid-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  user-select: none;
-}
 .about-body {
   font-size: 19px;
   line-height: 1.6;
@@ -455,375 +350,14 @@ section {
   margin-bottom: 1.25rem;
 }
 
-/* Identity line above the headline */
-.about-identity {
-  font-family: var(--mono);
-  font-size: 15px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-bottom: 1.5rem;
-}
-
-/* Photo floated inline at the start of the first paragraph, instead of its own grid column */
-.about-lede {
-  overflow: hidden;
-}
-.about-photo-inline {
-  float: left;
-  width: 280px;
-  margin: 0 2rem 1.25rem 0;
-}
-.about-photo-caption {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--ink-muted);
-  letter-spacing: 0.02em;
-  text-align: right;
-  margin-top: 0.85rem;
-  transform: rotate(-3deg);
-}
-
-.about-more-links {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 2.5rem;
-}
-.about-more-links .ct-more-link {
-  margin-top: 0;
-}
-
-/* Skills marquee */
-#skills {
-  background: var(--paper2);
-}
-.page--secondary #skills .sec-inner {
-  padding-top: 2rem;
-}
-.skills-title {
-  font-family: var(--serif);
-  font-size: clamp(37px, 3.4vw, 53px);
-  font-weight: 300;
-  text-align: center;
-  margin-bottom: 2.6rem;
-}
-.skills-marquee {
-  display: grid;
-  gap: 1.2rem;
-}
-.skills-track {
-  display: flex;
-  gap: 0.7rem;
-  align-items: center;
-  width: max-content;
-  animation: marquee 22s linear infinite;
-  will-change: transform;
-}
-.skills-track.reverse {
-  animation-direction: reverse;
-  animation-duration: 26s;
-  opacity: 0.92;
-}
-.skills-marquee:hover .skills-track {
-  animation-play-state: paused;
-}
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-.skill-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0;
-  padding: 0.55rem 0.9rem;
-  border: none;
-  border-radius: 999px;
-  background: rgba(255, 253, 248, 0.7);
-  backdrop-filter: blur(8px);
-  color: var(--ink-soft);
-  font-size: 15px;
-  letter-spacing: 0.02em;
-  user-select: none;
-}
-.skill-chip.subtle {
-  background: rgba(255, 253, 248, 0.55);
-}
-.skill-icon {
-  margin-right: 6px;
-  opacity: 0.8;
-  color: rgba(25, 23, 19, 0.78);
-  font-size: 15px;
-  line-height: 1;
-}
-
-/* Experience + education: section bg comes from parent (.page--secondary = paper2) */
-#experience {
-  background: transparent;
-  scroll-margin-top: 7rem;
-}
-.page--secondary #experience .sec-inner {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-#experience .ct-item {
-  background: rgba(255, 253, 248, 0.88);
-}
-#experience .ct-item:hover {
-  background: #fffdf8;
-}
-
-/* Center timeline (experience + education) */
-.center-timeline {
-  position: relative;
-  padding: 0.5rem 0;
-  display: grid;
-  gap: 1.3rem;
-}
-.ct-line {
-  display: none;
-}
-.ct-item {
-  position: relative;
-  width: min(520px, 100%);
-  padding: 1.25rem 1.25rem;
-  border: none;
-  border-radius: 14px;
-  background: rgba(255, 253, 248, 0.75);
-  backdrop-filter: blur(10px);
-  transition:
-    transform 0.22s ease,
-    background 0.22s ease;
-}
-.ct-item:focus-visible {
-  outline: 2px solid rgba(201, 169, 110, 0.55);
-  outline-offset: 3px;
-}
-.ct-item:hover {
-  transform: translateY(-3px);
-  background: rgba(255, 253, 248, 0.92);
-}
-.ct-item.left {
-  justify-self: start;
-  margin-right: auto;
-}
-.ct-item.right {
-  justify-self: end;
-  margin-left: auto;
-}
-/* Header stack: tight rhythm */
-.ct-head {
-  display: grid;
-  gap: 0.35rem;
-}
-.ct-time {
-  font-family: var(--mono);
-  font-size: 14px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-.ct-title {
-  font-family: var(--serif);
-  font-size: clamp(27px, 2.4vw, 33px);
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-}
-.ct-title--editorial {
-  font-size: clamp(28px, 2.65vw, 36px);
-  font-weight: 500;
-  letter-spacing: -0.018em;
-  line-height: 1.12;
-}
-.ct-sub {
-  font-size: 17px;
-  color: rgba(201, 169, 110, 0.95);
-  letter-spacing: 0.04em;
-  font-weight: 500;
-  line-height: 1.45;
-}
-/* Experience cards that carry their own summary instead of linking out to a
-   detail page — always visible, matching .ct-detail li's body type. */
-.ct-desc {
-  margin-top: 0.9rem;
-  color: var(--ink-soft);
-  font-size: 18px;
-  line-height: 1.65;
-}
-.ct-detail {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition:
-    max-height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-    opacity 0.28s ease;
-}
-.ct-item:hover .ct-detail,
-.ct-item:focus-within .ct-detail,
-.ct-item.is-open .ct-detail {
-  max-height: 880px;
-  opacity: 1;
-}
-.ct-edu-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.ct-sub-line {
-  line-height: 1.45;
-}
-/* Experience timeline cards: always-visible link through to the item's own
-   detail page — deliberately outside .ct-detail's hover-reveal so it isn't
-   hidden from touch/keyboard users. */
-.ct-more-link {
-  display: inline-block;
-  margin-top: 0.9rem;
-  font-family: var(--mono);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-.ct-more-link:hover,
-.ct-more-link:focus-visible {
-  color: rgba(201, 169, 110, 0.95);
-}
-.ct-detail-kicker {
-  font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  margin-top: 0.75rem;
-  margin-bottom: 0.15rem;
-}
-.ct-detail ul {
-  list-style: none;
-  margin-top: 0.85rem;
-}
-.ct-detail-kicker + ul {
-  margin-top: 0.35rem;
-}
-.ct-detail li {
-  position: relative;
-  padding-left: 0;
-  padding-bottom: 0.32rem;
-  color: var(--ink-soft);
-  font-size: 18px;
-  line-height: 1.65;
-}
-
-/* Projects — scattered polaroid gallery, one photo per project */
+/* Projects listing — the page's own text-led layout lives in
+   src/styles/about-projects.css under the .worklist-* namespace. The scattered
+   polaroid gallery that used to sit here (.projects-gallery, .project-photo-*,
+   @keyframes photo-sway) is gone with #59: it was an absolutely-positioned
+   pile inside a fixed-height canvas, which a card carrying a full summary
+   cannot fit. Nothing else on the site referenced those rules. */
 #projects {
   background: transparent;
-}
-.projects-gallery-wrap {
-  padding: clamp(4.25rem, 11vh, 6rem) 3.5rem clamp(2.5rem, 6vh, 4rem);
-}
-.projects-gallery {
-  position: relative;
-  width: 100%;
-  height: clamp(520px, 64vh, 680px);
-  /* Single source of truth for the card width: the card sizes itself from it,
-     and ProjectsSection offsets each card by half of it to centre a row. */
-  --card-w: clamp(190px, 24vw, 300px);
-}
-.project-photo-card {
-  --tilt: 0deg;
-  --hover-boost: 0;
-  position: absolute;
-  display: block;
-  width: var(--card-w);
-  text-decoration: none;
-  color: inherit;
-}
-/* Single merged rule: .reveal (opacity/transform fade-in-on-scroll) and this
-   card's own --hover-boost smoothing both need `transition` on this exact
-   element, and the shorthand doesn't merge across separate rules — whichever
-   selector wins takes the whole property list, silently dropping the other.
-   A compound selector here has higher specificity than either lone class,
-   so it deterministically wins and carries the full merged list. */
-.project-photo-card.reveal {
-  transition:
-    opacity 0.7s ease,
-    transform 0.7s ease,
-    --hover-boost 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.project-photo-card:hover,
-.project-photo-card:focus-visible {
-  --hover-boost: 1;
-  z-index: 10 !important;
-}
-.project-photo-card:focus-visible {
-  outline: 2px solid rgba(25, 23, 19, 0.35);
-  outline-offset: 4px;
-}
-.project-photo-swing {
-  display: block;
-  transform-origin: center;
-  animation: photo-sway 7.4s ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-}
-.project-photo-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 10px 18px rgba(25, 23, 19, 0.18));
-  user-select: none;
-}
-.project-photo-label {
-  display: block;
-  margin-top: 0.65rem;
-  text-align: center;
-  font-family: var(--serif);
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-  color: var(--ink);
-}
-@keyframes photo-sway {
-  0%,
-  100% {
-    transform: rotate(calc(var(--tilt) - (var(--hover-boost) * 2.5deg)))
-      translateY(calc(var(--hover-boost) * -4px));
-  }
-  50% {
-    transform: rotate(calc(var(--tilt) + (var(--hover-boost) * 2.5deg)))
-      translateY(calc(var(--hover-boost) * -8px));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .project-photo-swing {
-    animation: none;
-    transform: rotate(var(--tilt));
-  }
-  .project-photo-card.reveal {
-    transition: opacity 0.7s ease;
-  }
-}
-@media (max-width: 720px) {
-  .projects-gallery-wrap {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-  .projects-gallery {
-    position: static;
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2.25rem;
-  }
-  .project-photo-card {
-    position: static;
-    width: min(70vw, 320px);
-  }
 }
 
 /* Project detail — unified editorial system, compact, no section rules */
@@ -896,7 +430,11 @@ section {
   margin-bottom: 0.85rem;
 }
 .section-title-row .project-detail-section-title {
-  flex-shrink: 0;
+  /* Shrinkable, with `min-width: 0` so it may wrap. `flex-shrink: 0` kept a
+     long section heading on one line and pushed it off the right edge of a
+     phone — the rule line after it still takes whatever is left. */
+  flex: 0 1 auto;
+  min-width: 0;
   margin-bottom: 0;
 }
 .section-title-row::after {
@@ -1034,6 +572,56 @@ section {
   letter-spacing: 0.02em;
   color: var(--ink-muted);
 }
+/* Short technical notes (/projects/almabot, /experience/bloom-mcp — #60).
+   `.tech-note-*` appears on those two pages only. They reuse the detail-page
+   hero, section and video rules above; these three fill the gaps that the long
+   write-ups did not need — the identity line under the subtitle, the demo
+   disclosure, and the closing link back to /projects. */
+.tech-note-identity {
+  margin: 0 0 1.35rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.75;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+.tech-note-demo-toggle {
+  display: inline-block;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-decoration-color: rgba(25, 23, 19, 0.28);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+.tech-note-demo-toggle:hover {
+  color: rgba(196, 165, 116, 0.95);
+  text-decoration-color: rgba(196, 165, 116, 0.65);
+}
+.tech-note-demo-toggle:focus-visible {
+  outline: 1px solid rgba(25, 23, 19, 0.3);
+  outline-offset: 3px;
+}
+.tech-note-foot {
+  margin: 2.1rem 0 0;
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.72;
+  color: var(--ink-soft);
+}
+
 .project-detail-tech {
   background: #0a0908;
   color: rgba(255, 253, 248, 0.94);
@@ -2096,12 +1684,6 @@ a.contact-info-link:focus-visible .contact-info-value {
 
 /* Responsive */
 @media (max-width: 900px) {
-  nav {
-    padding: 1.2rem 1.5rem;
-  }
-  nav ul {
-    gap: 1.25rem;
-  }
   #hero-section {
     grid-template-columns: 1fr;
   }
@@ -2117,24 +1699,9 @@ a.contact-info-link:focus-visible .contact-info-value {
   .sec-inner {
     padding: 4rem 1.5rem;
   }
-  .page--secondary #about .sec-inner,
-  .page--secondary #skills .sec-inner,
-  .page--secondary #experience .sec-inner {
+  .page--secondary #about .sec-inner {
     padding-top: 4rem;
     padding-bottom: 4rem;
-  }
-  .about-photo-inline {
-    float: none;
-    width: 180px;
-    margin: 0 0 1.5rem 0;
-  }
-  .ct-item {
-    padding: 1.2rem 1.2rem;
-  }
-  .ct-item.left,
-  .ct-item.right {
-    justify-self: stretch;
-    margin: 0;
   }
   .project-row {
     grid-template-columns: 1fr;

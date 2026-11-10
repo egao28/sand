@@ -5,10 +5,10 @@ import { useEffect } from 'react'
 // hover detection. Keep in sync by hand when touching matched components.
 const HOVER_GROUPS = [
   {
-    selector: 'img, .hero-photo-wrap, .project-photo-card, .resume-photo-link, .worklist-card',
+    selector: 'img, .hero-photo-wrap, .resume-photo-link, .worklist-card',
     className: 'cursor-hover',
   },
-  { selector: 'a, button, .ct-item, .social-btn', className: 'cursor-link' },
+  { selector: 'a, button, .social-btn', className: 'cursor-link' },
   { selector: 'section#contact', className: 'cursor-dark-surface' },
 ]
 

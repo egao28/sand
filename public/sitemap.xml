@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   Hand-maintained. The routes come from src/App.jsx and the slugs from
-  src/data/siteContent.js — add an entry here when you add either. /contact is
-  left out on purpose: it only redirects to the homepage anchor.
+  src/data/siteContent.js — add an entry here when you add either.
   No <lastmod>: a stale one is worse than none.
+
+  /contact is the one URL the site serves that is not listed. It used to be a
+  redirect to the homepage's contact anchor, which is why it was left out; #66
+  made it the contact section's own page. The URL set here was explicitly out
+  of scope for that work, so adding it is a separate call.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://whitesandooz.vercel.app/</loc><priority>1.0</priority></url>
