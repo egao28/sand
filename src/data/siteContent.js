@@ -26,25 +26,63 @@ const CARELINK_DEMO = {
 }
 
 export const siteContent = {
-  // The five entries in the nav, in order. The logo is not one of them: it is
-  // what returns to the opening, so there is no Home entry (#67).
+  // The six entries in the nav, in order. The logo is not one of them: it is
+  // what returns to the opening, so there is no Home entry. The theme button
+  // is not one either — it is a button, not a destination, and SiteNav renders
+  // it after this list (#70).
   //
-  // `match` is the set of path prefixes that light an entry up. About owns the
-  // experience write-ups and Projects owns the project write-ups, so a detail
-  // page keeps its section lit. GitHub leaves the site, so it carries `href`
-  // and no `match` and is never current.
+  // Three kinds of entry, and the kind is what decides the rest:
   //
-  // Every target already exists in this repo: /resume is the existing page,
-  // /contact is the existing route (a redirect to the homepage anchor before
-  // #66, the contact section's own page after it), and the GitHub URL is the
-  // one in `contact.items` and `about.links`.
+  //   `to`    an in-site page. Only these can be the current page, and only
+  //           these carry `match` — the set of path prefixes that light the
+  //           entry up. About owns the experience write-ups and Projects owns
+  //           the project write-ups, so a detail page keeps its section lit.
+  //   `href` + `download`
+  //           a file served from this origin. Resume is the only one: it hands
+  //           over the PDF rather than opening a page, so it is an action and
+  //           never current.
+  //   `href` + `external`
+  //           somewhere else entirely. Opens in a new tab and is never
+  //           current: GitHub and LinkedIn are not pages of this site and must
+  //           not pose as the one you are on.
+  //
+  // `group` is only the rail's spacing: 'pages' then 'external', with a gap
+  // between them.
   nav: {
     items: [
-      { id: 'about', label: 'About', to: '/about', match: ['/about', '/experience'] },
-      { id: 'projects', label: 'Projects', to: '/projects', match: ['/projects'] },
-      { id: 'resume', label: 'Resume', to: '/resume', match: ['/resume'] },
-      { id: 'contact', label: 'Contact', to: '/contact', match: ['/contact'] },
-      { id: 'github', label: 'GitHub', href: 'https://github.com/egao28', external: true },
+      {
+        id: 'about',
+        label: 'About',
+        to: '/about',
+        match: ['/about', '/experience'],
+        group: 'pages',
+      },
+      { id: 'projects', label: 'Projects', to: '/projects', match: ['/projects'], group: 'pages' },
+      {
+        id: 'resume',
+        label: 'Resume',
+        // The real PDF in the repo, hashed through the bundler like any other
+        // asset, so this is same-origin and `download` is honoured. #70 drops
+        // the Resume page: the entry is the download now.
+        href: resumePdf,
+        download: 'Evelyn_Gao_Resume.pdf',
+        group: 'pages',
+      },
+      { id: 'contact', label: 'Contact', to: '/contact', match: ['/contact'], group: 'pages' },
+      {
+        id: 'github',
+        label: 'GitHub',
+        href: 'https://github.com/egao28',
+        external: true,
+        group: 'external',
+      },
+      {
+        id: 'linkedin',
+        label: 'LinkedIn',
+        href: 'https://www.linkedin.com/in/xinyi-evelyn-gao/',
+        external: true,
+        group: 'external',
+      },
     ],
   },
   hero: {
@@ -140,7 +178,6 @@ export const siteContent = {
     // Under 900px the rail is not rendered, so GitHub survives as a text link
     // at the end of the body and nowhere else. Resume and Contact are in the
     // compact top bar; GitHub is not, because it leaves the site.
-    github: { label: 'GitHub', href: 'https://github.com/egao28' },
   },
   experience: {
     label: 'experience',
@@ -396,15 +433,16 @@ export const siteContent = {
       },
     ],
   },
-  resume: {
-    label: 'resume',
-    title: 'Resume',
-    sub: 'Download my current resume.',
-    href: resumePdf,
-    fileName: 'Xinyi Gao Resume.pdf',
-    buttonLabel: 'Download PDF',
-    lastUpdated: import.meta.env.VITE_RESUME_LAST_UPDATED,
-  },
+  // No `resume` block any more: #70 replaced the Resume page with the download
+  // on the nav entry itself, and the title, blurb and button label here were
+  // that page's copy. The file name the download saves as lives on the nav
+  // entry above, beside the href it belongs to.
+  //
+  // `vite.config.js` still resolves VITE_RESUME_LAST_UPDATED, and nothing reads
+  // it now — the "Last updated" line was the page's. The machinery is left in
+  // place rather than deleted in passing: its stale-date warning is the only
+  // thing tracking when resume.pdf was last replaced, and that is a call to
+  // make on its own, not inside an icon change.
   contact: {
     panelHeadline: 'Contact',
     formHeadline: "Let's get in touch!",
