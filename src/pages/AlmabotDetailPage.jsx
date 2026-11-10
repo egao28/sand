@@ -13,10 +13,7 @@ export default function AlmabotDetailPage() {
   const [demoOpen, setDemoOpen] = useState(false)
 
   return (
-    <main
-      className="page page--secondary project-detail-page project-detail-page--tone-b"
-      aria-label="AlmaBot"
-    >
+    <main className="page page--secondary project-detail-page tech-note-page" aria-label="AlmaBot">
       <div className="project-detail-back-wrap sec-inner">
         <Link className="project-detail-back" to="/projects">
           ← All projects

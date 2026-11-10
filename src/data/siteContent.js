@@ -122,10 +122,6 @@ export const siteContent = {
       'At CHAI, I investigate how language models use evidence and how reference answers and feedback shape their reasoning. Previously, at the Salk Institute, I developed tools that enable AI agents to run reproducible scientific analyses. My goal is to make AI a reliable partner in scientific research, from carrying out an analysis to supporting its conclusions with evidence.',
     ],
 
-    // Runs as the last line of the body, with no heading of its own.
-    interests:
-      'Outside of research, I play the flute, crochet, read, and follow League of Legends esports.',
-
     // Selected Experience. Roles and dates are #58's list, not
     // `experience.items` — that array survives only to back /experience/:slug
     // and the `sub` string BloomMcpDetailPage renders, so the two differ on
@@ -302,6 +298,7 @@ export const siteContent = {
           role: 'Independent project · Evaluating AI assistants',
           summary:
             'I built an academic advising agent spanning 4,502 courses and a 127-question benchmark to evaluate its reliability. My experiments informed the choice of BM25 over a tuned hybrid retriever and examined how well model confidence predicts answer correctness. The project connects system design with empirical evaluation of the evidence and uncertainty behind AI-generated answers.',
+          // Not rendered since #71 — see the note on ART in ProjectsSection.
           art: 'photo-4',
           actions: [{ label: 'Technical note', to: '/projects/almabot' }],
           demo: { label: 'Watch demo', ...ALMABOT_DEMO },
@@ -411,6 +408,7 @@ export const siteContent = {
           // No tool count, on purpose — see #56.
           summary:
             'I developed analysis tools and validation infrastructure that let AI agents execute scientific workflows through natural-language requests. My contributions span data quality checks, dimensionality reduction, clustering, and reproducibility tracking, connecting model-driven tool use with structured, testable analyses. The system records how results were produced so researchers can inspect and reproduce them.',
+          // Not rendered since #71 — see the note on ART in ProjectsSection.
           art: 'photo-2',
           actions: [{ label: 'Technical note', to: '/experience/bloom-mcp' }],
         },

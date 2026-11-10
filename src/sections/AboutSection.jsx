@@ -26,8 +26,6 @@ export default function AboutSection({ content }) {
                 {paragraph}
               </p>
             ))}
-
-            <p className="profile-prose profile-interests">{content.interests}</p>
           </div>
 
           <figure className="profile-portrait">

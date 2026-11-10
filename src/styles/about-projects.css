@@ -57,15 +57,6 @@
   margin-bottom: 24px;
 }
 
-/* Last line of the body. No heading, no pull-quote treatment — just a slightly
-   quieter paragraph set off by space. */
-.profile-interests {
-  color: var(--ink-muted);
-  font-size: 17px;
-  margin-top: 1.6rem;
-  margin-bottom: 0;
-}
-
 /* The polaroid: paper border and tilt as delivered, 30% wider than the #62
    baseline of 260px. Width only — the image keeps its own aspect ratio, so
    nobody is cropped out of it. */
@@ -162,10 +153,22 @@
 
 /* ======================================================= /projects ======= */
 
+/*
+  Layout A / Editorial (#71). One column of text on the page's own background:
+  no card fill, no border, no shadow, no corner radius and nothing that lifts
+  under the pointer. Entries are separated by a hairline rule and by space, and
+  that is the whole of the structure.
+
+  The numbers below are #71's: 960px of content, summaries read at no more than
+  70ch, 32px above and below each entry, 14px between its paragraphs, and 20px
+  between the text actions underneath.
+*/
+
 /* .sec-inner opens a 6.5rem band, which is too deep under the fixed nav for a
    page that starts straight into the list. Tightened on this class rather than
    on .sec-inner so the override cannot reach any other section on the site. */
 .worklist-inner {
+  max-width: 960px;
   padding-top: 4rem;
   padding-bottom: 3.5rem;
 }
@@ -190,7 +193,10 @@
   margin-top: 4rem;
 }
 
-/* An <h2> — the group heading for its tier, hence the explicit weight. */
+/* An <h2> — the group heading for its tier, hence the explicit weight. The two
+   tiers are told apart by this and by the space above it, not by a different
+   treatment of the entries underneath: Featured and Other are the same kind of
+   list, and every summary in both is on the page in full. */
 .worklist-tier-label {
   font-family: var(--mono);
   font-size: 13px;
@@ -201,116 +207,56 @@
   margin-bottom: 1.5rem;
 }
 
-.worklist-grid {
-  display: grid;
-  gap: 1.5rem;
-  /* Not `stretch`: expanding a demo would otherwise stretch every other card
-     in that row to match the player's height, leaving tall empty boxes beside
-     it. Each card keeps its own height instead. */
-  align-items: start;
+/* The rule lives between entries, so the list does not open or close on one.
+   `--rule` is the divider token; #73 gives it its dark value. */
+.worklist-entry {
+  padding: 32px 0;
 }
 
-.worklist-tier--featured .worklist-grid {
-  grid-template-columns: 1fr;
+.worklist-entry + .worklist-entry {
+  border-top: 1px solid var(--rule, #ddd5c7);
 }
 
-/* 340px rather than 300px so the four compact entries land as a 2x2 inside
-   .sec-inner's 1100px, instead of three across with one stranded below. */
-.worklist-tier--secondary .worklist-grid {
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+.worklist-entry:first-child {
+  padding-top: 0;
 }
 
-/* A card is a container, not a link: the actions inside it are the links, so a
-   card with no destination (CHAI) is still a legitimate card rather than a
-   dead anchor. */
-.worklist-card {
-  position: relative;
-  background: var(--paper2);
-  border: 1px solid var(--line);
-  padding: 2rem 2.1rem;
-  transition:
-    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
-}
-
-.worklist-card:hover,
-.worklist-card:focus-within {
-  transform: translateY(-3px);
-  border-color: var(--accent);
-  box-shadow: 0 12px 30px rgba(25, 23, 19, 0.08);
-}
-
-.worklist-card--featured {
-  padding: 2.5rem 2.6rem;
-}
-
-/* Text and art are columns of the same grid, never a stack with a positioned
-   photo: at every width the photo is beside or below the summary, and there is
-   no layer order in which it can cover text. */
-.worklist-card-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 2.5rem;
-  align-items: start;
-}
-
-.worklist-card--with-art .worklist-card-body {
-  grid-template-columns: minmax(0, 1fr) 200px;
-}
-
-.worklist-art {
-  margin: 0;
-  /* A still tilt, not an animation: nothing here moves, so there is nothing
-     for the reduced-motion block below to switch off. */
-  transform: rotate(-2.5deg);
-}
-
-.worklist-art-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 10px 18px rgba(25, 23, 19, 0.18));
-  user-select: none;
-}
-
-.worklist-card-title {
+/* Size and line-height come from the Alegreya scale in typography.css, which
+   is imported after this file and owns every heading size on the site. */
+.worklist-entry-title {
   font-family: var(--serif);
   font-weight: 400;
-  line-height: 1.16;
-  font-size: 30px;
 }
 
-.worklist-card--featured .worklist-card-title {
-  font-size: clamp(32px, 3.2vw, 42px);
-}
-
-.worklist-card-role {
+.worklist-entry-role {
   font-family: var(--mono);
-  font-size: 12px;
+  font-size: 13px;
   letter-spacing: 0.07em;
   color: var(--ink-muted);
-  margin-top: 0.65rem;
+  margin-top: 14px;
   line-height: 1.5;
 }
 
-.worklist-card-summary {
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--ink-soft);
-  max-width: 68ch;
-  margin-top: 1.1rem;
-}
-
-.worklist-card--featured .worklist-card-summary {
+.worklist-entry-summary {
   font-size: 18px;
+  line-height: 1.65;
+  color: var(--ink-soft);
+  /* Reading width, independent of the 960px column: a line this long is what
+     the eye can follow back to the start of the next one. */
+  max-width: 70ch;
+  margin-top: 14px;
 }
 
+/* --- the text actions ---------------------------------------------------- */
+
+/* A row of words, not a row of buttons. It wraps rather than scrolls, so a
+   narrow screen drops the last action onto its own line instead of pushing the
+   page sideways. */
 .worklist-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.8rem;
-  margin-top: 1.6rem;
+  gap: 12px 20px;
+  margin-top: 20px;
 }
 
 .worklist-action {
@@ -318,53 +264,46 @@
   font-size: 13px;
   line-height: 1.5; /* buttons default to `normal`; keeps them level with the links */
   letter-spacing: 0.07em;
-  color: var(--ink);
+  color: var(--accent-link, #795a28);
   text-decoration: none;
-  border: 1px solid var(--line);
-  padding: 0.55rem 1.1rem;
-  transition:
-    border-color 0.25s ease,
-    background 0.25s ease,
-    color 0.25s ease;
+  /* No frame, no fill, no padding that would read as a hit area. */
+  border: 0;
+  padding: 0;
+  background: none;
+  transition: color 0.2s ease;
 }
 
 .worklist-action:hover,
 .worklist-action:focus-visible {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
 }
 
-.worklist-action--primary {
-  border-color: var(--ink);
-}
-
-.worklist-action--primary:hover,
-.worklist-action--primary:focus-visible {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+/* External destinations only. An in-site link must not suggest a new window. */
+.worklist-action-arrow {
+  margin-left: 0.3em;
 }
 
 /* A real <button> sitting in the same row as the link actions, so it needs the
    UA background cleared. `cursor: inherit` rather than `none`: it then follows
    body, which the site switches back to `auto` under (hover: none). */
 .worklist-demo-toggle {
-  background: none;
   cursor: inherit;
 }
 
 /* Deliberately sets no `display`, so the panel's `hidden` attribute is the one
-   thing deciding whether it shows. Capped short of the card's full width so the
-   player doesn't dwarf the summary above it. */
+   thing deciding whether it shows. Capped short of the column's full width so
+   the player doesn't dwarf the summary above it. */
 .worklist-demo-panel {
   margin-top: 1.6rem;
   max-width: 760px;
 }
 
-/* Entrance for cards that are present at mount. Deliberately a CSS animation
+/* Entrance for entries that are present at mount. Deliberately a CSS animation
    and not the shared `.reveal` class: useRevealOnScroll snapshots `.reveal`
    once on mount, so anything mounted later would stay at opacity 0 forever. */
-@keyframes worklist-card-in {
+@keyframes worklist-entry-in {
   from {
     opacity: 0;
     transform: translateY(18px);
@@ -375,25 +314,19 @@
   }
 }
 
-.worklist-card--animated {
-  animation: worklist-card-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+.worklist-entry--animated {
+  animation: worklist-entry-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: var(--worklist-delay, 0s);
 }
 
 /* ======================================================== motion ========= */
 
 @media (prefers-reduced-motion: reduce) {
-  .worklist-card,
   .worklist-action,
   .profile-role-org-link {
     transition: none;
   }
-  .worklist-card:hover,
-  .worklist-card:focus-within {
-    transform: none;
-    box-shadow: none;
-  }
-  .worklist-card--animated {
+  .worklist-entry--animated {
     animation: none;
     opacity: 1;
     transform: none;
@@ -434,23 +367,9 @@
   }
 }
 
-@media (max-width: 860px) {
-  .worklist-card,
-  .worklist-card--featured {
-    padding: 1.6rem 1.5rem;
-  }
-  .worklist-tier--secondary .worklist-grid {
-    grid-template-columns: 1fr;
-  }
-  /* Art drops below the summary instead of beside it. */
-  .worklist-card--with-art .worklist-card-body {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.6rem;
-  }
-  .worklist-art {
-    width: min(220px, 60vw);
-  }
-  .worklist-card-summary {
+@media (max-width: 899px) {
+  .worklist-entry-summary {
+    font-size: 17px;
     max-width: none;
   }
 }
