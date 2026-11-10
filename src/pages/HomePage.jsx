@@ -35,7 +35,7 @@ export default function HomePage({ handedOver }) {
         inert={!handedOver || undefined}
       >
         <SiteTopBar items={siteContent.nav.items} />
-        <AboutSection content={siteContent.about} resume={siteContent.resume} />
+        <AboutSection content={siteContent.about} />
       </div>
     </main>
   )

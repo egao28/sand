@@ -70,7 +70,7 @@ export const siteContent = {
     name: 'Evelyn Gao',
     photo: {
       alt: 'Polaroid photo of Evelyn Gao pointing at a whiteboard',
-      caption: 'Aug 14, 2026',
+      caption: 'Aug 14, 2026 · at Salk',
     },
 
     // Copy below is approved verbatim in #58. Wording, numbers and
@@ -132,18 +132,15 @@ export const siteContent = {
       },
     ],
 
-    // CV carries no href on purpose: AboutSection reads `resume.href` and
-    // `resume.fileName`, so this link and /resume serve the same imported
-    // resume.pdf under the same download name and cannot drift apart. Nothing
-    // on the page claims that file is current.
-    links: [
-      { label: 'CV', fromResume: true },
-      { label: 'Email', href: 'mailto:evelyneyi@outlook.com' },
-      { label: 'GitHub', href: 'https://github.com/egao28' },
-      // The arrow is rendered as a separate aria-hidden span, so the label
-      // stays the approved words and a screen reader doesn't announce it.
-      { label: 'Explore my research and projects', arrow: true, to: '/projects', lead: true },
-    ],
+    // #58's row of links — CV, Email, GitHub and `Explore my research and
+    // projects →` — is gone with #68: the rail carries all four entry points,
+    // and a page that already has a nav does not need a second one scattered
+    // across the end of its body.
+    //
+    // Under 900px the rail is not rendered, so GitHub survives as a text link
+    // at the end of the body and nowhere else. Resume and Contact are in the
+    // compact top bar; GitHub is not, because it leaves the site.
+    github: { label: 'GitHub', href: 'https://github.com/egao28' },
   },
   experience: {
     label: 'experience',

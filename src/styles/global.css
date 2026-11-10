@@ -7,6 +7,9 @@
 @import './site-nav.css';
 /* Hover and focus motion for the rail's five icons. */
 @import './nav-icons.css';
+/* The Alegreya scale. Imported last of the four so its sizes win over the
+   per-component rules it is correcting. */
+@import './typography.css';
 
 /* Smooth local hover “wind” (used in hang-sway keyframes) */
 @property --hover-boost {
@@ -263,7 +266,9 @@
 }
 
 .hang-text--serif {
-  font-family: var(--serif);
+  /* Not the content font. The wind letters keep Cormorant Garamond — they are
+     the one place #68 does not swap. */
+  font-family: var(--serif-hero);
   font-weight: 400;
 }
 .hang-text--mono {

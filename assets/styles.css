@@ -9,7 +9,12 @@
   --accent-soft: rgba(196, 165, 116, 0.2);
   --line: rgba(25, 23, 19, 0.1);
 
-  --serif: 'Cormorant Garamond', Georgia, serif;
+  /* The content font: every editorial heading on the site. Swapped from
+     Cormorant Garamond to Alegreya in #68. */
+  --serif: 'Alegreya', Georgia, serif;
+  /* The homepage's wind letters, and only those — the documented exception to
+     that swap, so the opening still reads in the faces it was drawn with. */
+  --serif-hero: 'Cormorant Garamond', Georgia, serif;
   --sans: 'Space Grotesk', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   --mono:
     'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
@@ -312,14 +317,13 @@ section {
 #about {
   background: var(--paper);
 }
-.page--secondary #about .sec-inner {
-  padding-top: 4rem;
-  padding-bottom: 3.5rem;
-}
 
-/* Secondary routes (About, Projects, Resume, etc.): same canvas as Projects — var(--paper2) */
+/* Secondary routes carried their own slightly darker canvas, which left a
+   visible seam down the page once the fixed header went and the content
+   started beside a rail sitting on the body background. One warm cream runs
+   through the opening and every page now (#68). */
 .page--secondary {
-  background: var(--paper2);
+  background: var(--paper);
   min-height: 100vh;
 }
 .page--secondary #about {
@@ -426,7 +430,11 @@ section {
   margin-bottom: 0.85rem;
 }
 .section-title-row .project-detail-section-title {
-  flex-shrink: 0;
+  /* Shrinkable, with `min-width: 0` so it may wrap. `flex-shrink: 0` kept a
+     long section heading on one line and pushed it off the right edge of a
+     phone — the rule line after it still takes whatever is left. */
+  flex: 0 1 auto;
+  min-width: 0;
   margin-bottom: 0;
 }
 .section-title-row::after {

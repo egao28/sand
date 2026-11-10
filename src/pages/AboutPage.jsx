@@ -7,7 +7,7 @@ export default function AboutPage() {
 
   return (
     <main className="page page--secondary">
-      <AboutSection content={siteContent.about} resume={siteContent.resume} />
+      <AboutSection content={siteContent.about} />
     </main>
   )
 }

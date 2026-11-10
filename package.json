@@ -12,7 +12,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "verify": "node scripts/verify-site.mjs"
   },
   "keywords": [],
   "author": "",
@@ -35,6 +36,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
+    "puppeteer-core": "^24.10.2",
     "vite": "^8.0.2"
   },
   "lint-staged": {

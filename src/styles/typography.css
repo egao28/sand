@@ -1,0 +1,87 @@
+/*
+  The Alegreya scale (#68).
+
+  Every rule here targets a selector that already sets `font-family: var(--serif)`
+  somewhere else — the swap itself is the token in assets/styles.css, and this
+  file only fixes the sizes and the weight that go with the new face. It is one
+  file rather than a dozen scattered edits so the whole scale can be read, and
+  audited, in one place.
+
+  Three sizes, from #68:
+
+    content page title    40px/1.15 desktop, 32px/1.2 mobile
+    secondary heading     28px/1.25 desktop, 25px/1.25 mobile
+    project card title    24px/1.25
+
+  Not touched, on purpose: the body sans, the mono used for dates, kickers and
+  tags, and the homepage's wind letters, which keep Cormorant Garamond.
+
+  Weight is 400 everywhere. Only Alegreya 400 is loaded, so a rule asking for
+  500 would get a synthesised bold; the several rules that used to ask for 300
+  or 500 are normalised here.
+*/
+
+/* ---------------------------------------------- content page titles ----- */
+
+.project-detail-title,
+.worklist-title,
+.profile-name,
+.not-found-headline {
+  font-size: 40px;
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+/* ---------------------------------------------- secondary headings ------ */
+
+.about-headline,
+.project-detail-page .about-headline.project-detail-section-title,
+.detail-subheading,
+.contact-panel-headline {
+  font-size: 28px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+/* --------------------------------------------------- item titles -------- */
+
+/* Both tiers of card, and the institution headings in Selected Experience,
+   which are the same kind of thing: the title of one entry in a list. The
+   featured cards no longer take a larger title of their own — #68 gives
+   project card titles one size. */
+.worklist-card-title,
+.worklist-card--featured .worklist-card-title,
+.profile-role-org {
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 400;
+}
+
+/* ------------------------------------------------------- the rest ------- */
+
+/* Still Alegreya, still 400, but not headings — these keep the sizes they
+   already had and only lose the weights that would now be synthesised. */
+.detail-pull-quote,
+.contact-info-value {
+  font-weight: 400;
+}
+
+/* ------------------------------------------------------- mobile --------- */
+
+@media (max-width: 899px) {
+  .project-detail-title,
+  .worklist-title,
+  .profile-name,
+  .not-found-headline {
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .about-headline,
+  .project-detail-page .about-headline.project-detail-section-title,
+  .detail-subheading,
+  .contact-panel-headline {
+    font-size: 25px;
+    line-height: 1.25;
+  }
+}

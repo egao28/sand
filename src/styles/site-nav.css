@@ -20,9 +20,11 @@
   --rail-left: 40px;
   --rail-hit: 48px;
   --rail-gap: 12px;
-  /* Space the fixed rail needs on the left of every route that is not the
-     opening. #68 sets the final content inset. */
-  --rail-reserve: 150px;
+  /* The content inset (#68). Wide enough that the rail never sits over the
+     text, and the same on every route so the left edge does not move as you
+     navigate. */
+  --content-inset: clamp(180px, 22vw, 340px);
+  --content-edge: 48px;
   /* The one tinted surface in the navigation: the current page's hit area. */
   --rail-current-bg: #e8dce2;
   --rail-ink: #302d29;
@@ -220,9 +222,40 @@
 
 @media (min-width: 900px) {
   .page-root:not(.page-root--home) {
-    padding-left: var(--rail-reserve);
+    padding-left: var(--content-inset);
+    padding-right: var(--content-edge);
+  }
+  /* The opening is full-bleed; the content below it is not. */
+  .home-about {
+    padding-left: var(--content-inset);
+    padding-right: var(--content-edge);
+  }
+  /* The inset above replaces `.sec-inner`'s own side padding rather than
+     stacking on top of it, which would push every page a further 56px in. Its
+     vertical padding is untouched. */
+  .sec-inner {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 899px) {
+  .page-root {
+    padding-left: 24px;
+    padding-right: 24px;
   }
   .home-about {
-    padding-left: var(--rail-reserve);
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  .sec-inner {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  /* The page already supplies the side padding; the bar adding its own would
+     indent it past the content it sits above. */
+  .site-topbar {
+    padding-left: 0;
+    padding-right: 0;
   }
 }

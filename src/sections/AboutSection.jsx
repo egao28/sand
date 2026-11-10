@@ -1,45 +1,17 @@
 import { Link } from 'react-router-dom'
 import polaroidPhoto from '../assets/about/myself.png'
 
-// The page's only <h1> is the name, so the heading order is h1 (name) →
-// h2 (Selected Experience) → h3 (each institution). Deliberately no slogan,
-// tagline or hero headline above it, and the first body sentence is set at
-// body size — enlarging it would recreate the headline this rewrite removed.
-function ProfileLink({ link, resume }) {
-  const label = (
-    <>
-      {link.label}
-      {link.arrow ? <span aria-hidden="true"> →</span> : null}
-    </>
-  )
-  const className = `profile-link${link.lead ? ' profile-link--lead' : ''}`
-
-  if (link.to) {
-    return (
-      <Link to={link.to} className={className}>
-        {label}
-      </Link>
-    )
-  }
-
-  // CV resolves through `resume` so this link and /resume always serve the same
-  // imported resume.pdf under the same filename.
-  const href = link.fromResume ? resume.href : link.href
-  const isExternal = href.startsWith('http')
-
-  return (
-    <a
-      href={href}
-      className={className}
-      {...(link.fromResume ? { download: resume.fileName } : {})}
-      {...(isExternal ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-    >
-      {label}
-    </a>
-  )
-}
-
-export default function AboutSection({ content, resume }) {
+/**
+ * The About page, rendered by both `/about` and the homepage below the opening.
+ * One component and one copy of the data; the routes differ only in whether the
+ * opening is played first.
+ *
+ * The page's only <h1> is the name, so the heading order is h1 (name) →
+ * h2 (Selected Experience) → h3 (each institution). Deliberately no slogan,
+ * tagline or hero headline above it, and the first body sentence is set at body
+ * size — enlarging it would recreate the headline the #58 rewrite removed.
+ */
+export default function AboutSection({ content }) {
   return (
     <section id="about" aria-labelledby="profile-name">
       <div className="sec-inner profile-inner">
@@ -91,11 +63,21 @@ export default function AboutSection({ content, resume }) {
           </ul>
         </section>
 
-        <nav className="profile-links reveal" aria-label="Elsewhere">
-          {content.links.map((link) => (
-            <ProfileLink key={link.label} link={link} resume={resume} />
-          ))}
-        </nav>
+        {/* Under 900px the rail is not rendered and the compact top bar carries
+            only the four pages, so this is GitHub's only place on the site at
+            that width. Above it the rail has GitHub, and this is `display:
+            none` — which takes it out of the tab order and the accessibility
+            tree too, so there is never a second GitHub link to land on. */}
+        <p className="profile-outbound">
+          <a
+            className="profile-outbound-link"
+            href={content.github.href}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {content.github.label}
+          </a>
+        </p>
       </div>
     </section>
   )

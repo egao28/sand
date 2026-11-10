@@ -16,38 +16,45 @@
 
 /* ========================================================== /about ======= */
 
-/* The page is short on purpose; .sec-inner's 6.5rem band is tightened for
-   #about in assets/styles.css so the body doesn't start below the fold. */
+/*
+  The layout numbers below are #68's. The page is one column of content inset
+  from the left, with the prose and the polaroid side by side at the widest
+  size, stacked inside that column between 900 and 1199px, and a single column
+  under 900px. The left inset itself is on `.page-root` in site-nav.css, where
+  the rail it clears is defined.
+*/
+
 .profile-inner {
-  max-width: 980px;
+  max-width: 1040px;
+  /* Left-aligned in the content area rather than centred in it: the inset on
+     the left is what positions this page, and centring would fight it. */
+  margin: 0;
+  padding: 96px 0 6rem;
 }
 
 .profile-intro {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  gap: 3.5rem;
+  grid-template-columns: minmax(0, 1fr) 338px;
+  gap: 56px;
   align-items: start;
 }
 
 /* The name is a heading, not a headline: this page carries no slogan, so the
-   name is set only slightly above body scale and well below
-   .project-detail-title. Enlarging it would reintroduce the hero this
-   rewrite removed. */
+   name is set at the same size as any other content page's title. Enlarging it
+   would reintroduce the hero the #58 rewrite removed. Size and weight come from
+   the Alegreya scale in typography.css. */
 .profile-name {
   font-family: var(--serif);
-  font-size: clamp(34px, 3.4vw, 44px);
-  font-weight: 400;
-  line-height: 1.1;
   letter-spacing: -0.01em;
   margin-bottom: 1.6rem;
 }
 
 .profile-prose {
   font-size: 19px;
-  line-height: 1.62;
+  line-height: 1.65;
   color: var(--ink-soft);
-  max-width: 64ch;
-  margin-bottom: 1.15rem;
+  max-width: 62ch;
+  margin-bottom: 24px;
 }
 
 /* Last line of the body. No heading, no pull-quote treatment — just a slightly
@@ -59,6 +66,9 @@
   margin-bottom: 0;
 }
 
+/* The polaroid: paper border and tilt as delivered, 30% wider than the #62
+   baseline of 260px. Width only — the image keeps its own aspect ratio, so
+   nobody is cropped out of it. */
 .profile-portrait {
   margin: 0;
   transform: rotate(-3deg);
@@ -103,18 +113,18 @@
   border-top: 1px solid var(--line);
 }
 
-/* Compact list, not a timeline: every line is readable without hovering,
-   and the item is not itself a hover target. */
+/* Compact list, not a timeline: every line is readable without hovering, and
+   the item is not itself a hover target. */
 .profile-role {
   padding: 1.5rem 0;
   border-bottom: 1px solid var(--line);
 }
 
+/* The institution. Size and weight come from the Alegreya scale in
+   typography.css, where it sits in the same bucket as a project card title:
+   both are the title of one entry in a list. */
 .profile-role-org {
   font-family: var(--serif);
-  font-size: 26px;
-  font-weight: 400;
-  line-height: 1.2;
 }
 
 /* Plain text link, not a button: same size and face as the heading it sits in,
@@ -150,57 +160,20 @@
   margin-top: 0.7rem;
 }
 
-/* --- Links --------------------------------------------------------------- */
+/* --- GitHub, on narrow screens only -------------------------------------- */
 
-.profile-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 3rem;
+.profile-outbound {
+  display: none;
+  margin-top: 2.5rem;
 }
 
-.profile-link {
-  font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.profile-outbound-link {
+  font-family: var(--sans);
+  font-size: 15px;
   color: var(--ink-soft);
-  text-decoration: none;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 0.55rem 1.15rem;
-  transition:
-    border-color 0.25s ease,
-    color 0.25s ease,
-    background 0.25s ease;
-}
-
-.profile-link:hover,
-.profile-link:focus-visible {
-  color: var(--ink);
-  border-color: var(--accent);
-  background: var(--accent-soft);
-}
-
-/* The one link that leads somewhere rather than out: no pill, reads as a
-   sentence, and takes the full row on narrow screens. */
-.profile-link--lead {
-  border: none;
-  border-radius: 0;
-  padding: 0.55rem 0;
-  margin-left: 0.6rem;
-  text-transform: none;
-  letter-spacing: 0.04em;
-  font-size: 14px;
-  color: var(--ink);
-  border-bottom: 1px solid var(--accent);
-}
-
-.profile-link--lead:hover,
-.profile-link--lead:focus-visible {
-  background: transparent;
-  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 0.3em;
 }
 
 /* ======================================================= /projects ======= */
@@ -428,7 +401,6 @@
 @media (prefers-reduced-motion: reduce) {
   .worklist-card,
   .worklist-action,
-  .profile-link,
   .profile-role-org-link {
     transition: none;
   }
@@ -446,31 +418,43 @@
 
 /* ===================================================== responsive ======== */
 
-@media (max-width: 860px) {
-  /* Photo moves below the text rather than beside it, so it can never overlap
-     or cover the body. */
+/* 900-1199px: the prose and the photo stack inside the content column, with the
+   photo after the body and before Selected Experience. The nav stays where it
+   is. */
+@media (max-width: 1199px) {
   .profile-intro {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
   }
   .profile-portrait {
-    width: min(220px, 60vw);
-    margin: 0 auto;
+    width: 300px;
   }
   .profile-portrait-caption {
-    text-align: center;
+    text-align: left;
+  }
+}
+
+@media (max-width: 899px) {
+  .profile-inner {
+    padding-top: 2.5rem;
+  }
+  .profile-portrait {
+    width: min(100%, 360px);
+  }
+  .profile-prose {
+    font-size: 17px;
   }
   .profile-prose,
   .profile-role-note {
     max-width: none;
   }
-  .profile-links {
-    gap: 0.6rem;
+  /* The rail is gone at this width, so this is the only GitHub link there is. */
+  .profile-outbound {
+    display: block;
   }
-  .profile-link--lead {
-    margin-left: 0;
-    flex-basis: 100%;
-  }
+}
+
+@media (max-width: 860px) {
   .worklist-card,
   .worklist-card--featured {
     padding: 1.6rem 1.5rem;
