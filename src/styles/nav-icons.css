@@ -156,7 +156,12 @@
   .nav-icon-github-dot,
   .nav-icon-linkedin-dot,
   .nav-icon-theme-turn,
-  .site-rail-label {
+  .site-rail-label,
+  /* The current-page tint. It is a colour, so it would otherwise fade when
+     the theme changes under it — which is the one thing #73 asks the theme
+     switch not to do when motion is turned down. */
+  .site-rail-link,
+  .site-topbar-theme {
     transition: none;
   }
 

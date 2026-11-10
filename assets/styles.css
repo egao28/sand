@@ -1,13 +1,42 @@
+/*
+  The palette, as one set of tokens for both themes (#73).
+
+  Light is the first visit and the default. Dark is the warm smoke-brown
+  scheme, applied by `html[data-theme="dark"]` — set before the first paint by
+  the inline script in index.html, so there is no flash of cream before it
+  lands. Deliberately not `prefers-color-scheme`: the brief asks for a light
+  first visit and a remembered manual choice, and consulting the system
+  setting as well would make those two disagree.
+
+  The `-rgb` triples exist so the dozens of `rgba(ink, alpha)` borders, rules
+  and shadows elsewhere in this file can flip with the theme instead of
+  staying ink-on-paper in a dark page. They are the same colours as the hex
+  tokens beside them and have to be kept in step.
+
+  Flat colour throughout: no gradient, texture, glow or shadow is introduced
+  here, and no filter is ever put on an image — a photograph with its colours
+  inverted is not a dark theme.
+*/
 :root {
   --paper: #fffdf8;
   --paper2: #f7f2e8;
-  --ink: #191713;
-  --ink-soft: #3a362f;
-  --ink-muted: #7f776c;
+  --ink: #302d29;
+  --ink-rgb: 48, 45, 41;
+  --ink-soft: #4a443c;
+  --ink-muted: #71685b;
   /* Warm gold / beige accent — no neon or high saturation */
   --accent: #c4a574;
-  --accent-soft: rgba(196, 165, 116, 0.2);
-  --line: rgba(25, 23, 19, 0.1);
+  --accent-rgb: 196, 165, 116;
+  --accent-soft: rgba(var(--accent-rgb), 0.2);
+  /* Links and emphasis: darker than --accent, which is decoration. */
+  --accent-link: #795a28;
+  --line: rgba(48, 45, 41, 0.1);
+  /* Dividers and input underlines. */
+  --rule: #ddd5c7;
+  --paper-rgb: 255, 253, 248;
+  /* Form feedback. */
+  --ok: #3f7d4a;
+  --bad: #b3483f;
 
   /* The content font: every editorial heading on the site. Swapped from
      Cormorant Garamond to Alegreya in #68. */
@@ -19,6 +48,27 @@
   --mono:
     'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
     monospace;
+}
+
+/* The warm smoke-brown dark theme. Only colour changes here — not one rule
+   below alters a size, a position or a structure. */
+html[data-theme='dark'] {
+  --paper: #514638;
+  --paper2: #5b4f40;
+  --ink: #f5efe4;
+  --ink-rgb: 245, 239, 228;
+  --ink-soft: #e8dfd0;
+  --ink-muted: #d8ccba;
+  --accent: #d5b77d;
+  --accent-rgb: 213, 183, 125;
+  --accent-soft: rgba(213, 183, 125, 0.18);
+  --accent-link: #d5b77d;
+  --line: rgba(245, 239, 228, 0.16);
+  --rule: #7a6b57;
+  --paper-rgb: 81, 70, 56;
+  /* Lifted off the defaults, which are too dark to read on smoke brown. */
+  --ok: #8fcf9b;
+  --bad: #f0a099;
 }
 
 *,
@@ -74,7 +124,7 @@ img {
 #cursor-dot {
   width: 10px;
   height: 10px;
-  background: rgba(25, 23, 19, 0.65);
+  background: rgba(var(--ink-rgb), 0.65);
   border-radius: 50%;
   transition:
     transform 0.18s ease,
@@ -84,7 +134,7 @@ img {
 #cursor-ring {
   width: 26px;
   height: 26px;
-  border: 1px solid rgba(25, 23, 19, 0.18);
+  border: 1px solid rgba(var(--ink-rgb), 0.18);
   border-radius: 50%;
   background: transparent;
   opacity: 0; /* keep cursor simple: dot only */
@@ -92,21 +142,21 @@ img {
 }
 
 body.cursor-hover #cursor-dot {
-  background: rgba(201, 169, 110, 0.85);
+  background: rgba(var(--accent-rgb), 0.85);
   transform: translate(-50%, -50%) scale(1.08);
 }
 body.cursor-link #cursor-ring {
   opacity: 0;
 }
 body.cursor-link #cursor-dot {
-  background: rgba(201, 169, 110, 0.95);
+  background: rgba(var(--accent-rgb), 0.95);
   transform: translate(-50%, -50%) scale(1.25);
 }
 
 /* Dark contact / hero panels: light dot for contrast */
 body.cursor-dark-surface #cursor-dot {
   background: rgba(255, 253, 248, 0.92);
-  box-shadow: 0 0 0 1px rgba(25, 23, 19, 0.08);
+  box-shadow: 0 0 0 1px rgba(var(--ink-rgb), 0.08);
 }
 body.cursor-dark-surface.cursor-hover #cursor-dot {
   background: rgba(255, 253, 248, 0.98);
@@ -174,7 +224,7 @@ body.cursor-dark-surface.cursor-link #cursor-dot {
   will-change: transform;
 }
 .placeholder-photo {
-  background: linear-gradient(135deg, var(--paper2) 0%, rgba(201, 169, 110, 0.16) 100%);
+  background: linear-gradient(135deg, var(--paper2) 0%, rgba(var(--accent-rgb), 0.16) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -273,7 +323,7 @@ body.cursor-dark-surface.cursor-link #cursor-dot {
     transform 0.2s;
 }
 .social-btn:hover {
-  background: rgba(201, 169, 110, 0.14);
+  background: rgba(var(--accent-rgb), 0.14);
   color: var(--ink);
   transform: translateY(-2px);
 }
@@ -379,7 +429,7 @@ section {
   transition: color 0.2s ease;
 }
 .project-detail-back:hover {
-  color: rgba(201, 169, 110, 0.95);
+  color: rgba(var(--accent-rgb), 0.95);
 }
 .project-detail-hero {
   position: relative;
@@ -473,7 +523,11 @@ section {
 }
 .experience-detail-subtitle {
   font-size: 17px;
-  color: rgba(201, 169, 110, 0.95);
+  /* --accent is the decorative gold, and at 17px on cream it measured 2.30:1
+     — too faint for a standfirst, which is reading text, not ornament (#73).
+     --accent-link is the same hue carried to a readable weight: 6.25:1 light,
+     4.77:1 dark. */
+  color: var(--accent-link);
   letter-spacing: 0.04em;
   font-weight: 500;
   line-height: 1.45;
@@ -529,7 +583,7 @@ section {
   line-height: inherit;
   color: var(--ink-soft);
   text-decoration: underline;
-  text-decoration-color: rgba(25, 23, 19, 0.28);
+  text-decoration-color: rgba(var(--ink-rgb), 0.28);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.22em;
   border-bottom: none;
@@ -540,11 +594,11 @@ section {
     opacity 0.2s ease;
 }
 .project-detail-demo-link:hover {
-  color: rgba(196, 165, 116, 0.95);
-  text-decoration-color: rgba(196, 165, 116, 0.65);
+  color: rgba(var(--accent-rgb), 0.95);
+  text-decoration-color: rgba(var(--accent-rgb), 0.65);
 }
 .project-detail-demo-link:focus-visible {
-  outline: 1px solid rgba(25, 23, 19, 0.3);
+  outline: 1px solid rgba(var(--ink-rgb), 0.3);
   outline-offset: 3px;
 }
 .project-detail-video {
@@ -555,14 +609,14 @@ section {
   width: 100%;
   height: auto;
   /* Poster and frames are light, so a soft border keeps the edge off the beige panel */
-  border: 1px solid rgba(25, 23, 19, 0.12);
+  border: 1px solid rgba(var(--ink-rgb), 0.12);
   /* Match the .detail-diagram card radius */
   border-radius: 12px;
   background: #f7f5f0;
-  box-shadow: 0 10px 28px rgba(25, 23, 19, 0.1);
+  box-shadow: 0 10px 28px rgba(var(--ink-rgb), 0.1);
 }
 .project-detail-video-player:focus-visible {
-  outline: 1px solid rgba(25, 23, 19, 0.3);
+  outline: 1px solid rgba(var(--ink-rgb), 0.3);
   outline-offset: 3px;
 }
 .project-detail-video-caption {
@@ -599,7 +653,7 @@ section {
   text-transform: uppercase;
   color: var(--ink-soft);
   text-decoration: underline;
-  text-decoration-color: rgba(25, 23, 19, 0.28);
+  text-decoration-color: rgba(var(--ink-rgb), 0.28);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.3em;
   transition:
@@ -607,11 +661,11 @@ section {
     text-decoration-color 0.2s ease;
 }
 .tech-note-demo-toggle:hover {
-  color: rgba(196, 165, 116, 0.95);
-  text-decoration-color: rgba(196, 165, 116, 0.65);
+  color: rgba(var(--accent-rgb), 0.95);
+  text-decoration-color: rgba(var(--accent-rgb), 0.65);
 }
 .tech-note-demo-toggle:focus-visible {
-  outline: 1px solid rgba(25, 23, 19, 0.3);
+  outline: 1px solid rgba(var(--ink-rgb), 0.3);
   outline-offset: 3px;
 }
 .tech-note-foot {
@@ -850,6 +904,63 @@ section {
   background: linear-gradient(70deg, #f8f5ed 0%, #e6dac2 55%, #d8c8a4 100%);
 }
 
+/*
+  Dark theme: the detail pages' tones go flat (#73).
+
+  Those six tones are light-mode artwork — cream-to-beige ramps that only read
+  as anything on a pale page. #73 asks for flat colour with no gradient, so in
+  dark every one of them resolves to the page background and the pages become
+  what they already are in structure: one background, with the type on it.
+
+  Light is untouched: the tones are the one piece of decoration the brief
+  keeps, and #71 deliberately left them alone on the five write-ups that are
+  not technical notes.
+*/
+html[data-theme='dark'] .project-detail-page,
+html[data-theme='dark'] .project-detail-page--tone-a,
+html[data-theme='dark'] .project-detail-page--tone-b,
+html[data-theme='dark'] .project-detail-page--tone-c,
+html[data-theme='dark'] .project-detail-page--tone-d,
+html[data-theme='dark'] .project-detail-page--tone-e,
+html[data-theme='dark'] .project-detail-page--tone-f,
+html[data-theme='dark'] .project-detail-hero,
+html[data-theme='dark'] .project-detail-hero--plain,
+html[data-theme='dark'] .project-detail-motivation,
+html[data-theme='dark'] .project-detail-approach,
+html[data-theme='dark'] .project-detail-demo,
+html[data-theme='dark'] .project-detail-page--tone-a .project-detail-hero,
+html[data-theme='dark'] .project-detail-page--tone-b .project-detail-hero,
+html[data-theme='dark'] .project-detail-page--tone-c .project-detail-hero--plain,
+html[data-theme='dark'] .project-detail-page--tone-d .project-detail-hero,
+html[data-theme='dark'] .project-detail-page--tone-e .project-detail-hero,
+html[data-theme='dark'] .project-detail-page--tone-f .project-detail-hero,
+html[data-theme='dark'] .project-detail-page--tone-a .project-detail-motivation,
+html[data-theme='dark'] .project-detail-page--tone-b .project-detail-motivation,
+html[data-theme='dark'] .project-detail-page--tone-c .project-detail-motivation,
+html[data-theme='dark'] .project-detail-page--tone-d .project-detail-motivation,
+html[data-theme='dark'] .project-detail-page--tone-e .project-detail-motivation,
+html[data-theme='dark'] .project-detail-page--tone-f .project-detail-motivation,
+html[data-theme='dark'] .project-detail-page--tone-a .project-detail-approach,
+html[data-theme='dark'] .project-detail-page--tone-b .project-detail-approach,
+html[data-theme='dark'] .project-detail-page--tone-c .project-detail-approach,
+html[data-theme='dark'] .project-detail-page--tone-d .project-detail-approach,
+html[data-theme='dark'] .project-detail-page--tone-e .project-detail-approach,
+html[data-theme='dark'] .project-detail-page--tone-f .project-detail-approach,
+html[data-theme='dark'] .project-detail-page--tone-a .project-detail-demo,
+html[data-theme='dark'] .project-detail-page--tone-b .project-detail-demo,
+html[data-theme='dark'] .project-detail-page--tone-c .project-detail-demo,
+html[data-theme='dark'] .project-detail-page--tone-d .project-detail-demo,
+html[data-theme='dark'] .project-detail-page--tone-e .project-detail-demo,
+html[data-theme='dark'] .project-detail-page--tone-f .project-detail-demo {
+  background: var(--paper);
+}
+
+/* The title sat on a pale ramp and carried a near-white highlight to lift it
+   off. On smoke brown that is a white smear under the letters. */
+html[data-theme='dark'] .project-detail-title {
+  text-shadow: none;
+}
+
 /* Long-form experience detail pages (e.g. Bloom MCP): extra content blocks
    beyond the base project-detail system, built from the same tokens/type
    scale so a richer write-up doesn't introduce a second visual language. */
@@ -909,7 +1020,10 @@ section {
   gap: 0.75rem;
 }
 .detail-tool-card {
-  background: rgba(255, 253, 248, 0.75);
+  /* Paper-based, not a literal cream: the text inside is var(--ink), so a
+     fixed near-white here would leave cream letters on a white card in dark
+     (#73). */
+  background: rgba(var(--paper-rgb), 0.75);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 0.85rem 1rem;
@@ -932,7 +1046,7 @@ section {
 .detail-diagram {
   margin: 2rem 0;
   padding: 1.4rem 1.4rem 0.5rem;
-  background: rgba(255, 253, 248, 0.75);
+  background: rgba(var(--paper-rgb), 0.75);
   border: 1px solid var(--line);
   border-radius: 12px;
 }
@@ -997,7 +1111,10 @@ section {
   font-family: var(--mono);
   font-size: 13px;
   font-weight: 700;
-  color: var(--accent);
+  /* The step number, on the page rather than on the dark Technical band — see
+     the override further down for that one. --accent measured 2.30:1 here; a
+     number you have to lean in to read is not a numbered list (#73). */
+  color: var(--accent-link);
   white-space: nowrap;
 }
 .detail-tl-body {
@@ -1036,7 +1153,7 @@ section {
 }
 
 .detail-callout {
-  background: rgba(255, 253, 248, 0.75);
+  background: rgba(var(--paper-rgb), 0.75);
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 1.35rem 1.6rem;
@@ -1055,7 +1172,7 @@ section {
   display: block;
   margin: 1.1rem 0 1.5rem;
   padding: 1rem 1.2rem;
-  background: rgba(25, 23, 19, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
   border: 1px solid var(--line);
   border-radius: 8px;
   font-family: var(--mono);
@@ -1195,7 +1312,7 @@ section {
   transition: transform 0.25s ease;
 }
 .project-row:focus-visible {
-  box-shadow: 0 0 0 2px rgba(201, 169, 110, 0.45);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.45);
 }
 .project-row:hover .project-art-inner,
 .project-row:focus-within .project-art-inner {
@@ -1216,9 +1333,9 @@ section {
   height: 100%;
   min-height: 210px;
   background:
-    radial-gradient(1200px 400px at 20% 10%, rgba(201, 169, 110, 0.25), transparent 50%),
-    radial-gradient(900px 500px at 80% 80%, rgba(25, 23, 19, 0.1), transparent 55%),
-    linear-gradient(135deg, rgba(255, 253, 248, 0.2), rgba(201, 169, 110, 0.1));
+    radial-gradient(1200px 400px at 20% 10%, rgba(var(--accent-rgb), 0.25), transparent 50%),
+    radial-gradient(900px 500px at 80% 80%, rgba(var(--ink-rgb), 0.1), transparent 55%),
+    linear-gradient(135deg, rgba(255, 253, 248, 0.2), rgba(var(--accent-rgb), 0.1));
   transform: scale(1.02);
   transition:
     transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -1230,12 +1347,12 @@ section {
 .project-art-inner.art-b {
   background:
     radial-gradient(900px 450px at 30% 30%, rgba(44, 62, 107, 0.16), transparent 55%),
-    linear-gradient(135deg, rgba(255, 253, 248, 0.3), rgba(201, 169, 110, 0.1));
+    linear-gradient(135deg, rgba(255, 253, 248, 0.3), rgba(var(--accent-rgb), 0.1));
 }
 .project-art-inner.art-c {
   background:
     radial-gradient(900px 450px at 70% 30%, rgba(108, 62, 139, 0.14), transparent 55%),
-    linear-gradient(135deg, rgba(255, 253, 248, 0.3), rgba(201, 169, 110, 0.1));
+    linear-gradient(135deg, rgba(255, 253, 248, 0.3), rgba(var(--accent-rgb), 0.1));
 }
 .project-art:hover .project-art-inner {
   transform: scale(1.07);
@@ -1251,7 +1368,7 @@ section {
   text-transform: uppercase;
   padding: 0.5rem 0.7rem;
   border-radius: 999px;
-  color: rgba(25, 23, 19, 0.85);
+  color: rgba(var(--ink-rgb), 0.85);
   background: rgba(255, 253, 248, 0.8);
   border: none;
   transition: opacity 0.28s ease;
@@ -1276,7 +1393,7 @@ section {
   text-transform: uppercase;
   padding: 0.2rem 0.55rem;
   border-radius: 5px;
-  background: rgba(25, 23, 19, 0.05);
+  background: rgba(var(--ink-rgb), 0.05);
   color: var(--ink-muted);
 }
 .project-title {
@@ -1300,7 +1417,7 @@ section {
   font-size: 15px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(201, 169, 110, 0.95);
+  color: rgba(var(--accent-rgb), 0.95);
   text-decoration: none;
   transition:
     color 0.2s ease,
@@ -1479,7 +1596,7 @@ section {
   .resume-photo-link:hover .resume-photo,
   .resume-photo-link:focus-visible .resume-photo {
     transform: none;
-    box-shadow: 0 10px 28px rgba(25, 23, 19, 0.22);
+    box-shadow: 0 10px 28px rgba(var(--ink-rgb), 0.22);
   }
 }
 
@@ -1554,7 +1671,7 @@ section {
   color: var(--ink);
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--rule, #ddd5c7);
+  border-bottom: 1px solid var(--rule);
   border-radius: 0;
   padding: 0 0 0.5rem;
   transition:
@@ -1576,7 +1693,7 @@ section {
 .contact-field input:focus,
 .contact-field textarea:focus {
   outline: none;
-  border-bottom-color: var(--accent-link, #795a28);
+  border-bottom-color: var(--accent-link);
   border-bottom-width: 2px;
   /* The extra pixel comes out of the padding, so nothing below shifts. */
   padding-bottom: calc(0.5rem - 1px);
@@ -1607,7 +1724,7 @@ section {
   font-size: 14px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent-link, #795a28);
+  color: var(--accent-link);
   transition:
     color 0.2s ease,
     opacity 0.2s ease;
@@ -1649,11 +1766,11 @@ section {
 }
 
 .contact-form-status--ok {
-  color: #3f7d4a;
+  color: var(--ok);
 }
 
 .contact-form-status--error {
-  color: #b3483f;
+  color: var(--bad);
 }
 
 /* The address itself, small, under the form — the one thing besides the form
@@ -1667,14 +1784,14 @@ section {
 .contact-direct-link {
   color: var(--ink-muted);
   text-decoration: underline;
-  text-decoration-color: var(--rule, #ddd5c7);
+  text-decoration-color: var(--rule);
   text-underline-offset: 0.3em;
   transition: color 0.2s ease;
 }
 
 .contact-direct-link:hover,
 .contact-direct-link:focus-visible {
-  color: var(--accent-link, #795a28);
+  color: var(--accent-link);
 }
 
 #contact .footer-bar {
@@ -1709,7 +1826,9 @@ section {
   font-family: var(--mono);
   font-size: 15px;
   letter-spacing: 0.12em;
-  color: rgba(255, 253, 248, 0.38);
+  /* Was a fixed cream, from when this sat on the old dark contact panel. That
+     panel went with #72 and the bar is on the page now. */
+  color: var(--ink-muted);
 }
 .footer-bar--single {
   justify-content: flex-start;

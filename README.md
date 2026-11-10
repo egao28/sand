@@ -64,6 +64,23 @@ isn't one. CI runs lint, format and build only.
 `npm run test:contact` stubs the mail service and sends nothing, which is the only way it
 runs — the recipient is a real inbox.
 
+## Themes
+
+Light is the default and the first visit; the choice is remembered in
+`localStorage` and applied by an inline script in `index.html` before the first paint,
+so there is no flash of the wrong theme. `prefers-color-scheme` is deliberately not
+consulted — the brief asks for a light first visit and a remembered manual choice, and
+reading the system setting as well would make the inline script and the app disagree.
+
+The palette is one set of tokens in `assets/styles.css`: `:root` for light,
+`html[data-theme="dark"]` for the warm smoke-brown dark. The `--ink-rgb`, `--paper-rgb`
+and `--accent-rgb` triples exist so the `rgba(ink, alpha)` borders and rules scattered
+through that file flip with the theme instead of staying ink-on-paper on a dark page —
+they have to be kept in step with the hex tokens beside them.
+
+Two things that are deliberately _not_ themed: `.project-detail-tech` is a near-black
+band in both themes, and `logo.png` is a raster asset that is never filtered.
+
 ## The contact form
 
 `/contact` posts to `api/contact.js`, a serverless function on the host, which forwards to
