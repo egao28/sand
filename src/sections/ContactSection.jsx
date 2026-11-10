@@ -19,6 +19,51 @@ const LIMITS = { name: 100, email: 200, message: 4000 }
  * arrives. */
 const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+/* The line under each field, drawn instead of bordered.
+ *
+ * One smooth path each, three segments of cubic Bezier joined with `S` so the
+ * control points mirror across every junction and the curve cannot kink. They
+ * are not a wave: the segments are different lengths and different depths, so
+ * nothing in them repeats. Measured off the baseline at y=3, the furthest any
+ * of the three strays is 1.07px, 1.15px and 1.16px — the brief's 1-1.5px, as a
+ * number rather than an impression.
+ *
+ * The viewBox is 640 wide because that is the form's own measure, so at the
+ * full desktop width the curve is drawn at exactly the proportions it was
+ * designed at and only compresses on a narrower screen. It is vector at every
+ * width; there is no bitmap here to go soft when it stretches.
+ */
+const FIELD_RULES = {
+  name: 'M 0 3.1 C 86 1.85, 162 1.85, 238 3.05 S 352 4.6, 430 3.45 S 560 1.9, 640 2.95',
+  email: 'M 0 2.95 C 70 4.3, 134 4.35, 206 3.1 S 330 1.4, 418 2.75 S 548 4.3, 640 3.2',
+  message: 'M 0 3.05 C 94 2, 178 1.85, 256 3.15 S 388 4.5, 466 3.3 S 572 2, 640 2.9',
+}
+
+/* `preserveAspectRatio="none"` is what lets the path stretch to the field's
+ * width; `vector-effect="non-scaling-stroke"` is what stops the stroke being
+ * stretched along with it, so all three lines are 1.25px at every width.
+ * Decorative, and marked as such: it carries no meaning the label does not
+ * already give, and CSS keeps it out of the way of the pointer. */
+function FieldRule({ field }) {
+  return (
+    <svg
+      className="contact-field-rule"
+      viewBox="0 0 640 6"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d={FIELD_RULES[field]}
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  )
+}
+
 export default function ContactSection({ content }) {
   const [form, setForm] = useState(EMPTY_FORM)
   // Honeypot. Held outside `form` so it can never be spread into the payload.
@@ -104,8 +149,8 @@ export default function ContactSection({ content }) {
 
   return (
     <section id="contact" aria-labelledby="contact-title">
-      <div className="sec-inner contact-inner">
-        <h1 id="contact-title" className="contact-title">
+      <div className="sec-inner page-shell contact-inner">
+        <h1 id="contact-title" className="contact-title page-shell-title">
           {content.title}
         </h1>
 
@@ -141,6 +186,7 @@ export default function ContactSection({ content }) {
               onChange={handleChange}
               disabled={sending}
             />
+            <FieldRule field="name" />
           </div>
 
           <div className="contact-field">
@@ -156,6 +202,7 @@ export default function ContactSection({ content }) {
               onChange={handleChange}
               disabled={sending}
             />
+            <FieldRule field="email" />
           </div>
 
           <div className="contact-field">
@@ -170,6 +217,7 @@ export default function ContactSection({ content }) {
               onChange={handleChange}
               disabled={sending}
             />
+            <FieldRule field="message" />
           </div>
 
           <div className="contact-form-footer">

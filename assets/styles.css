@@ -741,10 +741,49 @@ section {
   text-shadow: none;
 }
 
-/* One reading column for the whole article, title included, so nothing steps
-   in or out as you scroll. 720px is #71's. */
+/* The note's outer container: the same one /about, /projects and /contact use,
+   so a note starts on the site's common left edge. It used to be the reading
+   column itself — 720px with `.sec-inner`'s `margin: 0 auto` still in force,
+   which centred it in the content area and started every heading and every
+   paragraph 178px further in than /about's at 1440px. That is the extra indent
+   that made these pages read as a narrow phone column; it is removed here
+   rather than pulled back with a negative margin. */
 .tech-note-page .sec-inner {
-  max-width: 720px;
+  max-width: var(--shell-max);
+  margin-inline: 0;
+}
+
+/* The reading column inside it: 800px, left-aligned, no second centring. One
+   rule over the direct children of each section rather than a list of element
+   names, so a paragraph added later cannot miss it. The back link, the title,
+   the identity line, the section headings and the body all share this edge
+   because they all share this cap.
+
+   `.note-wide` is the way out for the things the brief lets run wider — a
+   diagram, a code block, a table — and it goes up to the container, which is
+   --shell-max and no further. */
+.tech-note-page .sec-inner > *,
+.tech-note-page .project-detail-body > * {
+  max-width: var(--note-measure);
+}
+
+.tech-note-page .note-wide,
+.tech-note-page .note-wide > * {
+  max-width: none;
+}
+
+/* A wide block still has to stay inside the page. Anything that cannot shrink —
+   a code block, a table — scrolls inside itself at narrow widths instead of
+   widening the document. */
+.tech-note-page pre,
+.tech-note-page .note-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tech-note-page table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 /* 40px between sections, and no padding of their own: the gradients that
@@ -774,9 +813,12 @@ section {
   margin-bottom: 0;
 }
 
+/* `max-width: none` was right while the container itself was the 720px
+   column. It is the 1000px shell now, so the measure is stated here — the same
+   800px the rule above gives every other block in a note. */
 .tech-note-page .project-detail-body .project-detail-prose,
 .tech-note-page .project-detail-prose {
-  max-width: none;
+  max-width: var(--note-measure);
   font-size: 18px;
   line-height: 1.7;
   margin-bottom: 0;
@@ -1641,12 +1683,12 @@ html[data-theme='dark'] .project-detail-title {
   color: var(--ink);
 }
 
+/* Width, left edge and the space above the title are the shared container's
+   (`.page-shell` in page-shell.css), which this element also carries. The
+   640px that used to be here is now on the form itself, so the page sits in
+   the same 1000px container as /about and /projects while the fields keep the
+   measure they were given. The right-hand space is left empty, as it was. */
 .contact-inner {
-  /* Left-aligned on the same line as every other page's content: the inset on
-     .page-root is what positions this, so centring would fight it. */
-  max-width: 640px;
-  margin: 0;
-  padding-top: 4rem;
   padding-bottom: 3.5rem;
 }
 
@@ -1656,11 +1698,15 @@ html[data-theme='dark'] .project-detail-title {
   line-height: 1.1;
   font-weight: 400;
   letter-spacing: -0.01em;
+  /* Mobile only: on desktop the gap is `--shell-title-gap`, the same one under
+     the /about and /projects titles. */
   margin-bottom: 2.5rem;
 }
 
+/* The fields' measure, which is what the 640px was always for. */
 .contact-form {
   display: block;
+  max-width: 640px;
 }
 
 /* Off-screen, not display:none — a bot fills what it can find in the DOM, and
@@ -1689,7 +1735,12 @@ html[data-theme='dark'] .project-detail-title {
 }
 
 /* No box and no card fill: one line under the field, and that is the whole
-   decoration. */
+   decoration. The line itself is no longer a border — `.contact-field-rule`
+   below draws it — so the field carries no border at all. */
+.contact-field {
+  position: relative;
+}
+
 .contact-field input,
 .contact-field textarea {
   display: block;
@@ -1700,12 +1751,9 @@ html[data-theme='dark'] .project-detail-title {
   color: var(--ink);
   background: transparent;
   border: 0;
-  border-bottom: 1px solid var(--rule);
   border-radius: 0;
   padding: 0 0 0.5rem;
-  transition:
-    border-color 0.2s ease,
-    color 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .contact-field input {
@@ -1719,13 +1767,56 @@ html[data-theme='dark'] .project-detail-title {
   resize: vertical;
 }
 
+/* The focus ring is deliberately suppressed here, as it was before: the line
+   under the field is the focus indicator, and it answers in the two ways the
+   border used to — the theme's accent colour and a step up in weight. */
 .contact-field input:focus,
 .contact-field textarea:focus {
   outline: none;
-  border-bottom-color: var(--accent-link);
-  border-bottom-width: 2px;
-  /* The extra pixel comes out of the padding, so nothing below shifts. */
-  padding-bottom: calc(0.5rem - 1px);
+}
+
+/* The drawn line. Absolutely positioned and 6px tall, centred on the pixel the
+   1px border used to occupy, so every field keeps the height and the position
+   it had and nothing below it moves.
+
+   It is a sibling of the input rather than a background on it, because a
+   background cannot be a path. `pointer-events: none` is what keeps that from
+   mattering: the line is never between the pointer and the field, never
+   between a drag and the text being selected, and never in the tab order.
+
+   Nothing here animates on its own — no draw-on, no drift, no loop. The two
+   transitions are the same 0.2s the field's own colour uses, and both are off
+   under reduced motion. The colours are the theme's existing tokens, so dark
+   gets the #82766C divider and the #D7C7AC accent without a second rule. */
+.contact-field-rule {
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  display: block;
+  width: 100%;
+  height: 6px;
+  pointer-events: none;
+  color: var(--rule);
+  transition: color 0.2s ease;
+}
+
+.contact-field-rule path {
+  stroke-width: 1.25;
+  transition: stroke-width 0.2s ease;
+}
+
+.contact-field:focus-within .contact-field-rule {
+  color: var(--accent-link);
+}
+
+.contact-field:focus-within .contact-field-rule path {
+  stroke-width: 2;
+}
+
+/* A field nobody can type in should not be drawn at full strength either. */
+.contact-field:has(input:disabled) .contact-field-rule,
+.contact-field:has(textarea:disabled) .contact-field-rule {
+  opacity: 0.6;
 }
 
 .contact-field input:disabled,
@@ -1839,7 +1930,9 @@ html[data-theme='dark'] .project-detail-title {
   .contact-submit,
   .contact-submit-arrow,
   .contact-field input,
-  .contact-field textarea {
+  .contact-field textarea,
+  .contact-field-rule,
+  .contact-field-rule path {
     transition: none;
   }
   .contact-submit:hover:not(:disabled) .contact-submit-arrow {
@@ -1893,11 +1986,19 @@ html[data-theme='dark'] .project-detail-title {
   .sec-inner {
     padding: 4rem 1.5rem;
   }
+  .project-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* /about's own space above and below the content on a phone. It used to sit in
+   the 900px block above, where its id-plus-two-classes weight also governed the
+   768-900 band and overrode the shared container's 96px on /about alone — the
+   one page that band had to agree with. The numbers are unchanged; only the
+   width it applies at is. */
+@media (max-width: 767px) {
   .page--secondary #about .sec-inner {
     padding-top: 4rem;
     padding-bottom: 4rem;
-  }
-  .project-row {
-    grid-template-columns: 1fr;
   }
 }

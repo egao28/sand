@@ -1,0 +1,65 @@
+/*
+  The shared desktop layout for /about, /projects, /contact and the technical
+  notes.
+
+  The three main pages are one layout system: the same left edge, the same
+  width limit, and the same distance from the top of the content area down to
+  the title. Before this file each of them set its own `max-width` on top of
+  `.sec-inner`'s `margin: 0 auto`, so /projects and /contact were centred in
+  whatever the content area had spare and therefore started further in than
+  /about — 58px further at 1440px, 126px at 1600px. The notes had it worse:
+  a 720px column centred in the same area starts 178px in at 1440px, which is
+  what made them read as a narrow phone column pushed to the middle of a wide
+  page.
+
+  Nothing here compensates for that with a margin or a transform. The centring
+  is removed where it happens, and every container below is left-aligned.
+
+  The left edge itself is deliberately NOT set here: it is `--content-inset` on
+  `.page-root` in site-nav.css, the one number that keeps every route clear of
+  the rail. Leaving it alone is what keeps /about exactly where it is and makes
+  the other pages line up with it rather than the other way round.
+
+  Desktop only, where desktop is the site's existing 768px breakpoint — the
+  width at which the rail replaces the compact bar. Below it every page keeps
+  the vertical padding it already had.
+*/
+
+:root {
+  /* The outer container. Content stops here; narrower than this it simply
+     follows the content area down, so there is nothing to overflow. */
+  --shell-max: 1000px;
+
+  /* Top of the content area to the top of the page title. /about's number,
+     which is the one the brief takes as the baseline. */
+  --shell-top: 96px;
+
+  /* Page title to the first thing under it. /about's number, for the same
+     reason. One value for all three pages: before this, /about used 1.6rem,
+     /contact 2.5rem and /projects 2.75rem. */
+  --shell-title-gap: 1.6rem;
+
+  /* The reading column inside a technical note. The note's own container is
+     --shell-max, so a diagram, a code block or a table can take the full
+     width (see `.note-wide` in assets/styles.css) while prose stays here. */
+  --note-measure: 800px;
+}
+
+.page-shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  /* Never `auto`. `.sec-inner` centres itself, and centring inside a content
+     area that is already inset from the left is what moved these pages right
+     by half of whatever space was left over. */
+  margin-inline: 0;
+}
+
+@media (min-width: 768px) {
+  .page-shell {
+    padding-top: var(--shell-top);
+  }
+
+  .page-shell-title {
+    margin-bottom: var(--shell-title-gap);
+  }
+}

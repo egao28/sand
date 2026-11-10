@@ -7,7 +7,11 @@
 @import './site-nav.css';
 /* Hover and focus motion for the rail's five icons. */
 @import './nav-icons.css';
-/* The Alegreya scale. Imported last of the four so its sizes win over the
+/* The common desktop container: one left edge and one width limit for /about,
+   /projects, /contact and the technical notes. Imported after the three sheets
+   above so it wins the max-width and margin it is correcting. */
+@import './page-shell.css';
+/* The Alegreya scale. Imported last of the five so its sizes win over the
    per-component rules it is correcting. */
 @import './typography.css';
 
