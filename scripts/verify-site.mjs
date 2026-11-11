@@ -1290,9 +1290,12 @@ const opening = await page.evaluate(() => {
 })
 check(opening.navOpacity === '0', `the six entries are not painted (opacity ${opening.navOpacity})`)
 check(opening.inert, 'and the nav is inert, so Tab cannot reach them')
+/* Both ends of the range. `< 48` alone passes when the button has been carried
+ * *too* far up and is sitting on the logo — a negative gap is still less than
+ * 48 — which is exactly what a stale `--rail-nav-height` does. */
 check(
-  opening.themeBelowLogo < 48,
-  `the theme button sits right under the logo, not below a gap (${opening.themeBelowLogo}px)`
+  opening.themeBelowLogo >= 0 && opening.themeBelowLogo < 48,
+  `the theme button sits right under the logo, neither below a gap nor on top of it (${opening.themeBelowLogo}px)`
 )
 
 /* Scroll past the handover: the nav arrives whole and the button comes down. */
