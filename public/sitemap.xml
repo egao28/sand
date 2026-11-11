@@ -13,7 +13,10 @@
   <url><loc>https://whitesandooz.vercel.app/</loc><priority>1.0</priority></url>
   <url><loc>https://whitesandooz.vercel.app/about</loc><priority>0.8</priority></url>
   <url><loc>https://whitesandooz.vercel.app/projects</loc><priority>0.8</priority></url>
-  <url><loc>https://whitesandooz.vercel.app/resume</loc><priority>0.8</priority></url>
+  <!-- Resume is hidden for now: the route is commented out in src/App.jsx, so
+       this URL would send a crawler to the 404 page. Uncomment it with the
+       route. -->
+  <!-- <url><loc>https://whitesandooz.vercel.app/resume</loc><priority>0.8</priority></url> -->
   <url><loc>https://whitesandooz.vercel.app/projects/proxima</loc><priority>0.6</priority></url>
   <url><loc>https://whitesandooz.vercel.app/projects/almabot</loc><priority>0.6</priority></url>
   <url><loc>https://whitesandooz.vercel.app/projects/carelink</loc><priority>0.6</priority></url>
