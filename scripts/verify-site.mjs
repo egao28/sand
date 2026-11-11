@@ -19,7 +19,8 @@
  */
 import { existsSync } from 'node:fs'
 import { spawn } from 'node:child_process'
-import { createHash } from 'node:crypto'
+// Only used by the resume PDF check below, which is commented out with it.
+// import { createHash } from 'node:crypto'
 import puppeteer from 'puppeteer-core'
 
 const PORT = Number(process.env.VERIFY_PORT ?? 4178)
@@ -54,10 +55,13 @@ const ROUTES = [
   ['/contact', '.contact-form'],
 ]
 
-/* `/resume` is deliberately not in ROUTES: since #70 it is a redirect to the
- * PDF, so visiting it and then asking what rendered would be asking the PDF.
- * It gets its own check further down. */
-const RESUME_PATH = '/resume'
+// Resume is hidden for now (its nav entry and `/resume` route are commented
+// out in src/data/siteContent.js and src/App.jsx), so these checks have
+// nothing to assert against. Uncomment them with it.
+// /* `/resume` is deliberately not in ROUTES: since #70 it is a redirect to the
+//  * PDF, so visiting it and then asking what rendered would be asking the PDF.
+//  * It gets its own check further down. */
+// const RESUME_PATH = '/resume'
 
 /** `projects.listingOnly` entries carry an `id`, never a `slug`, so none of
  * them may resolve a project URL. If one ever does, a listing card has quietly
@@ -86,7 +90,8 @@ const RAIL = [
   ['about', 'page'],
   ['projects', 'page'],
   ['contact', 'page'],
-  ['resume', 'download'],
+  // Resume is hidden for now; uncomment with its nav entry.
+  // ['resume', 'download'],
   ['github', 'external'],
   ['linkedin', 'external'],
 ]
@@ -369,7 +374,8 @@ await new Promise((r) => setTimeout(r, 400))
 const MOVERS = {
   about: '.nav-icon-about-arm',
   projects: '.nav-icon-pinwheel',
-  resume: '.nav-icon-resume-page',
+  // Resume is hidden for now; uncomment with its nav entry.
+  // resume: '.nav-icon-resume-page',
   contact: '.nav-icon-contact-letter',
   github: '.nav-icon-github-branch',
   linkedin: '.nav-icon-linkedin-dot',
@@ -416,22 +422,28 @@ check(
   `keyboard focus plays the motion too (${focusMoved.before} -> ${focusMoved.after})`
 )
 
-console.log('\n# /resume still resolves, and it resolves to the PDF')
+// Resume is hidden for now (its nav entry and `/resume` route are commented
+// out in src/data/siteContent.js and src/App.jsx), so these checks have
+// nothing to assert against. Uncomment them with it.
+// console.log('\n# /resume still resolves, and it resolves to the PDF')
+// await page.setViewport({ width: 1440, height: 900 })
+// await page.goto(BASE + RESUME_PATH, { waitUntil: 'networkidle0' })
+// const landed = page.url()
+// check(
+//   landed.endsWith('.pdf') && landed.startsWith(BASE),
+//   `${RESUME_PATH} lands on a same-origin PDF (${landed.replace(BASE, '')})`
+// )
+// const pdf = await fetch(landed)
+// const pdfHead = Buffer.from(await pdf.arrayBuffer())
+//   .subarray(0, 5)
+//   .toString()
+// check(
+//   pdf.ok && pdfHead === '%PDF-',
+//   `that PDF is a real PDF, not a placeholder (${pdf.status}, starts ${JSON.stringify(pdfHead)})`
+// )
+// The viewport the block above set is kept: the checks below were written
+// against 1440x900.
 await page.setViewport({ width: 1440, height: 900 })
-await page.goto(BASE + RESUME_PATH, { waitUntil: 'networkidle0' })
-const landed = page.url()
-check(
-  landed.endsWith('.pdf') && landed.startsWith(BASE),
-  `${RESUME_PATH} lands on a same-origin PDF (${landed.replace(BASE, '')})`
-)
-const pdf = await fetch(landed)
-const pdfHead = Buffer.from(await pdf.arrayBuffer())
-  .subarray(0, 5)
-  .toString()
-check(
-  pdf.ok && pdfHead === '%PDF-',
-  `that PDF is a real PDF, not a placeholder (${pdf.status}, starts ${JSON.stringify(pdfHead)})`
-)
 
 console.log('\n# the theme choice survives a reload')
 await visit('/about')
@@ -580,49 +592,52 @@ for (const [path, w, h] of [
   )
 }
 
-console.log('\n# the resume download is the new file, everywhere it is offered')
-await visit('/about', 1440, 900)
-const resumeHrefs = await page.evaluate(() => {
-  const all = [...document.querySelectorAll('a[download]')]
-  return {
-    count: all.length,
-    hrefs: [...new Set(all.map((a) => a.getAttribute('href')))],
-    names: [...new Set(all.map((a) => a.getAttribute('download')))],
-  }
-})
-check(
-  resumeHrefs.hrefs.length === 1,
-  `every download entry points at one file (${resumeHrefs.count} links, ${resumeHrefs.hrefs.join(', ')})`
-)
-check(
-  resumeHrefs.names.length === 1 && resumeHrefs.names[0] === 'Evelyn_Gao_Resume.pdf',
-  `and all save as Evelyn_Gao_Resume.pdf (${resumeHrefs.names.join(', ')})`
-)
-check(
-  /-[A-Za-z0-9_-]{8,}\.pdf$/.test(resumeHrefs.hrefs[0]),
-  `the published name carries a content hash, so no cache can serve the old one (${resumeHrefs.hrefs[0]})`
-)
-
-const EXPECTED_PDF_SHA = '2f5bf9768255ce997f7e13465c6561c95aa04a0b2d74482805a8dd7570f22b7b'
-/* The nav's own href, and the file `/resume` ends up on. The second one has to
- * be read by driving the browser: `/resume` is a client-side route that hands
- * over to the PDF from JavaScript, so fetching it directly returns the app
- * shell rather than following anything. */
-await page.goto(BASE + RESUME_PATH, { waitUntil: 'networkidle0' })
-const legacyLanded = page.url().replace(BASE, '')
-
-for (const [label, from] of [
-  ['the nav download', resumeHrefs.hrefs[0]],
-  [`${RESUME_PATH} (via ${legacyLanded})`, legacyLanded],
-]) {
-  const res = await fetch(BASE + from)
-  const bytes = Buffer.from(await res.arrayBuffer())
-  const sha = createHash('sha256').update(bytes).digest('hex')
-  check(
-    sha === EXPECTED_PDF_SHA,
-    `${label} delivers the handoff PDF (${bytes.length} bytes, sha256 ${sha.slice(0, 16)}…)`
-  )
-}
+// Resume is hidden for now (its nav entry and `/resume` route are commented
+// out in src/data/siteContent.js and src/App.jsx), so these checks have
+// nothing to assert against. Uncomment them with it.
+// console.log('\n# the resume download is the new file, everywhere it is offered')
+// await visit('/about', 1440, 900)
+// const resumeHrefs = await page.evaluate(() => {
+//   const all = [...document.querySelectorAll('a[download]')]
+//   return {
+//     count: all.length,
+//     hrefs: [...new Set(all.map((a) => a.getAttribute('href')))],
+//     names: [...new Set(all.map((a) => a.getAttribute('download')))],
+//   }
+// })
+// check(
+//   resumeHrefs.hrefs.length === 1,
+//   `every download entry points at one file (${resumeHrefs.count} links, ${resumeHrefs.hrefs.join(', ')})`
+// )
+// check(
+//   resumeHrefs.names.length === 1 && resumeHrefs.names[0] === 'Evelyn_Gao_Resume.pdf',
+//   `and all save as Evelyn_Gao_Resume.pdf (${resumeHrefs.names.join(', ')})`
+// )
+// check(
+//   /-[A-Za-z0-9_-]{8,}\.pdf$/.test(resumeHrefs.hrefs[0]),
+//   `the published name carries a content hash, so no cache can serve the old one (${resumeHrefs.hrefs[0]})`
+// )
+//
+// const EXPECTED_PDF_SHA = '2f5bf9768255ce997f7e13465c6561c95aa04a0b2d74482805a8dd7570f22b7b'
+// /* The nav's own href, and the file `/resume` ends up on. The second one has to
+//  * be read by driving the browser: `/resume` is a client-side route that hands
+//  * over to the PDF from JavaScript, so fetching it directly returns the app
+//  * shell rather than following anything. */
+// await page.goto(BASE + RESUME_PATH, { waitUntil: 'networkidle0' })
+// const legacyLanded = page.url().replace(BASE, '')
+//
+// for (const [label, from] of [
+//   ['the nav download', resumeHrefs.hrefs[0]],
+//   [`${RESUME_PATH} (via ${legacyLanded})`, legacyLanded],
+// ]) {
+//   const res = await fetch(BASE + from)
+//   const bytes = Buffer.from(await res.arrayBuffer())
+//   const sha = createHash('sha256').update(bytes).digest('hex')
+//   check(
+//     sha === EXPECTED_PDF_SHA,
+//     `${label} delivers the handoff PDF (${bytes.length} bytes, sha256 ${sha.slice(0, 16)}…)`
+//   )
+// }
 
 console.log('\n# the contact form, against a stubbed endpoint')
 /* The endpoint is intercepted here, so running this sends no mail to anyone.
@@ -1068,7 +1083,10 @@ console.log('\n# /about never plays the opening')
 await visit('/about')
 check(!(await page.$('.opening-scene')), '/about has no opening scene')
 
-console.log('\n# the rail groups three pages, then three actions, then the theme')
+// Resume is hidden for now, so the nav is one entry shorter. Restore the
+// commented line and drop the one under it when its entry comes back.
+// console.log('\n# the rail groups three pages, then three actions, then the theme')
+console.log('\n# the rail groups three pages, then two actions, then the theme')
 await visit('/about', 1440, 900)
 const grouping = await page.evaluate(() => {
   const items = [...document.querySelectorAll('.site-rail-item')]
@@ -1093,12 +1111,22 @@ const grouping = await page.evaluate(() => {
     radius: getComputedStyle(document.querySelector('.site-rail-link')).borderRadius,
   }
 })
+// Resume is hidden for now, so the nav is one entry shorter. Restore the
+// commented line and drop the one under it when its entry comes back.
+// check(
+//   grouping.groups.join(',') === 'pages,pages,pages,tools,tools,tools',
+//   `three pages then three actions (${grouping.groups.join(', ')})`
+// )
+// check(
+//   grouping.gaps.join(',') === '12,12,24,12,12',
+//   `gaps are 12/12 inside the groups and 24 between them (${grouping.gaps.join(', ')})`
+// )
 check(
-  grouping.groups.join(',') === 'pages,pages,pages,tools,tools,tools',
-  `three pages then three actions (${grouping.groups.join(', ')})`
+  grouping.groups.join(',') === 'pages,pages,pages,tools,tools',
+  `three pages then two actions (${grouping.groups.join(', ')})`
 )
 check(
-  grouping.gaps.join(',') === '12,12,24,12,12',
+  grouping.gaps.join(',') === '12,12,24,12',
   `gaps are 12/12 inside the groups and 24 between them (${grouping.gaps.join(', ')})`
 )
 check(grouping.themeGap === 16, `the theme button follows at 16px (${grouping.themeGap}px)`)
@@ -1123,7 +1151,10 @@ const rules = await page.evaluate(
 )
 check(rules === 0, `no frame, divider or shadow anywhere in the rail (${rules} found)`)
 
-console.log('\n# the compact bar is seven icons, not a row of words')
+// Resume is hidden for now, so the nav is one entry shorter. Restore the
+// commented line and drop the one under it when its entry comes back.
+// console.log('\n# the compact bar is seven icons, not a row of words')
+console.log('\n# the compact bar is six icons, not a row of words')
 await visit('/about', 390, 844)
 const bar = await page.evaluate(() => {
   const links = [...document.querySelectorAll('.site-topbar-link')]
@@ -1172,10 +1203,16 @@ const bar = await page.evaluate(() => {
     shadow: getComputedStyle(document.querySelector('.site-topbar')).boxShadow,
   }
 })
-check(bar.count === 7, `seven controls in the bar (${bar.count})`)
+// Resume is hidden for now, so the nav is one entry shorter. Restore the
+// commented line and drop the one under it when its entry comes back.
+// check(bar.count === 7, `seven controls in the bar (${bar.count})`)
+check(bar.count === 6, `six controls in the bar (${bar.count})`)
 check(bar.logo, 'the original logo is on its own row above them')
 check(bar.visibleText === 0, `none of them paints a word (${bar.visibleText} with text)`)
-check(bar.names === 7, `all seven keep an accessible name (${bar.names})`)
+// Resume is hidden for now, so the nav is one entry shorter. Restore the
+// commented line and drop the one under it when its entry comes back.
+// check(bar.names === 7, `all seven keep an accessible name (${bar.names})`)
+check(bar.names === 6, `all six keep an accessible name (${bar.names})`)
 check(
   bar.hits.every(([w, h]) => w >= 44 && h >= 44),
   `every tap target is at least 44x44 (${bar.hits.map((h) => h.join('x')).join(' ')})`
@@ -1184,8 +1221,14 @@ check(
   bar.icons.every((i) => i && i[0] === '28' && i[1] === '28'),
   `every icon is 28x28 (${JSON.stringify(bar.icons)})`
 )
+// Resume is hidden for now, so the nav is one entry shorter. Restore the
+// commented line and drop the one under it when its entry comes back.
+// check(
+//   bar.gaps.join(',') === '0,0,8,0,0' && bar.themeGap === 8,
+//   `8px between the groups and before the theme (${bar.gaps.join(',')} then ${bar.themeGap})`
+// )
 check(
-  bar.gaps.join(',') === '0,0,8,0,0' && bar.themeGap === 8,
+  bar.gaps.join(',') === '0,0,8,0' && bar.themeGap === 8,
   `8px between the groups and before the theme (${bar.gaps.join(',')} then ${bar.themeGap})`
 )
 check(bar.edge === '12px', `12px down each side of the bar (${bar.edge})`)
@@ -1224,7 +1267,12 @@ check(
   `at 320px the targets are still 44px wide (${narrow.hits.join(' ')})`
 )
 check(narrow.rows === 1, `and still on one line (${narrow.rows} line(s))`)
-check(narrow.scrollable, 'the row scrolls sideways instead')
+// Resume is hidden for now, so six controls fit at 320px and there is nothing
+// left to scroll. The two checks above still hold the line that matters — 44px
+// targets, one row. Restore the commented check and drop the one under it when
+// the Resume entry comes back.
+// check(narrow.scrollable, 'the row scrolls sideways instead')
+check(!narrow.scrollable, 'and the six of them fit at 320px without scrolling')
 
 console.log('\n# the opening carries the logo and the theme control, and nothing else')
 await visit('/', 1440, 900)
@@ -1242,9 +1290,12 @@ const opening = await page.evaluate(() => {
 })
 check(opening.navOpacity === '0', `the six entries are not painted (opacity ${opening.navOpacity})`)
 check(opening.inert, 'and the nav is inert, so Tab cannot reach them')
+/* Both ends of the range. `< 48` alone passes when the button has been carried
+ * *too* far up and is sitting on the logo — a negative gap is still less than
+ * 48 — which is exactly what a stale `--rail-nav-height` does. */
 check(
-  opening.themeBelowLogo < 48,
-  `the theme button sits right under the logo, not below a gap (${opening.themeBelowLogo}px)`
+  opening.themeBelowLogo >= 0 && opening.themeBelowLogo < 48,
+  `the theme button sits right under the logo, neither below a gap nor on top of it (${opening.themeBelowLogo}px)`
 )
 
 /* Scroll past the handover: the nav arrives whole and the button comes down. */

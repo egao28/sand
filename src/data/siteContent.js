@@ -1,4 +1,7 @@
-import resumePdf from '../../resume.pdf'
+// Resume is hidden for now, so nothing imports the PDF. The file is still in
+// the repo: uncomment this line together with the nav entry below to bring the
+// download back.
+// import resumePdf from '../../resume.pdf'
 
 // Proxima's one public deployment. Declared once so the /projects card and the
 // detail page's "Try it here" panel cannot drift onto different URLs.
@@ -26,10 +29,11 @@ const CARELINK_DEMO = {
 }
 
 export const siteContent = {
-  // The six entries in the nav, in the order the rail and the compact bar
-  // both render them. The logo is not one of them: it is what returns to the
-  // opening, so there is no Home entry. The theme button is not one either —
-  // it is a button, not a destination, and SiteNav renders it after this list.
+  // The six entries in the nav — five while Resume is commented out below — in
+  // the order the rail and the compact bar both render them. The logo is not
+  // one of them: it is what returns to the opening, so there is no Home entry.
+  // The theme button is not one either — it is a button, not a destination, and
+  // SiteNav renders it after this list.
   //
   // Three kinds of entry, and the kind is what decides the rest:
   //
@@ -61,16 +65,23 @@ export const siteContent = {
       },
       { id: 'projects', label: 'Projects', to: '/projects', match: ['/projects'], group: 'pages' },
       { id: 'contact', label: 'Contact', to: '/contact', match: ['/contact'], group: 'pages' },
-      {
-        id: 'resume',
-        label: 'Resume',
-        // The real PDF in the repo, hashed through the bundler like any other
-        // asset, so this is same-origin and `download` is honoured. There is
-        // no Resume page: the entry is the download.
-        href: resumePdf,
-        download: 'Evelyn_Gao_Resume.pdf',
-        group: 'tools',
-      },
+      // Resume is hidden for now: commented out rather than removed, so
+      // bringing it back is uncommenting this block, the import at the top of
+      // this file, the route and redirect in src/App.jsx, the link in
+      // src/pages/NotFoundPage.jsx, the URL in public/sitemap.xml and the
+      // checks in scripts/verify-site.mjs. Nothing else has to move: the group
+      // spacing is an adjacent-sibling rule, so GitHub simply becomes the first
+      // entry of the tools group.
+      // {
+      //   id: 'resume',
+      //   label: 'Resume',
+      //   // The real PDF in the repo, hashed through the bundler like any
+      //   // other asset, so this is same-origin and `download` is honoured.
+      //   // There is no Resume page: the entry is the download.
+      //   href: resumePdf,
+      //   download: 'Evelyn_Gao_Resume.pdf',
+      //   group: 'tools',
+      // },
       {
         id: 'github',
         label: 'GitHub',

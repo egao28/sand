@@ -17,12 +17,17 @@ single-page app; no backend.
 | `/experience/bloom-mcp`       | Salk Institute — MCP platform for scientific analyses, 2026                  |
 | `/experience/sony`            | Sony — CS operations & maintenance intern, 2025                              |
 | `/experience/tsinghua`        | Tsinghua — vehicle emission spatiotemporal modeling, 2024–25                 |
-| `/resume`                     | `resume.pdf` download with its last-updated date                             |
+| `/resume`                     | Hidden for now — commented out with the nav Resume entry                     |
 | `/contact`                    | Contact details and the message form                                         |
 
 Navigation is the five icons in the left rail — About, Projects, Resume, Contact, GitHub —
 with the logo above them returning to the opening. Under 900px the rail is replaced by a
 compact top bar and GitHub moves to the end of About. Anything off-route lands on a 404 page.
+
+Resume is hidden for now. Its nav entry, the `/resume` route and the links that pointed at it
+are commented out rather than deleted — in `src/data/siteContent.js`, `src/App.jsx`,
+`src/pages/NotFoundPage.jsx`, `public/sitemap.xml` and `scripts/verify-site.mjs` — so bringing
+it back is uncommenting them together. `resume.pdf` itself is untouched.
 
 ## Editing it
 

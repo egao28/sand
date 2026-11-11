@@ -25,13 +25,19 @@
   /* Between the logo and the first entry. */
   --rail-nav-top: 28px;
 
-  /* The height of the six entries and the gaps between them, derived from the
-     four numbers above rather than written out: 6 hit areas, 4 within-group
-     gaps and the one group gap. The opening reads it to carry the theme button
-     up under the logo while the entries are hidden, so a change to any of the
-     spacing tokens above has to move that with it — which is exactly what
-     deriving it does. */
-  --rail-nav-height: calc(6 * var(--rail-hit) + 4 * var(--rail-gap) + var(--rail-group-gap));
+  /* The height of the entries and the gaps between them, derived from the four
+     numbers above rather than written out. The opening reads it to carry the
+     theme button up under the logo while the entries are hidden, so a change
+     to any of the spacing tokens above has to move that with it — which is
+     exactly what deriving it does.
+
+     It is derived from the spacing but not from the count, so hiding an entry
+     has to be followed here too: five entries while Resume is commented out of
+     src/data/siteContent.js, so 5 hit areas, 3 within-group gaps and the one
+     group gap. Left at six it lifts the button 60px too far and lands it on
+     the logo. Restore the commented line with that entry. */
+  /* --rail-nav-height: calc(6 * var(--rail-hit) + 4 * var(--rail-gap) + var(--rail-group-gap)); */
+  --rail-nav-height: calc(5 * var(--rail-hit) + 3 * var(--rail-gap) + var(--rail-group-gap));
 
   /* The content inset. Wide enough that the rail never sits over the text, and
      the same on every route so the left edge does not move as you navigate. */

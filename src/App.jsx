@@ -74,34 +74,39 @@ function ScrollToTop() {
   return null
 }
 
-/** `/resume` was a page with a download on it until #70 put the download on the
- * nav entry itself. The URL has been linked and shared, so it still has to
- * resolve — it hands over the same PDF rather than 404ing.
- *
- * `location.replace`, not a router <Navigate>: the target is a file the
- * bundler hashes, not a route, so react-router has nothing to navigate to. It
- * also leaves no entry in the history, so Back goes where the visitor came
- * from instead of bouncing them through this redirect again.
- */
-function ResumeRedirect() {
-  const href = siteContent.nav.items.find((item) => item.id === 'resume')?.href
-
-  useEffect(() => {
-    if (href) window.location.replace(href)
-  }, [href])
-
-  return (
-    <main className="page page--secondary resume-redirect">
-      <p className="resume-redirect-note">
-        Opening the resume PDF.{' '}
-        <a href={href} download="Evelyn_Gao_Resume.pdf">
-          Download it directly
-        </a>{' '}
-        if nothing happens.
-      </p>
-    </main>
-  )
-}
+// Resume is hidden for now. The nav entry it reads the PDF from is commented
+// out in src/data/siteContent.js, so there is nothing for this to hand over —
+// it is commented out with its <Route> below rather than removed. Uncomment
+// both together with that entry.
+//
+// /** `/resume` was a page with a download on it until #70 put the download on the
+//  * nav entry itself. The URL has been linked and shared, so it still has to
+//  * resolve — it hands over the same PDF rather than 404ing.
+//  *
+//  * `location.replace`, not a router <Navigate>: the target is a file the
+//  * bundler hashes, not a route, so react-router has nothing to navigate to. It
+//  * also leaves no entry in the history, so Back goes where the visitor came
+//  * from instead of bouncing them through this redirect again.
+//  */
+// function ResumeRedirect() {
+//   const href = siteContent.nav.items.find((item) => item.id === 'resume')?.href
+//
+//   useEffect(() => {
+//     if (href) window.location.replace(href)
+//   }, [href])
+//
+//   return (
+//     <main className="page page--secondary resume-redirect">
+//       <p className="resume-redirect-note">
+//         Opening the resume PDF.{' '}
+//         <a href={href} download="Evelyn_Gao_Resume.pdf">
+//           Download it directly
+//         </a>{' '}
+//         if nothing happens.
+//       </p>
+//     </main>
+//   )
+// }
 
 /** `/#contact` was the contact section's address until #66 moved it to its own
  * page. Old links still arrive here, so send them on rather than dropping them
@@ -158,7 +163,8 @@ function Shell() {
           <Route path="/experience/sony" element={<SonyDetailPage />} />
           <Route path="/experience/tsinghua" element={<TsinghuaDetailPage />} />
           <Route path="/experience/:slug" element={<ExperienceDetailPage />} />
-          <Route path="/resume" element={<ResumeRedirect />} />
+          {/* Hidden with the nav entry; `/resume` falls through to the 404 page. */}
+          {/* <Route path="/resume" element={<ResumeRedirect />} /> */}
           <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

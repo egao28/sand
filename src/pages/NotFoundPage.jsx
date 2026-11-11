@@ -5,7 +5,9 @@ const LINKS = [
   { to: '/', label: 'Home' },
   { to: '/about', label: 'About' },
   { to: '/projects', label: 'Projects' },
-  { to: '/resume', label: 'Resume' },
+  // Hidden with the nav entry in src/data/siteContent.js: the route is
+  // commented out, so this link would only land back on this page.
+  // { to: '/resume', label: 'Resume' },
 ]
 
 export default function NotFoundPage() {
